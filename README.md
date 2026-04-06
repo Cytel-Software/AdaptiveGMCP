@@ -5,7 +5,7 @@
 You can install the AdaptGMCP package in R directly from the GitHub repository using the `remotes` package:
 
 ```R
-remotes::install_github("Cytel-Inc/AdaptiveGMCP", ref = "master")
+remotes::install_github("Cytel-Software/AdaptiveGMCP", ref = "master")
 ```
 
 This will download and install the latest version of the package from the master branch.
@@ -55,7 +55,7 @@ The binary and mixed endpoint engine is currently undergoing testing. We welcome
 
 **How to report bugs or observations:**
 
-1. Go to the [Issues](https://github.com/Cytel-Inc/AdaptiveGMCP/issues) section of the GitHub repository.
+1. Go to the [Issues](https://github.com/Cytel-Software/AdaptiveGMCP/issues) section of the GitHub repository.
 2. Click on the "New issue" button.
 3. Provide a clear and descriptive title for your issue.
 4. In the description, include as much detail as possible, such as:
