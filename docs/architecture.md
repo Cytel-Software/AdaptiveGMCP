@@ -1,95 +1,26 @@
-# Architecture — Non-interactive analysis interface (PC / inverse-normal combination)
+# Architecture & Data Conventions — AdaptiveGMCP
 
-## Context
-The exported function `adaptGMCP_PC()` performs multi-look graphical multiple testing with closed testing and inverse-normal p-value combination across looks. Today it is implemented as an interactive console workflow (via `readline()`), which blocks:
+## Architecture
+- Simulation flow: `simMAMSMEP` builds a `gmcpSimObj` and drives per-look simulation and selection; see [R/MAMSMEP_SIMULATION_MAIN.R](../R/MAMSMEP_SIMULATION_MAIN.R) and wrapper in [R/simMAMSMEP_Wrapper.R](../R/simMAMSMEP_Wrapper.R).
+- Analysis flows:
+  - CER method: [R/cerAdaptGMCP_Analysis.R](../R/cerAdaptGMCP_Analysis.R) — stage 1/2 analysis with conditional error computation and optional adaptation.
+  - P‑value combination: [R/pValueAdaptGMCP_Analysis.R](../R/pValueAdaptGMCP_Analysis.R) — inverse normal combination with rpact boundaries.
+- Graph visualization: [R/graphPlot.R](../R/graphPlot.R) renders visNetwork graphs of hypotheses, weights, and transitions.
+- Shiny app: `AdaptGMCPSimApp` is the exported entry point; UI/server defined in [inst/shinyApps/AdaptGMCPSimApp.R](../inst/shinyApps/AdaptGMCPSimApp.R). Modules in the same folder:
+  - `tabularModule.R` — tabular input/output
+  - `correlationMatrixModule.R` — correlation matrix editor
+  - `transitionMatrixModule.R` — graph transition matrix editor
+  - `IAModule.R` — interim analysis configuration
+  - `helper_inputDataCsv.R` — CSV upload helpers
 
-- Batch processing of multiple analysis cases
-- Writing fully scripted, end-to-end analysis pipelines
-- Unit testing against deterministic inputs
+## Data & Hypothesis Conventions
+- Hypothesis ordering: order by endpoint, then treatment (iterate treatments within each endpoint; e.g., for 2 trts × 3 eps: H1=EP1/T1, H2=EP1/T2, H3=EP2/T1, H4=EP2/T2, H5=EP3/T1, H6=EP3/T2). See UI note in [inst/shinyApps/AdaptGMCPSimApp.R](../inst/shinyApps/AdaptGMCPSimApp.R) and `WI`/`G` usage across functions.
+- Weights and transitions: `WI` (initial weights) and `G` (transition matrix) drive intersection weights via `genWeights()`; conventions are consistent across simulation and analyses.
+- Info fraction and allocation: `info_frac` is cumulative per-look; `simMAMSMEP` normalizes `Arms.alloc.ratio` so control equals 1.
+- Two-arm constraint: For 2 arms, parametric tests are auto-downgraded (Bonferroni / Non‑Parametric); see logic in [R/MAMSMEP_SIMULATION_MAIN.R](../R/MAMSMEP_SIMULATION_MAIN.R).
 
-## Goals
-- Preserve backward compatibility: **do not modify** existing exported functions.
-- Provide a fully non-interactive analysis interface.
-- Implement a stateless pipeline: each step takes an explicit state object + new inputs and returns updated state.
-
-## Non-goals
-- Refactoring the legacy interactive `adaptGMCP_PC()` implementation.
-- Changing the core mathematics.
-- Implementing the CER method in this change (can be done later using the same pattern).
-
-## Design overview
-### API surface
-Three new exported functions implement the workflow:
-
-- `SetupAnalysis_PC()`
-  - Creates a "PCAnalysisState" object.
-  - Computes design boundaries (rpact), intersection weights (`genWeights()`), and inverse-normal weights.
-
-- `AnalyzeLook_PC(state, p_raw, ...)`
-  - Advances the analysis by exactly one look.
-  - Optional (look > 1) pre-analysis updates:
-    - `selection` (drop/retain hypotheses)
-    - `new_weights` + `new_G` (strategy update)
-    - `new_correlation` (correlation update)
-
-- `PlotAnalysisGraph(state, stage)`
-  - Plots the graph from the current state or from historical snapshots.
-
-Additionally, S3 methods exist for convenience:
-- `print.PCAnalysisState()` — prints design + per-look results so far
-- `plot.PCAnalysisState()` — plots the current graph
-
-### Stateless workflow
-All mutable information is carried in the returned object. There is no hidden global state.
-
-Recommended usage:
-1. `state <- SetupAnalysis_PC(...)`
-2. For each look `k`:
-   - `state <- AnalyzeLook_PC(state, p_raw = ..., selection = ..., new_weights = ..., new_G = ..., new_correlation = ...)`
-
-## State object
-Class: `PCAnalysisState` (S3)
-
-Key fields:
-- `mcpObj`: internal list mirroring the legacy `mcpObj` structure used by `PerLookMCPAnalysis()`.
-- `setup_mcpObj`: snapshot of the setup state to support plotting the initial graph.
-- `thresholds`: stage-wise p-value thresholds.
-- `mvtnorm_algo`: algorithm object from `chooseMVTAlgo()`.
-- `completed_looks`: integer.
-- `trial_completed`: logical — TRUE when no active hypotheses remain.
-- `look_history`: list of per-look snapshots (stores the `mcpObj` after each analysis and the inputs used).
-
-## Termination behavior
-The pipeline stops when further analysis is impossible.
-
-Hard stops:
-- `trial_completed == TRUE` (all hypotheses rejected or dropped)
-- `completed_looks == LastLook` (all planned looks completed)
-
-Unlike the interactive workflow (which has user-driven continuation), the non-interactive workflow does not prompt; users control the flow by deciding whether to call `AnalyzeLook_PC()` again.
-
-## Reuse of existing core computations
-The non-interactive interface deliberately reuses existing internal functions without modification:
-- `PerLookMCPAnalysis()`
-- `addNAPvalue()`
-- `modifyIntersectWeights()`
-- `genWeights()`
-- `chooseMVTAlgo()`
-- `plotGraph()`
-
-This limits risk and ensures numerical parity with `adaptGMCP_PC()`.
-
-## Testing approach
-The legacy function is interactive and cannot be called directly from automated tests.
-
-Strategy:
-- Add **test scaffolds** for the new API using deterministic inputs.
-- Gate tests behind an option (skipped by default), and leave TODO placeholders for expected outputs.
-- A developer can run `adaptGMCP_PC()` manually for each test scenario and paste expected results into the tests, then enable execution.
-
-## Files
-- R/pc_analysis_state.R
-- R/pc_analysis_helpers.R
-- R/pc_analysis_api.R
-- tests/testthat/test-pc_analysis_api.R
-- internalData/PC_Analysis_NonInteractive_Example.R
+## External Dependencies
+- rpact: group sequential design boundaries and alpha spending (used to derive `stageLevels` and `alphaSpent`).
+- Core runtime: `data.table`, `dplyr`, `mvtnorm`, `Matrix`, `matrixcalc`, `parallel`, `stringr`.
+- Visualization/UI: `visNetwork`, `ggplot2`, `gridExtra`, `shiny`, `rhandsontable`, `htmltools`, `shinycssloaders`.
+- See [DESCRIPTION](../DESCRIPTION) for full `Imports`/`Suggests`.

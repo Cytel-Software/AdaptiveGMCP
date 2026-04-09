@@ -49,6 +49,15 @@ For detailed usage and arguments of each function, please refer to the help sect
   ?adaptGMCP_PC
   ```
 
+### `AdaptGMCPSimApp` (Shiny App)
+
+- **How to launch:**
+  ```R
+  library(AdaptGMCP)
+  AdaptGMCPSimApp()
+  ```
+- **Description:** Interactive Shiny application for configuring and running adaptive GMCP simulations without writing code. Provides UI modules for hypothesis graphs, correlation/transition matrices, and interim analysis settings.
+
 ## Note
 
 The binary and mixed endpoint engine is currently undergoing testing. We welcome your feedback to help improve the R package.
