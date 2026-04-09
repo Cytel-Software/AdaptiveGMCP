@@ -278,3 +278,82 @@ testthat::test_that("Test 3: PC analysis API scaffolds (full transition at look 
   g <- PlotAnalysisGraph(state, stage = 2)
   testthat::expect_true(!is.null(g))
 })
+
+############
+# Test: look argument validation
+testthat::test_that("AnalyzeLook_PC: look argument validation and error handling", {
+  # Minimal 2-hypothesis, 2-look setup (no option guard needed — tests error conditions and
+  # completed_looks only, not specific computed output values)
+  wi <- c(0.5, 0.5)
+  g <- matrix(c(0, 1, 1, 0), byrow = TRUE, nrow = 2)
+  corr <- matrix(c(1, 0.5, 0.5, 1), byrow = TRUE, nrow = 2)
+
+  state0 <- SetupAnalysis_PC(
+    WI = wi,
+    G = g,
+    test.type = "Partly-Parametric",
+    alpha = 0.025,
+    info_frac = c(0.5, 1.0),
+    Correlation = corr,
+    plotGraphs = FALSE
+  )
+
+  # --- Pure validation errors (fired before any computation) ---
+
+  # look mismatch: state expects look 1, user passes look = 2
+  testthat::expect_error(
+    AnalyzeLook_PC(state0, p_raw = c(H1 = 0.10, H2 = 0.20), look = 2L, plotGraphs = FALSE),
+    regexp = "does not match the expected next look"
+  )
+
+  # look is non-numeric
+  testthat::expect_error(
+    AnalyzeLook_PC(state0, p_raw = c(H1 = 0.10, H2 = 0.20), look = "a", plotGraphs = FALSE),
+    regexp = "single positive integer"
+  )
+
+  # look is non-integer numeric (1.5)
+  testthat::expect_error(
+    AnalyzeLook_PC(state0, p_raw = c(H1 = 0.10, H2 = 0.20), look = 1.5, plotGraphs = FALSE),
+    regexp = "single positive integer"
+  )
+
+  # look = 0 (not positive)
+  testthat::expect_error(
+    AnalyzeLook_PC(state0, p_raw = c(H1 = 0.10, H2 = 0.20), look = 0L, plotGraphs = FALSE),
+    regexp = "single positive integer"
+  )
+
+  # --- Correct usage ---
+
+  # look = NULL (default): proceeds normally and completed_looks advances
+  state1_null <- AnalyzeLook_PC(state0, p_raw = c(H1 = 0.10, H2 = 0.20), look = NULL, plotGraphs = FALSE)
+  testthat::expect_equal(state1_null$completed_looks, 1L)
+
+  # look = 1L (correct explicit value): same result as omitting look
+  state1_expl <- AnalyzeLook_PC(state0, p_raw = c(H1 = 0.10, H2 = 0.20), look = 1L, plotGraphs = FALSE)
+  testthat::expect_equal(state1_expl$completed_looks, 1L)
+
+  # --- After final look: specific "final look" error ---
+
+  # Run look 2 to complete the trial
+  state2 <- AnalyzeLook_PC(state1_null, p_raw = c(H1 = 0.10, H2 = 0.20), look = 2L, plotGraphs = FALSE)
+  testthat::expect_true(state2$trial_completed)
+
+  # Calling again after final look must name the final look in the error message
+  testthat::expect_error(
+    AnalyzeLook_PC(state2, p_raw = c(H1 = 0.10, H2 = 0.20), plotGraphs = FALSE),
+    regexp = "was the final look"
+  )
+
+  # --- Early stopping: "all hypotheses rejected or dropped" error ---
+
+  # Simulate early-stopped state (trial_completed = TRUE before the final look is reached)
+  state_early_stopped <- state1_null
+  state_early_stopped$trial_completed <- TRUE   # completed_looks (1) < LastLook (2)
+
+  testthat::expect_error(
+    AnalyzeLook_PC(state_early_stopped, p_raw = c(H1 = 0.10, H2 = 0.20), plotGraphs = FALSE),
+    regexp = "all hypotheses have been rejected or dropped"
+  )
+})

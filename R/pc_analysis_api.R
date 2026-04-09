@@ -223,6 +223,11 @@ SetupAnalysis_PC <- function(
 #' @param state A "PCAnalysisState" object.
 #' @param p_raw Named numeric vector of raw p-values for the current look, for the
 #'   currently active hypotheses (state$mcpObj$IndexSet).
+#' @param look Optional positive integer explicitly naming the current look number.
+#'   When provided, it must match the look number implied by the state object
+#'   (i.e. \code{state$completed_looks + 1}). This argument exists purely for
+#'   readability of user scripts — it does not change program logic.
+#'   If \code{NULL} (default), the look number is inferred from the state.
 #' @param selection Optional character vector of hypotheses to retain for this look
 #'   (only meaningful when look > 1). NULL means no selection.
 #' @param new_weights Optional numeric vector of new weights for continuing hypotheses.
@@ -235,6 +240,7 @@ SetupAnalysis_PC <- function(
 AnalyzeLook_PC <- function(
     state,
     p_raw,
+    look = NULL,
     selection = NULL,
     new_weights = NULL,
     new_G = NULL,
@@ -243,14 +249,30 @@ AnalyzeLook_PC <- function(
   if (!inherits(state, "PCAnalysisState")) stop("state must be a PCAnalysisState object")
 
   if (isTRUE(state$trial_completed)) {
+    if (state$completed_looks >= state$mcpObj$LastLook) {
+      stop(
+        "Look ", state$mcpObj$LastLook, " was the final look — ",
+        "the trial analysis is already complete."
+      )
+    }
     stop("Trial already concluded — all hypotheses have been rejected or dropped.")
   }
 
   mcpObj <- state$mcpObj
   next_look <- as.integer(state$completed_looks + 1L)
 
-  if (next_look > mcpObj$LastLook) {
-    stop("All planned looks have been completed.")
+  if (!is.null(look)) {
+    if (!is.numeric(look) || length(look) != 1L || look != as.integer(look) || look < 1L) {
+      stop("look must be a single positive integer.")
+    }
+    look <- as.integer(look)
+    if (look != next_look) {
+      stop(
+        "look argument (", look, ") does not match the expected next look (",
+        next_look, ") based on the analysis state. ",
+        "The next look to be analyzed is look ", next_look, "."
+      )
+    }
   }
 
   # Apply optional changes before analyzing look > 1
