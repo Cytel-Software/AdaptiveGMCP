@@ -145,12 +145,12 @@ simMAMSMEP_Wrapper <- function(InputDF, sOutPath) {
 
   ## Uncomment this code block to save raw p-values to a CSV file
   # Save combined raw p-values to CSV if we have data
-  if (nrow(allRawPValues) > 0) {
-    timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
-    csvFilePath <- paste0("internalData/RawPValues_", timestamp, ".csv")
-    write.csv(allRawPValues, file = csvFilePath, row.names = FALSE)
-    cat("\nRaw p-values saved to:", csvFilePath, "\n")
-  }
+  # if (nrow(allRawPValues) > 0) {
+  #   timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
+  #   csvFilePath <- paste0("internalData/RawPValues_", timestamp, ".csv")
+  #   write.csv(allRawPValues, file = csvFilePath, row.names = FALSE)
+  #   cat("\nRaw p-values saved to:", csvFilePath, "\n")
+  # }
 
   return(dfOut)
 }
