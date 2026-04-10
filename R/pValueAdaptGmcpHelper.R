@@ -688,8 +688,11 @@ conn.comp <- function(m) {
       M <- c(M, w)
       Q <- setdiff(unique(c(Q, which(!is.na(m[w, ])))), M)
     }
+    out <- c(out, list(M))
+    N <- setdiff(N, M)
+    M <- numeric(0)
   }
-  return(cliques)
+  return(out)
 }
 #---------------------- -
 
