@@ -50,12 +50,12 @@ testthat::test_that("Test 1: PC analysis API scaffolds", {
 
   testthat::expect_equal(state$completed_looks, 1L)
 
-  exp_out <- readRDS("t1.l1.AdjPValues.rds")
+  exp_out <- readRDS(testthat::test_path("t1.l1.AdjPValues.rds"))
   expected_cols_look1 <- colnames(exp_out)
   testthat::expect_true(all(expected_cols_look1 %in% colnames(state$mcpObj$AdjPValues)))
   testthat::expect_equal(state$mcpObj$AdjPValues, exp_out)
 
-  exp_out <- readRDS("t1.l1.RejFlagCurr.rds")
+  exp_out <- readRDS(testthat::test_path("t1.l1.RejFlagCurr.rds"))
   testthat::expect_equal(state$mcpObj$rej_flag_Curr, exp_out)
 
   # Look 2 with selection
@@ -68,12 +68,12 @@ testthat::test_that("Test 1: PC analysis API scaffolds", {
 
   testthat::expect_equal(state$completed_looks, 2L)
 
-  exp_out <- readRDS("t1.l2.AdjPValues.rds")
+  exp_out <- readRDS(testthat::test_path("t1.l2.AdjPValues.rds"))
   expected_cols_look2 <- colnames(exp_out)
   testthat::expect_true(all(expected_cols_look2 %in% colnames(state$mcpObj$AdjPValues)))
   testthat::expect_equal(state$mcpObj$AdjPValues, exp_out)
 
-  exp_out <- readRDS("t1.l2.IndexSet.rds")
+  exp_out <- readRDS(testthat::test_path("t1.l2.IndexSet.rds"))
   testthat::expect_equal(state$mcpObj$IndexSet, exp_out)
 
   # Look 3
@@ -85,7 +85,7 @@ testthat::test_that("Test 1: PC analysis API scaffolds", {
 
   testthat::expect_equal(state$completed_looks, 3L)
 
-  exp_out <- readRDS("t1.l3.AdjPValues.rds")
+  exp_out <- readRDS(testthat::test_path("t1.l3.AdjPValues.rds"))
   expected_cols_look3 <- colnames(exp_out)
   testthat::expect_true(all(expected_cols_look3 %in% colnames(state$mcpObj$AdjPValues)))
   testthat::expect_equal(state$mcpObj$AdjPValues, exp_out)
@@ -151,7 +151,7 @@ testthat::test_that("Test 2: PC analysis API scaffolds (strategy modification)",
     plotGraphs = FALSE
   )
 
-  exp_out <- readRDS("t2.l1.AdjPValues.rds")
+  exp_out <- readRDS(testthat::test_path("t2.l1.AdjPValues.rds"))
   testthat::expect_equal(state$mcpObj$AdjPValues, exp_out)
 
   # Apply a strategy modification before analyzing look 2
@@ -174,12 +174,12 @@ testthat::test_that("Test 2: PC analysis API scaffolds (strategy modification)",
   testthat::expect_equal(state$completed_looks, 2L)
 
   # TODO: Debug this
-  exp_out <- readRDS("t2.l2.AdjPValues.rds")
+  exp_out <- readRDS(testthat::test_path("t2.l2.AdjPValues.rds"))
   testthat::expect_equal(state$mcpObj$AdjPValues, exp_out)
 
   # TODO: Debug this
   # browser()
-  exp_out <- readRDS("t2.l2.IndexSet.rds")
+  exp_out <- readRDS(testthat::test_path("t2.l2.IndexSet.rds"))
   testthat::expect_equal(state$mcpObj$IndexSet, exp_out)
 
   # Plot helper should run
@@ -228,7 +228,7 @@ testthat::test_that("Test 3: PC analysis API scaffolds (full transition at look 
     MultipleWinners = TRUE
   )
 
-  exp_out <- readRDS("t3.bdryTab.rds")
+  exp_out <- readRDS(testthat::test_path("t3.bdryTab.rds"))
   testthat::expect_equal(state$mcpObj$bdryTab, exp_out)
 
   # Look 1
@@ -238,7 +238,7 @@ testthat::test_that("Test 3: PC analysis API scaffolds (full transition at look 
     plotGraphs = FALSE
   )
 
-  exp_out <- readRDS("t3.l1.AdjPValues.rds")
+  exp_out <- readRDS(testthat::test_path("t3.l1.AdjPValues.rds"))
   testthat::expect_equal(state$mcpObj$AdjPValues, exp_out)
 
   # Full transition at look 2:
@@ -270,7 +270,7 @@ testthat::test_that("Test 3: PC analysis API scaffolds (full transition at look 
 
   testthat::expect_equal(state$completed_looks, 2L)
 
-  exp_out <- readRDS("t3.l2.AdjPValues.rds")
+  exp_out <- readRDS(testthat::test_path("t3.l2.AdjPValues.rds"))
   testthat::expect_equal(state$mcpObj$AdjPValues, exp_out)
 
   # TODO: Debug this
@@ -355,5 +355,55 @@ testthat::test_that("AnalyzeLook_PC: look argument validation and error handling
   testthat::expect_error(
     AnalyzeLook_PC(state_early_stopped, p_raw = c(H1 = 0.10, H2 = 0.20), plotGraphs = FALSE),
     regexp = "all hypotheses have been rejected or dropped"
+  )
+})
+
+############
+# Always-on structural invariant test (no skip guard, no RDS fixtures)
+testthat::test_that("AnalyzeLook_PC: structural invariants hold across looks", {
+  wi <- c(0.5, 0.5)
+  g <- matrix(c(0, 1, 1, 0), byrow = TRUE, nrow = 2)
+  corr <- matrix(c(1, 0.5, 0.5, 1), byrow = TRUE, nrow = 2)
+
+  state <- SetupAnalysis_PC(
+    WI = wi,
+    G = g,
+    test.type = "Partly-Parametric",
+    alpha = 0.025,
+    info_frac = c(0.5, 1.0),
+    Correlation = corr,
+    plotGraphs = FALSE
+  )
+
+  # Initial state
+  testthat::expect_s3_class(state, "PCAnalysisState")
+  testthat::expect_equal(state$completed_looks, 0L)
+  testthat::expect_false(state$trial_completed)
+  testthat::expect_equal(state$mcpObj$IndexSet, c("H1", "H2"))
+
+  # Look 1: completed_looks advances, AdjPValues is populated, trial not yet complete
+  state <- AnalyzeLook_PC(
+    state,
+    p_raw = c(H1 = 0.10, H2 = 0.20),
+    plotGraphs = FALSE
+  )
+  testthat::expect_equal(state$completed_looks, 1L)
+  testthat::expect_false(state$trial_completed)
+  testthat::expect_true(is.data.frame(state$mcpObj$AdjPValues))
+  testthat::expect_true(nrow(state$mcpObj$AdjPValues) > 0)
+  testthat::expect_true(length(state$mcpObj$IndexSet) > 0)
+
+  # Look 2 (final look): trial_completed flips to TRUE, completed_looks = 2
+  state <- AnalyzeLook_PC(
+    state,
+    p_raw = c(H1 = 0.10, H2 = 0.20),
+    plotGraphs = FALSE
+  )
+  testthat::expect_equal(state$completed_looks, 2L)
+  testthat::expect_true(state$trial_completed)
+
+  # Calling again after trial is complete must error
+  testthat::expect_error(
+    AnalyzeLook_PC(state, p_raw = c(H1 = 0.10, H2 = 0.20), plotGraphs = FALSE)
   )
 })

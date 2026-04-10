@@ -278,6 +278,9 @@ AnalyzeLook_PC <- function(
   # Apply optional changes before analyzing look > 1
   if (next_look > 1) {
     if (!is.null(selection)) {
+      if (!isTRUE(state$design_params$Selection)) {
+        stop("selection cannot be applied: Selection was disabled in SetupAnalysis_PC()")
+      }
       mcpObj <- applySelection(mcpObj, selection, look = next_look)
       if (isTRUE(plotGraphs)) {
         plot_graph_after_selection(mcpObj, title = "Graph After Selection")
@@ -285,6 +288,9 @@ AnalyzeLook_PC <- function(
     }
 
     if (!is.null(new_weights) || !is.null(new_G)) {
+      if (!isTRUE(state$design_params$UpdateStrategy)) {
+        stop("new_weights/new_G cannot be applied: UpdateStrategy was disabled in SetupAnalysis_PC()")
+      }
       mcpObj$ModificationLook <- c(mcpObj$ModificationLook, as.integer(state$completed_looks))
       mcpObj <- applyStrategyUpdate(mcpObj, new_weights, new_G)
       if (isTRUE(plotGraphs)) {
@@ -353,7 +359,7 @@ AnalyzeLook_PC <- function(
     )
   )
 
-  if (length(mcpObj$IndexSet) == 0 || next_look == mcpObj$LastLook) {
+  if (isTRUE(StopTrial(mcpObj)) || length(mcpObj$IndexSet) == 0 || next_look == mcpObj$LastLook) {
     state$trial_completed <- TRUE
   }
 
@@ -386,6 +392,9 @@ PlotAnalysisGraph <- function(state, stage = NULL, title = NULL) {
     mcpObj <- state$setup_mcpObj
     default_title <- "Initial Graph"
   } else if (is.numeric(stage) && length(stage) == 1) {
+    if (stage != as.integer(stage)) {
+      stop("stage must be a whole number (integer-valued)")
+    }
     stage <- as.integer(stage)
     if (stage < 1 || stage > state$completed_looks) {
       stop("stage must be between 1 and completed_looks")

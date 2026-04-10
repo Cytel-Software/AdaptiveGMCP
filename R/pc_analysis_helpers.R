@@ -27,7 +27,7 @@ validate_p_raw <- function(p_raw, index_set) {
   if (any(is.na(p_raw))) stop("p_raw cannot contain NA")
   if (any(p_raw < 0) || any(p_raw > 1)) stop("p_raw values must be in [0, 1]")
 
-  if (is.null(names(p_raw)) || any(!nzchar(names(p_raw), keepNA = TRUE))) {
+  if (is.null(names(p_raw)) || anyNA(names(p_raw)) || any(!nzchar(names(p_raw)))) {
     if (length(p_raw) != length(index_set)) {
       stop("Unnamed p_raw must have length equal to current IndexSet")
     }
@@ -48,7 +48,7 @@ normalize_new_weights <- function(new_weights, index_set) {
   if (any(is.na(new_weights))) stop("new_weights cannot contain NA")
   if (any(new_weights < 0)) stop("new_weights must be non-negative")
 
-  if (is.null(names(new_weights)) || any(!nzchar(names(new_weights), keepNA = TRUE))) {
+  if (is.null(names(new_weights)) || anyNA(names(new_weights)) || any(!nzchar(names(new_weights)))) {
     if (length(new_weights) != length(index_set)) {
       stop("Unnamed new_weights must have length equal to current IndexSet")
     }

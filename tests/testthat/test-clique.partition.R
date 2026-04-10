@@ -6,14 +6,14 @@
 
 test_that("clique.partition: single node returns list(1)", {
   m <- matrix(1, nrow = 1, ncol = 1)
-  result <- clique.partition(m)
+  result <- AdaptGMCP:::clique.partition(m)
   expect_equal(result, list(1))
 })
 
 test_that("clique.partition: two nodes with known correlation form one clique", {
   m <- matrix(c(1, 0.7,
                 0.7, 1), nrow = 2, byrow = TRUE)
-  result <- clique.partition(m)
+  result <- AdaptGMCP:::clique.partition(m)
   expect_equal(length(result), 1)
   expect_equal(sort(result[[1]]), c(1L, 2L))
 })
@@ -21,7 +21,7 @@ test_that("clique.partition: two nodes with known correlation form one clique", 
 test_that("clique.partition: two nodes with unknown correlation form two singletons", {
   m <- matrix(c(1, NA,
                 NA, 1), nrow = 2, byrow = TRUE)
-  result <- clique.partition(m)
+  result <- AdaptGMCP:::clique.partition(m)
   expect_equal(length(result), 2)
   expect_equal(sort(unlist(result)), c(1L, 2L))
   expect_true(all(sapply(result, length) == 1))
@@ -31,7 +31,7 @@ test_that("clique.partition: fully known 3x3 forms one clique", {
   m <- matrix(c(1,   0.5, 0.3,
                 0.5, 1,   0.4,
                 0.3, 0.4, 1), nrow = 3, byrow = TRUE)
-  result <- clique.partition(m)
+  result <- AdaptGMCP:::clique.partition(m)
   expect_equal(length(result), 1)
   expect_equal(sort(result[[1]]), c(1L, 2L, 3L))
 })
@@ -40,7 +40,7 @@ test_that("clique.partition: all-unknown 3x3 forms three singletons", {
   m <- matrix(c(1,  NA, NA,
                 NA, 1,  NA,
                 NA, NA, 1), nrow = 3, byrow = TRUE)
-  result <- clique.partition(m)
+  result <- AdaptGMCP:::clique.partition(m)
   expect_equal(length(result), 3)
   expect_equal(sort(unlist(result)), c(1L, 2L, 3L))
   expect_true(all(sapply(result, length) == 1))
@@ -52,7 +52,7 @@ test_that("clique.partition: block-diagonal 4x4 forms two disjoint cliques", {
                 0.5, 1,   NA,  NA,
                 NA,  NA,  1,   0.3,
                 NA,  NA,  0.3, 1), nrow = 4, byrow = TRUE)
-  result <- clique.partition(m)
+  result <- AdaptGMCP:::clique.partition(m)
   expect_equal(length(result), 2)
   # All indices covered exactly once
   expect_equal(sort(unlist(result)), c(1L, 2L, 3L, 4L))
@@ -71,7 +71,7 @@ test_that("clique.partition: motivating population-enrichment 4x4 example", {
                 0.5, 1,   NA,  0.5,
                 0.5, NA,  1,   0.5,
                 NA,  0.5, 0.5, 1), nrow = 4, byrow = TRUE)
-  result <- clique.partition(m)
+  result <- AdaptGMCP:::clique.partition(m)
   # Must NOT produce a single group of all 4 (that would fail pmvnorm)
   expect_false(length(result) == 1)
   # All indices covered exactly once
@@ -93,7 +93,7 @@ test_that("clique.partition: motivating population-enrichment 4x4 example", {
 test_that("clique.partition: partition covers all hypotheses with no duplicates", {
   # Property-based check across a few different matrix sizes
   check.coverage <- function(m) {
-    result <- clique.partition(m)
+    result <- AdaptGMCP:::clique.partition(m)
     all.indices <- sort(unlist(result))
     n <- ncol(m)
     # All indices 1:n present
@@ -132,8 +132,8 @@ test_that("conn.comp vs clique.partition: agree on fully-known correlation matri
                 0.5, 1,   0.4,
                 0.3, 0.4, 1), nrow = 3, byrow = TRUE)
 
-  cc <- conn.comp(m)
-  cp <- clique.partition(m)
+  cc <- AdaptGMCP:::conn.comp(m)
+  cp <- AdaptGMCP:::clique.partition(m)
 
   expect_equal(length(cc), 1)
   expect_equal(length(cp), 1)
@@ -146,8 +146,8 @@ test_that("conn.comp vs clique.partition: agree on fully-zero (block-independent
                 NA, 1,  NA,
                 NA, NA, 1), nrow = 3, byrow = TRUE)
 
-  cc <- conn.comp(m)
-  cp <- clique.partition(m)
+  cc <- AdaptGMCP:::conn.comp(m)
+  cp <- AdaptGMCP:::clique.partition(m)
 
   expect_equal(length(cc), 3)
   expect_equal(length(cp), 3)
@@ -162,8 +162,8 @@ test_that("conn.comp vs clique.partition: agree on clean block-diagonal matrix",
                 NA,  NA,  1,   0.4,
                 NA,  NA,  0.4, 1), nrow = 4, byrow = TRUE)
 
-  cc <- conn.comp(m)
-  cp <- clique.partition(m)
+  cc <- AdaptGMCP:::conn.comp(m)
+  cp <- AdaptGMCP:::clique.partition(m)
 
   expect_equal(length(cc), 2)
   expect_equal(length(cp), 2)
@@ -184,8 +184,8 @@ test_that("conn.comp vs clique.partition: DIVERGE on population-enrichment matri
                 0.5, NA,  1,   0.5,
                 NA,  0.5, 0.5, 1), nrow = 4, byrow = TRUE)
 
-  cc <- conn.comp(m)
-  cp <- clique.partition(m)
+  cc <- AdaptGMCP:::conn.comp(m)
+  cp <- AdaptGMCP:::clique.partition(m)
 
   # conn.comp merges all 4 into one connected component
   expect_equal(length(cc), 1)

@@ -33,6 +33,7 @@ new_pc_analysis_state <- function(
   return(state)
 }
 
+#' @export
 print.PCAnalysisState <- function(x, ...) {
   if (!is.list(x) || is.null(x$mcpObj)) {
     stop("Invalid PCAnalysisState object")
@@ -73,6 +74,7 @@ print.PCAnalysisState <- function(x, ...) {
   return(invisible(x))
 }
 
+#' @export
 plot.PCAnalysisState <- function(x, ...) {
   mcpObj <- x$mcpObj
   title <- if (x$completed_looks == 0) {
