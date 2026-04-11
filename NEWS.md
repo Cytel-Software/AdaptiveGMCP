@@ -3,10 +3,10 @@
 ## New Features
 
 ### Non-Interactive Analysis Interface (P-Value Combination Method)
-* `SetupAnalysis_PC()`: New stateless setup function that initialises a `PCAnalysisState`
-  object from design parameters (graph weights, transition matrix, test type, alpha level,
-  information fractions, group-sequential design, and correlation). No console prompts — all
-  inputs are passed as function arguments.
+* `SetupAnalysis_PC()`: New non-interactive setup function that initialises a
+  `PCAnalysisState` object from design parameters (graph weights, transition matrix, test
+  type, alpha level, information fractions, group-sequential design, and correlation). No
+  console prompts — all inputs are passed as function arguments.
 * `AnalyzeLook_PC()`: Advances a `PCAnalysisState` object by exactly one look. Accepts the
   raw p-values for active hypotheses and optional adaptation inputs (selection, weight/graph
   update, correlation update). Returns the updated state object.
