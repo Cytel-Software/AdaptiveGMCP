@@ -135,8 +135,8 @@ corr <- matrix(c(
   NA, 0.5, 0.5, 1
 ), byrow = TRUE, nrow = 4)
 
-conn.comp(corr)
-clique.partition(corr)
+AdaptGMCP:::conn.comp(corr)
+AdaptGMCP:::clique.partition(corr)
 
 # Test type
 test <- "Partly-Parametric"
