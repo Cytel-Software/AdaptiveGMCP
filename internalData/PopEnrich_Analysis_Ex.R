@@ -50,10 +50,10 @@ corr <- matrix(c(1, 0.5, 0.5, NA,
 #                  NA, 1, NA, 0.5,
 #                  0.5, NA, 1, NA,
 #                  NA, 0.5, NA, 1), byrow = T, nrow = 4)
-x <- conn.comp(corr)
+x <- AdaptGMCP:::conn.comp(corr)
 print(x)
 
-y <- clique.partition(corr)
+y <- AdaptGMCP:::clique.partition(corr)
 print(y)
 
 # Calling the analysis function for p-value combination method
