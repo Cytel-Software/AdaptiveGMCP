@@ -307,7 +307,7 @@ adaptGMCP_CER <- function(
 
     # Pre-computation for the next look
     # Choice to proceed to next look or start over
-    trialTermUserInput <- terminateTrial(mcpObj)
+    trialTermUserInput <- trialContinuationDecision(mcpObj)
 
     if (trialTermUserInput == "y") # proceed to next look
       {

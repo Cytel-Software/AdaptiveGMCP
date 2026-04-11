@@ -232,9 +232,9 @@ adaptGMCP_PC <- function(
       }
 
     # Choice to proceed to next look or start over
-    trialTermUserInput <- terminateTrial(mcpObj)
+    curLkUserInp <- trialContinuationDecision(mcpObj)
 
-    if (trialTermUserInput == "y") # proceed to next look
+    if (curLkUserInp == "y") # proceed to next look
       {
         # Selection for next look
         if (Selection & (look < K)) {
@@ -274,10 +274,10 @@ adaptGMCP_PC <- function(
           mcpObj <- do_modifyCorrelation(mcpObj)
         }
         look <- look + 1
-      } else if (trialTermUserInput == "n") # terminate the trial
+      } else if (curLkUserInp == "n") # terminate the trial
       {
         break
-      } else if (trialTermUserInput == "s") # Start over from the last look inputs
+      } else if (curLkUserInp == "s") # Start over from the last look inputs
       {
         mcpObj <- Prev_mcpObj
       }
