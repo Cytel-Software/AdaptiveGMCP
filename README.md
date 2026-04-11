@@ -84,26 +84,29 @@ Correlation <- matrix(c(
 
 # Set up the analysis
 state <- SetupAnalysis_PC(
-  WI          = WI,
-  G           = G,
-  test.type   = "Partly-Parametric",
-  alpha       = 0.025,
-  info_frac   = c(0.5, 0.7, 1),
+  WI           = WI,
+  G            = G,
+  test.type    = "Partly-Parametric",
+  alpha        = 0.025,
+  info_frac    = c(0.5, 0.7, 1),
   typeOfDesign = "asOF",
-  Correlation = Correlation
+  Correlation  = Correlation,
+  plotGraphs   = FALSE
 )
 
 # Look 1
 state <- AnalyzeLook_PC(
   state,
-  p_raw = c(H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30)
+  p_raw      = c(H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30),
+  plotGraphs = FALSE
 )
 
 # Look 2 — with selection of continuing hypotheses
 state <- AnalyzeLook_PC(
   state,
-  p_raw     = c(H1 = 0.02, H2 = 0.10, H4 = 0.40),
-  selection = c("H1", "H2", "H4")
+  p_raw      = c(H1 = 0.02, H2 = 0.10, H4 = 0.40),
+  selection  = c("H1", "H2", "H4"),
+  plotGraphs = FALSE
 )
 
 # Look 3 — final look
