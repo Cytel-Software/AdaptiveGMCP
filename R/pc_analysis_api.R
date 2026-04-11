@@ -255,7 +255,7 @@ AnalyzeLook_PC <- function(
         "the trial analysis is already complete."
       )
     }
-    stop("Trial already concluded — all hypotheses have been rejected or dropped.")
+    stop("Trial already concluded — stopping criteria met.")
   }
 
   mcpObj <- state$mcpObj
