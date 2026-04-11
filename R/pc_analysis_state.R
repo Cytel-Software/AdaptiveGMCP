@@ -86,7 +86,14 @@ plot.PCAnalysisState <- function(x, ...) {
   HypothesisName <- mcpObj$allGraphs$HypothesisName
   HypoIDX <- get_numeric_part(HypothesisName)
 
-  activeStatus <- (!unlist(mcpObj$rej_flag_Curr[HypoIDX])) & (!mcpObj$DroppedFlag)
+  rej.flag.curr <- unlist(mcpObj$rej_flag_Curr[HypoIDX])
+  dropped.flag.curr <- if (!is.null(names(mcpObj$DroppedFlag)) &&
+    all(HypothesisName %in% names(mcpObj$DroppedFlag))) {
+    unname(mcpObj$DroppedFlag[HypothesisName])
+  } else {
+    mcpObj$DroppedFlag[HypoIDX]
+  }
+  activeStatus <- (!rej.flag.curr) & (!dropped.flag.curr)
   graphIDX <- which(
     mcpObj$allGraphs$IntersectIDX == paste(as.integer(activeStatus), collapse = "")
   )
