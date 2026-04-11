@@ -1,3 +1,24 @@
+# AdaptGMCP 2.1.0 (2026-04-11)
+
+## New Features
+
+### Non-Interactive Analysis Interface (P-Value Combination Method)
+* `SetupAnalysis_PC()`: New stateless setup function that initialises a `PCAnalysisState`
+  object from design parameters (graph weights, transition matrix, test type, alpha level,
+  information fractions, group-sequential design, and correlation). No console prompts — all
+  inputs are passed as function arguments.
+* `AnalyzeLook_PC()`: Advances a `PCAnalysisState` object by exactly one look. Accepts the
+  raw p-values for active hypotheses and optional adaptation inputs (selection, weight/graph
+  update, correlation update). Returns the updated state object.
+* `PlotAnalysisGraph()`: Plots the hypothesis graph stored in a `PCAnalysisState` object at
+  any stage of the analysis (initial graph, after a specific look, or current).
+
+These functions are designed for automated pipelines, batch processing, and scripted analyses
+where interactive console input is not appropriate. They replicate the behaviour of the
+existing interactive `adaptGMCP_PC()` function.
+
+---
+
 # AdaptGMCP 2.0.0 (2026-01-16)
 
 ## Major Release
