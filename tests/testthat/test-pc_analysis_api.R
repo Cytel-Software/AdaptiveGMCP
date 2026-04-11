@@ -346,7 +346,7 @@ testthat::test_that("AnalyzeLook_PC: look argument validation and error handling
     regexp = "was the final look"
   )
 
-  # --- Early stopping: "all hypotheses rejected or dropped" error ---
+  # --- Early stopping: trial already concluded before final look ---
 
   # Simulate early-stopped state (trial_completed = TRUE before the final look is reached)
   state_early_stopped <- state1_null
@@ -354,7 +354,7 @@ testthat::test_that("AnalyzeLook_PC: look argument validation and error handling
 
   testthat::expect_error(
     AnalyzeLook_PC(state_early_stopped, p_raw = c(H1 = 0.10, H2 = 0.20), plotGraphs = FALSE),
-    regexp = "all hypotheses have been rejected or dropped"
+    regexp = "Trial already concluded"
   )
 })
 
