@@ -133,6 +133,14 @@ applyStrategyUpdate <- function(mcpObj, new_weights, new_G) {
   mcpObj$newG <- validate_transition_matrix(new_G, mcpObj$IndexSet)
 
   modified <- modifyIntersectWeights(mcpObj)
+  if (is.character(modified)) {
+    stop("modifyIntersectWeights failed: ", toString(modified))
+  }
+  if (!is.list(modified) || is.null(modified$mcpObj)) {
+    stop(
+      "modifyIntersectWeights failed: expected a list containing 'mcpObj'"
+    )
+  }
   return(modified$mcpObj)
 }
 
