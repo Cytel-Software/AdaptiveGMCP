@@ -229,8 +229,8 @@ test_that("conn.comp vs clique.partition: DIVERGE on chain-connected matrix", {
                 0.6, 1,   0.5,
                 NA,  0.5, 1), nrow = 3, byrow = TRUE)
 
-  cc <- conn.comp(m)
-  cp <- clique.partition(m)
+  cc <- AdaptGMCP:::conn.comp(m)
+  cp <- AdaptGMCP:::clique.partition(m)
 
   # conn.comp: one component covering all 3
   expect_equal(length(cc), 1)
