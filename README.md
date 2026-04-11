@@ -112,7 +112,8 @@ state <- AnalyzeLook_PC(
 # Look 3 — final look
 state <- AnalyzeLook_PC(
   state,
-  p_raw = c(H2 = 0.005, H4 = 0.10)
+  p_raw      = c(H2 = 0.005, H4 = 0.10),
+  plotGraphs = FALSE
 )
 
 # Plot the hypothesis graph after look 2
