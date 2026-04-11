@@ -321,6 +321,7 @@ AnalyzeLook_PC <- function(
 
   if (length(mcpObj$IndexSet) == 0) {
     state$trial_completed <- TRUE
+    state$completion_reason <- "all_hypotheses_dropped"
     state$mcpObj <- mcpObj
     return(state)
   }
@@ -361,6 +362,13 @@ AnalyzeLook_PC <- function(
 
   if (isTRUE(StopTrial(mcpObj)) || length(mcpObj$IndexSet) == 0 || next_look == mcpObj$LastLook) {
     state$trial_completed <- TRUE
+    if (length(mcpObj$IndexSet) == 0) {
+      state$completion_reason <- "all_hypotheses_dropped"
+    } else if (next_look == mcpObj$LastLook) {
+      state$completion_reason <- "final_look"
+    } else {
+      state$completion_reason <- "early_stop_efficacy"
+    }
   }
 
   return(state)

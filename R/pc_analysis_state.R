@@ -12,6 +12,7 @@ new_pc_analysis_state <- function(
     design_params,
     completed_looks = 0L,
     trial_completed = FALSE,
+    completion_reason = NULL,
     look_history = list()) {
   if (!is.list(mcpObj)) stop("mcpObj must be a list")
   if (!is.numeric(completed_looks) || length(completed_looks) != 1) {
@@ -27,6 +28,7 @@ new_pc_analysis_state <- function(
     design_params = design_params,
     completed_looks = completed_looks,
     trial_completed = isTRUE(trial_completed),
+    completion_reason = completion_reason,
     look_history = look_history
   )
   class(state) <- "PCAnalysisState"
@@ -43,7 +45,17 @@ print.PCAnalysisState <- function(x, ...) {
   cat("PCAnalysisState\n")
   cat("- Looks completed:", x$completed_looks, "of", x$mcpObj$LastLook, "\n")
   if (isTRUE(x$trial_completed)) {
-    cat("- Status: TRIAL CONCLUDED (all hypotheses rejected or dropped)\n")
+    status_msg <- if (is.null(x$completion_reason)) {
+      "TRIAL CONCLUDED"
+    } else {
+      switch(x$completion_reason,
+        "final_look" = "TRIAL CONCLUDED (final look reached)",
+        "early_stop_efficacy" = "TRIAL CONCLUDED (early stopping — efficacy criterion met)",
+        "all_hypotheses_dropped" = "TRIAL CONCLUDED (all hypotheses dropped)",
+        "TRIAL CONCLUDED"
+      )
+    }
+    cat("- Status:", status_msg, "\n")
   }
   cat("\n")
 
