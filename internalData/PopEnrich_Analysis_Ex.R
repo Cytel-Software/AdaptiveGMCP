@@ -214,8 +214,8 @@ corr <- matrix(
   )
 )
 
-conn.comp(corr)
-clique.partition(corr)
+AdaptGMCP:::conn.comp(corr)
+AdaptGMCP:::clique.partition(corr)
 
 # Test type
 test <- "Partly-Parametric"
