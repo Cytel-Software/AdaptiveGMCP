@@ -307,15 +307,15 @@ AnalyzeLook_PC <- function(
       mcpObj <- applyCorrelationUpdate(mcpObj, new_correlation)
     }
   } else {
-    # For look 1, ensure no selection or strategy modification is applied
+    # For look 1, adaptation inputs are invalid and must be rejected.
     if (!is.null(selection)) {
-      warning("Selection cannot be applied at look 1 and will be ignored.")
+      stop("selection cannot be applied at look 1.")
     }
     if (!is.null(new_weights) || !is.null(new_G)) {
-      warning("Strategy modification cannot be applied at look 1 and will be ignored.")
+      stop("new_weights/new_G cannot be applied at look 1.")
     }
     if (!is.null(new_correlation)) {
-      warning("Correlation update cannot be applied at look 1 and will be ignored.")
+      stop("new_correlation cannot be applied at look 1.")
     }
   }
 
