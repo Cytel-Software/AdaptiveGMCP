@@ -1,0 +1,85 @@
+# Triggered when a version tag (e.g. v2.1.0) is pushed.
+# Runs R CMD check, builds the source tarball, extracts release notes
+# from NEWS.md, and creates a GitHub release — all without local involvement.
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  contents: write
+
+jobs:
+  check-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Pandoc
+        uses: r-lib/actions/setup-pandoc@v1
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.5.1'
+          use-public-rspm: true
+
+      - name: Install R dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::devtools, any::testthat
+          needs: check
+
+      - name: R CMD check
+        uses: r-lib/actions/check-r-package@v2
+        with:
+          args: 'c("--no-manual", "--as-cran")'
+          error-on: '"error"'
+
+      - name: Build source tarball
+        run: |
+          mkdir -p dist
+          Rscript -e "devtools::build(path = 'dist', binary = FALSE)"
+
+      - name: Install built tarball
+        run: |
+          TARBALL=$(ls dist/AdaptGMCP_*.tar.gz | head -1)
+          Rscript -e "if ('AdaptGMCP' %in% rownames(installed.packages())) remove.packages('AdaptGMCP')"
+          R CMD INSTALL "$TARBALL"
+
+      - name: Smoke check installed package
+        run: |
+          Rscript -e "library(AdaptGMCP); required <- c('simMAMSMEP','adaptGMCP_CER','adaptGMCP_PC','plotGraph','genPowerTablePlots','AdaptGMCPSimApp'); missing <- setdiff(required, getNamespaceExports('AdaptGMCP')); if (length(missing) > 0) stop(sprintf('Missing expected exports: %s', paste(missing, collapse = ', '))); cat('Smoke check passed. Package loaded and expected exports are available.\\n')"
+
+      - name: Run tests against installed package
+        run: |
+          Rscript -e "testthat::test_package('AdaptGMCP', reporter = 'summary', stop_on_failure = TRUE)"
+
+      - name: Extract version and release notes
+        id: meta
+        run: |
+          VERSION=$(grep "^Version:" DESCRIPTION | sed 's/Version:[[:space:]]*//' | xargs)
+          TARBALL=$(ls dist/AdaptGMCP_*.tar.gz | head -1)
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "tarball=${TARBALL}" >> $GITHUB_OUTPUT
+          # Extract the block from NEWS.md between the current version header
+          # and the next version header (exclusive).
+          awk "/^# AdaptGMCP ${VERSION}/{found=1; next} found && /^# AdaptGMCP /{exit} found{print}" \
+            NEWS.md > release_notes.md
+          echo "--- Release notes preview ---"
+          cat release_notes.md
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "AdaptGMCP ${{ steps.meta.outputs.version }}"
+          body_path: release_notes.md
+          files: ${{ steps.meta.outputs.tarball }}
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
