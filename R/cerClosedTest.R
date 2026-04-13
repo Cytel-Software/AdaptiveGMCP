@@ -24,7 +24,6 @@ checkRejection <- function(pValues, boundary) {
 
 # Overall decision
 getRejStatus <- function(pValues, IntTestDF, Stage1RejStatus = NULL) {
-  length(pValues)
   rej_flag <- rep(NA, length(pValues))
   namesHypo <- paste("H", 1:length(pValues), sep = "")
 
