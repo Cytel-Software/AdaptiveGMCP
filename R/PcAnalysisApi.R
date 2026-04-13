@@ -1,6 +1,6 @@
 # --------------------------------------------------------------------------------------------------
 #
-# Stateless analysis interface (p-value combination method) — exported API
+# Stateless analysis interface (p-value combination method) - exported API
 #
 # --------------------------------------------------------------------------------------------------
 
@@ -226,7 +226,7 @@ SetupAnalysis_PC <- function(
 #' @param look Optional positive integer explicitly naming the current look number.
 #'   When provided, it must match the look number implied by the state object
 #'   (i.e. \code{state$completed_looks + 1}). This argument exists purely for
-#'   readability of user scripts — it does not change program logic.
+#'   readability of user scripts - it does not change program logic.
 #'   If \code{NULL} (default), the look number is inferred from the state.
 #' @param selection Optional character vector of hypotheses to retain for this look
 #'   (only meaningful when look > 1). NULL means no selection.
@@ -251,11 +251,11 @@ AnalyzeLook_PC <- function(
   if (isTRUE(state$trial_completed)) {
     if (state$completed_looks >= state$mcpObj$LastLook) {
       stop(
-        "Look ", state$mcpObj$LastLook, " was the final look — ",
+        "Look ", state$mcpObj$LastLook, " was the final look - ",
         "the trial analysis is already complete."
       )
     }
-    stop("Trial already concluded — stopping criteria met.")
+    stop("Trial already concluded - stopping criteria met.")
   }
 
   mcpObj <- state$mcpObj

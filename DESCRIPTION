@@ -18,9 +18,9 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.3
 Imports: data.table, dplyr, gMCPLite, htmltools, knitr, Matrix, matrixcalc, mvtnorm, parallel, 
-         pbapply, plyr, RColorBrewer, rpact, shiny, stringr
+         pbapply, plyr, RColorBrewer, rpact, shiny, stringr, tidyr
 Suggests: future, ggplot2, gridExtra, lintr, promises, reshape2, 
-          rhandsontable, rmarkdown, shinycssloaders, testthat (>= 3.0.0), tidyr, usethis, 
+          rhandsontable, rmarkdown, shinycssloaders, testthat (>= 3.0.0), usethis, 
           visNetwork, gMCP, purrr, tidyverse, graphicalMCP
 Config/testthat/edition: 3
 VignetteBuilder: knitr
