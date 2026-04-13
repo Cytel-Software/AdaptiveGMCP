@@ -17,7 +17,6 @@ plotGraph <- function(HypothesisName, w, G, activeStatus, Title, Text) {
   # Libraries
   library(visNetwork)
   library(reshape2)
-  library(htmltools)
   #------------ -
 
   if (is.null(w) & is.null(G)) {
