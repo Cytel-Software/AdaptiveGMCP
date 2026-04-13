@@ -38,7 +38,8 @@ PerformStage1Test <- function(nArms, nEps, EpType, nLooks, nHypothesis,
   Stage1Analysis <- closedTest(
     WH = WH,
     boundary = plan_Bdry$Stage1Bdry,
-    pValues = Stage1Pvalues
+    pValues = Stage1Pvalues,
+    Stage1RejStatus = rep(FALSE, length(Stage1Pvalues))
   )
 
   intHypTab <- Stage1Analysis$IntersectHypoTest

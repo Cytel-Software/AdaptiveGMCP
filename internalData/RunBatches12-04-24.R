@@ -8,6 +8,8 @@
 #Uncomment the following code to run simulation;
 #short cut: 1) select all the following lines 2) ctrl+shift+c]
 
+if (interactive()) {
+
 
 #Load the package
 # library(AdaptGMCP)
@@ -61,4 +63,6 @@ SysInfo <- Sys.info()
 cat("Execution performed on ", SysInfo['nodename'],"\n",
     "Execution time", elapsed.time)
 ###################################################################################
+
+}
 

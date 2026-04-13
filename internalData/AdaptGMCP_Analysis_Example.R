@@ -8,6 +8,8 @@
 #####   Script to Run Combining P-value Analysis examples #############
 #######################################################################
 
+if (interactive()) {
+
 library(AdaptGMCP)
 
 #-----------------------Alpha------------------------
@@ -74,3 +76,5 @@ adaptGMCP_PC(
   UpdateStrategy = T,
   plotGraphs = plotGraphs
 )
+
+}

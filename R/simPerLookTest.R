@@ -45,7 +45,8 @@ perLookTest <- function(Arms.SS.Incr, SummStat, mcpObj, mvtnorm_algo) {
             Stage1Analysis <- closedTest(
               WH = mcpObj$WH,
               boundary = mcpObj$plan_Bdry$Stage1Bdry,
-              pValues = mcpObj$p_raw
+              pValues = mcpObj$p_raw,
+              Stage1RejStatus = rep(FALSE, length(mcpObj$p_raw))
             )
 
             Stage1Obj <- list(

@@ -80,6 +80,8 @@ Function to perform Adaptive GMCP Analysis following Conditional Error Rate meth
 ###############   Script to Run CER Analysis examples #################
 #######################################################################
 
+if (interactive()) {
+
 library(AdaptGMCP)
 
 ########################## Inputs ##############################
@@ -154,4 +156,6 @@ adaptGMCP_CER(nArms = nArms, nEps = nEps, sigma = sigma,
               alpha = alpha, WI = WI, G = G, info_frac = info_frac,
               typeOfDesign = typeOfDesign, test.type = test.type,
               AdaptStage2 = AdaptStage2,plotGraphs = plotGraphs)
+
+}
 }
