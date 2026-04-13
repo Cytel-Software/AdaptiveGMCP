@@ -1,6 +1,6 @@
 # --------------------------------------------------------------------------------------------------
 #
-# Stateless analysis interface (p-value combination method) — state object and S3 methods
+# Stateless analysis interface (p-value combination method) - state object and S3 methods
 #
 # --------------------------------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@ print.PCAnalysisState <- function(x, ...) {
     } else {
       switch(x$completion_reason,
         "final_look" = "TRIAL CONCLUDED (final look reached)",
-        "early_stop_efficacy" = "TRIAL CONCLUDED (early stopping — efficacy criterion met)",
+        "early_stop_efficacy" = "TRIAL CONCLUDED (early stopping - efficacy criterion met)",
         "all_hypotheses_dropped" = "TRIAL CONCLUDED (all hypotheses dropped)",
         "TRIAL CONCLUDED"
       )

@@ -10,17 +10,12 @@
 #' @param InputDF R Dataframe: This is the csv/excel input data in the R dataframe format
 #' @param sOutPath String: File path to save the output csv file
 #' @example ./internalData/RunBatches12-04-24.R
+#' @importFrom dplyr select mutate relocate rename bind_rows left_join
+#' @importFrom tidyr pivot_wider pivot_longer
 #' @export
 simMAMSMEP_Wrapper <- function(InputDF, sOutPath) {
   # Update the dataframe column names in the following mapping in case
   # the names in the input csv/excel changes
-  library(dplyr)
-  library(tidyr)
-
-  # ### Ani:
-  # browser()
-  # ###
-  #
   lOut <- list()
   allRawPValues <- data.frame() # Initialize dataframe to collect raw p-values
 
@@ -228,8 +223,6 @@ run1TestCase <- function(InputDF) {
 genPowerTablePlots <- function(PowerType, dfOut, TableTemDF) {
   library(ggplot2)
   library(gridExtra)
-  library(dplyr)
-  library(tidyr)
 
   p <- sapply(TableTemDF$ModelID, function(mID) {
     p <- dfOut[dfOut$ModelID == mID, PowerType]

@@ -23,7 +23,7 @@ checkRejection <- function(pValues, boundary) {
 }
 
 # Overall decision
-getRejStatus <- function(pValues, IntTestDF, Stage1RejStatus) {
+getRejStatus <- function(pValues, IntTestDF, Stage1RejStatus = NULL) {
   length(pValues)
   rej_flag <- rep(NA, length(pValues))
   namesHypo <- paste("H", 1:length(pValues), sep = "")
@@ -35,16 +35,20 @@ getRejStatus <- function(pValues, IntTestDF, Stage1RejStatus) {
         na.rm = T
       )
     } else {
-      rej_flag[i] <- Stage1RejStatus[i]
+      if (is.null(Stage1RejStatus)) {
+        rej_flag[i] <- FALSE
+      } else {
+        rej_flag[i] <- Stage1RejStatus[i]
+      }
     }
   }
-  RejStatus <- as.data.frame(matrix(rej_flag, nrow = 1),row.names = NULL)
+  RejStatus <- as.data.frame(matrix(rej_flag, nrow = 1), row.names = NULL)
   colnames(RejStatus) <- namesHypo
   RejStatus
 }
 
 # Closed Test
-closedTest <- function(WH, boundary, pValues, Stage1RejStatus) {
+closedTest <- function(WH, boundary, pValues, Stage1RejStatus = NULL) {
   AnalysisTable <- data.frame(WH[, 1:(ncol(WH) / 2)],
     "Rejected" = checkRejection(
       pValues = pValues,
