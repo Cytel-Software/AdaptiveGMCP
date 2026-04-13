@@ -95,7 +95,7 @@ git tag -a {TAG} -m "AdaptGMCP {VERSION} release"
 
 ## Step 3 — Push Commit and Tag to GitHub
 
-**Skip if:** `{TAG}` already appears in the `git ls-remote --tags origin` output.
+If `{TAG}` does **not** appear in the `git ls-remote --tags origin` output:
 
 Before running, inform the user:
 > Pushing the tag `{TAG}` to GitHub will trigger the `release.yml` GitHub Actions workflow, which will automatically run R CMD check, build the source tarball, extract release notes from `NEWS.md`, and create the GitHub release. This cannot be undone without manually deleting the tag and release on GitHub.
@@ -107,6 +107,20 @@ git push origin {TAG}
 ```
 
 If `git push origin master` fails with a non-fast-forward error, stop and instruct the user to pull and resolve conflicts before retrying. Do not force-push.
+
+If `{TAG}` **already appears** in `git ls-remote --tags origin`, do not auto-skip. You must ask the user to choose one of the following actions:
+1. Stop (do not make any git changes).
+2. Re-trigger the same version by deleting the remote tag and pushing the same tag again.
+
+Before offering option 2, explain that this will re-run the release workflow for the same version and may overwrite/recreate the GitHub release for `{TAG}`.
+
+If the user chooses option 2, run these steps with explicit confirmation before execution:
+```
+git push origin :refs/tags/{TAG}
+git push origin {TAG}
+```
+
+If remote tag deletion or re-push fails, report the full error output and stop.
 
 ---
 
@@ -134,4 +148,4 @@ No further local action is required.
 
 - If any git command exits with a non-zero code, report the full error output and stop. Do not attempt to recover automatically.
 - If `git push` fails because the remote has moved ahead, instruct the user to run `git pull --rebase origin master`, resolve any conflicts, then re-run the release prompt.
-- If the tag already exists on the remote but no GitHub release exists yet, skip Steps 1–3 entirely and proceed directly to Step 4 (the workflow may still be running or may need to be re-triggered manually).
+- If the tag already exists on the remote, never assume skip. Ask the user whether to stop or re-trigger by deleting and re-pushing the same tag.
