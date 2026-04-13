@@ -10,7 +10,7 @@
 #' @param InputDF R Dataframe: This is the csv/excel input data in the R dataframe format
 #' @param sOutPath String: File path to save the output csv file
 #' @example ./internalData/RunBatches12-04-24.R
-#' @importFrom dplyr select mutate relocate rename bind_rows left_join
+#' @importFrom dplyr select mutate relocate rename bind_rows left_join everything
 #' @importFrom tidyr pivot_wider pivot_longer
 #' @export
 simMAMSMEP_Wrapper <- function(InputDF, sOutPath) {
