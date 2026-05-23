@@ -1,7 +1,60 @@
-# Example for analysis in the population enrichment case
+# Examples for analysis in the population enrichment case
 library(AdaptGMCP)
 
-# EXAMPLE 1 #############################################
+# # EXAMPLE 5 #############################################
+# # Setting input parameters for the function
+
+# # Weights
+# wi <- rep(0.5, 2) # Initial weights for the 2 hypotheses
+# stopifnot(length(wi) == 2)
+
+# # Transition matrix
+# g <- matrix(c(0, 1, 1, 0), byrow = T, nrow = 2)
+
+# # Test type
+# test <- "Dunnett" # "Bonf" # "Partly-Parametric" #
+
+# # Type I error
+# alp <- 0.025
+
+# # Info fraction
+# t <- c(0.5, 1)
+
+# # Design type
+# des <- "asOF"
+
+# # Correlation matrix between test stats
+# corr <- matrix(c(1, 0.5, 0.5, 1), byrow = T, nrow = 2)
+
+# x <- AdaptGMCP:::conn.comp(corr)
+# print(x)
+
+# y <- AdaptGMCP:::clique.partition(corr)
+# print(y)
+
+# # Calling the analysis function for p-value combination method
+# design <- SetupAnalysis_PC(
+#   WI = wi,
+#   G = g,
+#   test.type = test,
+#   alpha = alp,
+#   info_frac = t,
+#   typeOfDesign = des,
+#   Correlation = corr,
+#   plotGraphs = TRUE,
+#   MultipleWinners = TRUE
+# )
+
+# # Look 1
+# look1_out <- AnalyzeLook_PC(
+#   design,
+#   p_raw = c(H1 = 0.025, H2 = 0.025), plotGraphs = TRUE
+# )
+
+# look1_out
+# #########################################################
+
+# EXAMPLE 4 #############################################
 # Problem: Full population and a subpopulation (50% of full population)
 # High dose and low dose of the drug being tested
 # 2 stage trial with interim look at 50% information fraction
@@ -46,10 +99,6 @@ corr <- matrix(c(1, 0.5, 0.5, NA,
                  0.5, 1, NA, 0.5,
                  0.5, NA, 1, 0.5,
                  NA, 0.5, 0.5, 1), byrow = T, nrow = 4)
-# corr <- matrix(c(1, NA, 0.5, NA,
-#                  NA, 1, NA, 0.5,
-#                  0.5, NA, 1, NA,
-#                  NA, 0.5, NA, 1), byrow = T, nrow = 4)
 x <- AdaptGMCP:::conn.comp(corr)
 print(x)
 
@@ -84,7 +133,7 @@ look1_out <- AnalyzeLook_PC(
 look1_out
 #########################################################
 
-# TESTS #################################################
+# EXAMPLE 3 #################################################
 wi <- c(1 / 2, 1 / 2, 0, 0)
 g <- matrix(c(
   0, 1 / 2, 1 / 2, 0,
@@ -115,7 +164,7 @@ out <- adaptGMCP_PC(WI=wi, G=g, test.type = tt, alpha = alp, info_frac = t,
 #########################################################
 
 
-# EXAMPLE 3 #############################################
+# EXAMPLE 2 #############################################
 wi <- c(1 / 2, 1 / 2, 0, 0)
 g <- matrix(c(
   0, 1 / 2, 1 / 2, 0,
@@ -160,7 +209,7 @@ out <- adaptGMCP_PC(WI=wi, G=g, test.type = test, alpha = alp, info_frac = t,
 #########################################################
 
 
-# EXAMPLE 2 #############################################
+# EXAMPLE 1 #############################################
 # Phase-3 clinical trial in severe oral mucositis
 # 2 doses (low, high) compared to placebo, 2 normal endpoints (primary and secondary) evaluated
 # In addition to the full population, a subgroup of patients with HPV+ status is also evaluated.
@@ -178,7 +227,7 @@ names(wi) <- c("H1", "H2", "H3", "H4", "H5", "H6", "H7", "H8")
 # Transition matrix for the graph:
 G <- matrix(
   c(
-  # H1    H2    H3    H4    H5    H6    H7    H8
+    # H1    H2    H3    H4    H5    H6    H7    H8
     0,    0.2,  0.4,  0,    0.2,  0.2,  0,    0,    # H1
     0.2,  0,    0,    0.4,  0.2,  0.2,  0,    0,    # H2
     0,    1/3,  0,    0,    1/3,  1/3,  0,    0,    # H3
@@ -197,7 +246,7 @@ G <- matrix(
 
 corr <- matrix(
   c(
-  # H1          H2          H3          H4          H5          H6          H7          H8
+    # H1          H2          H3          H4          H5          H6          H7          H8
     1,          0.5,        NA,         NA,         0.6324555,  0.3162278,  NA,         NA,         # H1
     0.5,        1,          NA,         NA,         0.3162278,  0.6324555,  NA,         NA,         # H2
     NA,         NA,         1,          0.5,        NA,         NA,         0.6324555,  0.3162278,  # H3
