@@ -13,6 +13,9 @@ See [docs/architecture.md](../docs/architecture.md) for the full architecture ov
 ## Build & Dev Workflow
 See [instructions/build.instructions.md](instructions/build.instructions.md) for the full build, test, lint, and renv workflow.
 
+## Debugging
+See [docs/debugging.md](../docs/debugging.md) for the package debugging workflow in VS Code.
+
 ## External Dependencies
 See [docs/architecture.md](../docs/architecture.md) for the full dependency list and rationale.
 
