@@ -34,7 +34,7 @@ Install these VS Code extensions:
 
    Save settings and reload VS Code window (`Ctrl+Shift+P` -> `Developer: Reload Window`).
 
-1. Restore package environment from lockfile:
+3. Restore package environment from lockfile:
 
 ```r
 source("rebuild_package.R")
