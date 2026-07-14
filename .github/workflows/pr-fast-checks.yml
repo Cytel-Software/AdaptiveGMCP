@@ -27,7 +27,7 @@ jobs:
       - name: Install R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::devtools, any::testthat, any::visNetwork, any::reshape2
+          extra-packages: any::devtools, any::testthat
           needs: check
       - name: Build and install package
         run: |
