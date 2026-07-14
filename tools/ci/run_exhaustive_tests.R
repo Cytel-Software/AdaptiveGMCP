@@ -1,7 +1,8 @@
 #!/usr/bin/env Rscript
 
-# Fast PR test subset.
-# Tests in this list are reserved for the exhaustive validation lane.
+# Exhaustive validation test subset.
+# This lane covers the heavier regression scenarios (including simulation-heavy
+# and snapshot-based tests) that are not suitable for per-PR fast feedback.
 exhaustive_tests <- c(
   "test-overall_powers_df_snapshot_CER.R",
   "test-overall_powers_df_snapshot_pvaluecomb.R",
@@ -21,27 +22,21 @@ if( length(missing_tests) > 0 )
   )
 }
 
-fast_tests <- setdiff(all_tests, exhaustive_tests)
-
-if( length(fast_tests) == 0 )
+if( length(exhaustive_tests) == 0 )
 {
-  stop("No fast tests selected. Check test lane configuration.")
+  stop("No exhaustive tests configured. Check test lane configuration.")
 }
 
 escape_regex <- function(x)
 {
-  return(gsub("([][{}()+*^$|\\\\?.])", "\\\\\\\\\\1", x, perl = TRUE))
+  return(gsub("([][{}()+*^$|\\\\?.])", "\\\\\\\\1", x, perl = TRUE))
 }
 
-test_stems <- sub("\\.R$", "", sub("^test-", "", fast_tests))
+test_stems <- sub("\\.R$", "", sub("^test-", "", exhaustive_tests))
 filter_regex <- paste(vapply(test_stems, escape_regex, character(1)), collapse = "|")
 
-message("Running fast tests (excluding exhaustive validation subset):")
+message("Running exhaustive tests (simulation/analysis heavy subset):")
 for( test_file in sort(exhaustive_tests) )
-{
-  message("  - excluded: ", test_file)
-}
-for( test_file in sort(fast_tests) )
 {
   message("  - included: ", test_file)
 }

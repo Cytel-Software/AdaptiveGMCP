@@ -13,7 +13,11 @@ permissions:
   contents: write
 
 jobs:
+  exhaustive-validation:
+    uses: ./.github/workflows/exhaustive-validation.yml
+
   check-and-release:
+    needs: exhaustive-validation
     runs-on: ubuntu-latest
 
     steps:
