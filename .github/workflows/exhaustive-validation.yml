@@ -48,7 +48,7 @@ jobs:
           Rscript -e "library(AdaptGMCP); required <- c('simMAMSMEP','adaptGMCP_CER','adaptGMCP_PC','plotGraph','genPowerTablePlots','AdaptGMCPSimApp'); missing <- setdiff(required, getNamespaceExports('AdaptGMCP')); if (length(missing) > 0) stop(sprintf('Missing expected exports: %s', paste(missing, collapse = ', '))); cat('Smoke check passed. Package loaded and expected exports are available.\\n')"
 
       - name: Run fast test subset
-        if: ${{ github.event_name != 'workflow_call' || inputs.run-fast-tests }}
+        if: ${{ github.event_name != 'workflow_call' || (github.event_name == 'workflow_call' && inputs.run-fast-tests) }}
         run: |
           Rscript tools/ci/run_fast_tests.R
 
