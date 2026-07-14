@@ -1,11 +1,6 @@
 ############
-# Test1
+# Test1 # COMPLETED
 testthat::test_that("Test 1: PC analysis API scaffolds", {
-  testthat::skip_if_not(
-    isTRUE(getOption("AdaptGMCP.run_pc_analysis_api_tests", FALSE)),
-    "Scaffold only: set options(AdaptGMCP.run_pc_analysis_api_tests = TRUE) and fill expected values"
-  )
-
   wi <- c(1 / 2, 1 / 2, 0, 0)
   g <- matrix(c(
     0, 1 / 2, 1 / 2, 0,
@@ -90,8 +85,6 @@ testthat::test_that("Test 1: PC analysis API scaffolds", {
   testthat::expect_true(all(expected_cols_look3 %in% colnames(state$mcpObj$AdjPValues)))
   testthat::expect_equal(state$mcpObj$AdjPValues, exp_out)
 
-
-  # TODO: Debug this
   testthat::expect_true(state$trial_completed)
 
   # Plot helper should run
@@ -103,12 +96,8 @@ testthat::test_that("Test 1: PC analysis API scaffolds", {
 })
 
 ############
-# Test2
+# Test2 # COMPLETED
 testthat::test_that("Test 2: PC analysis API scaffolds (strategy modification)", {
-  testthat::skip_if_not(
-    isTRUE(getOption("AdaptGMCP.run_pc_analysis_api_tests", FALSE)),
-    "Scaffold only: set options(AdaptGMCP.run_pc_analysis_api_tests = TRUE) and fill expected values"
-  )
   wi <- c(1 / 2, 1 / 2, 0, 0)
   g <- matrix(c(
     0, 1 / 2, 1 / 2, 0,
@@ -129,8 +118,6 @@ testthat::test_that("Test 2: PC analysis API scaffolds (strategy modification)",
 
   tt <- "Partly-Parametric"
   des <- "asOF"
-
-  #browser()
 
   state <- SetupAnalysis_PC(
     WI = wi,
@@ -173,12 +160,9 @@ testthat::test_that("Test 2: PC analysis API scaffolds (strategy modification)",
 
   testthat::expect_equal(state$completed_looks, 2L)
 
-  # TODO: Debug this
   exp_out <- readRDS(testthat::test_path("t2.l2.AdjPValues.rds"))
   testthat::expect_equal(state$mcpObj$AdjPValues, exp_out)
 
-  # TODO: Debug this
-  # browser()
   exp_out <- readRDS(testthat::test_path("t2.l2.IndexSet.rds"))
   testthat::expect_equal(state$mcpObj$IndexSet, exp_out)
 
@@ -188,13 +172,8 @@ testthat::test_that("Test 2: PC analysis API scaffolds (strategy modification)",
 })
 
 ############
-# Test3
+# Test3 # COMPLETED
 testthat::test_that("Test 3: PC analysis API scaffolds (full transition at look 2)", {
-  testthat::skip_if_not(
-    isTRUE(getOption("AdaptGMCP.run_pc_analysis_api_tests", FALSE)),
-    "Scaffold only: set options(AdaptGMCP.run_pc_analysis_api_tests = TRUE) and fill expected values"
-  )
-
   wi <- c(1 / 2, 1 / 2, 0, 0)
   g <- matrix(c(
     0, 1 / 2, 1 / 2, 0,
@@ -273,14 +252,12 @@ testthat::test_that("Test 3: PC analysis API scaffolds (full transition at look 
   exp_out <- readRDS(testthat::test_path("t3.l2.AdjPValues.rds"))
   testthat::expect_equal(state$mcpObj$AdjPValues, exp_out)
 
-  # TODO: Debug this
-  # browser()
   g <- PlotAnalysisGraph(state, stage = 2)
   testthat::expect_true(!is.null(g))
 })
 
 ############
-# Test: look argument validation
+# Test 4: look argument validation # COMPLETED
 testthat::test_that("AnalyzeLook_PC: look argument validation and error handling", {
   # Minimal 2-hypothesis, 2-look setup (no option guard needed — tests error conditions and
   # completed_looks only, not specific computed output values)
@@ -334,6 +311,8 @@ testthat::test_that("AnalyzeLook_PC: look argument validation and error handling
   state1_expl <- AnalyzeLook_PC(state0, p_raw = c(H1 = 0.10, H2 = 0.20), look = 1L, plotGraphs = FALSE)
   testthat::expect_equal(state1_expl$completed_looks, 1L)
 
+  testthat::expect_equal(state1_null, state1_expl)
+
   # --- After final look: specific "final look" error ---
 
   # Run look 2 to complete the trial
@@ -359,7 +338,7 @@ testthat::test_that("AnalyzeLook_PC: look argument validation and error handling
 })
 
 ############
-# Always-on structural invariant test (no skip guard, no RDS fixtures)
+# Test 5: Always-on structural invariant test (no skip guard, no RDS fixtures)
 testthat::test_that("AnalyzeLook_PC: structural invariants hold across looks", {
   wi <- c(0.5, 0.5)
   g <- matrix(c(0, 1, 1, 0), byrow = TRUE, nrow = 2)

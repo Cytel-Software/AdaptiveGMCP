@@ -61,6 +61,14 @@ devtools::load_all()
   # or
   devtools::test()
   ```
+- Run a specific test file:
+  ```r
+  testthat::test_file('tests/testthat/test-<name>.R')
+  ```
+- Run a targeted test suite (matching file names):
+  ```r
+  devtools::test(filter = '<pattern>')
+  ```
 
 ## Linting & Quality
 
