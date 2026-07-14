@@ -23,12 +23,14 @@ jobs:
         with:
           r-version: "4.5.1"
           use-public-rspm: true
+          cache: true
 
       - name: Install R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::devtools, any::testthat
           needs: check
+          cache-version: 1
       - name: Build and install package
         run: |
           R CMD build .
