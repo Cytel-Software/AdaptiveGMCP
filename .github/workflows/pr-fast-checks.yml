@@ -28,6 +28,7 @@ jobs:
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::devtools, any::testthat, any::visNetwork, any::reshape2
+          needs: check
       - name: Build and install package
         run: |
           R CMD build .
