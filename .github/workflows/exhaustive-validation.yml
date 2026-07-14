@@ -1,0 +1,65 @@
+name: Exhaustive Validation
+
+on:
+  workflow_call:
+    inputs:
+      run-fast-tests:
+        required: false
+        type: boolean
+        default: true
+  workflow_dispatch:
+  schedule:
+    - cron: "0 5 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  exhaustive-checks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Pandoc
+        uses: r-lib/actions/setup-pandoc@v1
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: "4.5.1"
+          use-public-rspm: true
+          cache: true
+      - name: Install R dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::devtools, any::testthat
+          needs: check
+          cache-version: 1
+      - name: Build and install package
+        run: |
+          R CMD build .
+          TARBALL=$(ls AdaptGMCP_*.tar.gz | head -1)
+          R CMD INSTALL "$TARBALL"
+
+      - name: Smoke check installed package exports
+        run: |
+          Rscript -e "library(AdaptGMCP); required <- c('simMAMSMEP','adaptGMCP_CER','adaptGMCP_PC','plotGraph','genPowerTablePlots','AdaptGMCPSimApp'); missing <- setdiff(required, getNamespaceExports('AdaptGMCP')); if (length(missing) > 0) stop(sprintf('Missing expected exports: %s', paste(missing, collapse = ', '))); cat('Smoke check passed. Package loaded and expected exports are available.\\n')"
+
+      - name: Run fast test subset
+        if: ${{ github.event_name != 'workflow_call' || (github.event_name == 'workflow_call' && inputs.run-fast-tests) }}
+        run: |
+          Rscript tools/ci/run_fast_tests.R
+
+      - name: Run exhaustive test subset
+        run: |
+          Rscript tools/ci/run_exhaustive_tests.R
+
+      - name: Upload test snapshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: exhaustive-test-snapshots
+          path: tests/testthat/_snaps
+          if-no-files-found: ignore
