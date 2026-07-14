@@ -30,7 +30,8 @@ jobs:
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::devtools, any::testthat
-
+          needs: check
+          cache-version: 1
       - name: Build and install package
         run: |
           R CMD build .
