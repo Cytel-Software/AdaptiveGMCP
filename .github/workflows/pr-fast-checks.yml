@@ -61,5 +61,5 @@ jobs:
     steps:
       - name: Fail gate if fast-checks failed
         run: |
-          echo "fast-checks result: ${{ needs.fast-checks.result }}"
-          test "${{ needs.fast-checks.result }}" = "success"
+          echo "fast-checks result: ${{ needs['fast-checks'].result }}"
+          test "${{ needs['fast-checks'].result }}" = "success"
