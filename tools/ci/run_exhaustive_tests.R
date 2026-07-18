@@ -29,7 +29,7 @@ if( length(exhaustive_tests) == 0 )
 
 escape_regex <- function(x)
 {
-  return(gsub("([][{}()+*^$|\\\\?.])", "\\\\\\1", x, perl = TRUE))
+  return(gsub("([][{}()+*^$|\\\\?.])", "\\\\\\\\1", x, perl = TRUE))
 }
 
 test_stems <- sub("\\.R$", "", sub("^test-", "", exhaustive_tests))
