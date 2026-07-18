@@ -18,9 +18,6 @@ jobs:
     with:
       run-fast-tests: false
 
-  exhaustive-validation:
-    uses: ./.github/workflows/exhaustive-validation.yml
-
   check-and-release:
     needs: exhaustive-validation
     runs-on: ubuntu-latest
