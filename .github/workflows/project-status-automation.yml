@@ -1,0 +1,152 @@
+name: Project Status Automation
+
+# Keeps the "Status" field of GitHub Project items in sync with issue/PR lifecycle events.
+#
+# Required repository/org secrets and variables:
+#   - secrets.PROJECT_TOKEN  : a PAT with "project" and "repo" OAuth scopes
+#   - vars.PROJECT_NUMBER    : the integer number shown in the project's URL
+#                              (e.g. 3 for https://github.com/orgs/MyOrg/projects/3)
+#                              Configure at: Settings > Secrets and variables > Actions > Variables
+#
+# Rules implemented:
+#   1. Issue added to project  → Status = "Todo"
+#   2. Issue closed            → Status = "Done"
+#   3. Issue reopened          → Status = "In Progress"
+#   4. Linked PR opened        → Status = "In Progress" (for each closing-issue reference)
+
+on:
+  projects_v2_item:
+    types: [created]
+  issues:
+    types: [closed, reopened]
+  pull_request:
+    types: [opened]
+
+permissions:
+  contents: read
+
+jobs:
+  update-project-status:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+      PROJECT_NUMBER: ${{ vars.PROJECT_NUMBER }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate PROJECT_NUMBER variable
+        run: |
+          if [ -z "$PROJECT_NUMBER" ]; then
+            echo "::error::PROJECT_NUMBER is not set. Configure it at: Settings > Secrets and variables > Actions > Variables."
+            exit 1
+          fi
+
+      # ── Rule 1: Issue added to project → Todo ─────────────────────────────────
+      - name: Issue added to project → set Status to Todo
+        if: >-
+          github.event_name == 'projects_v2_item' &&
+          github.event.projects_v2_item.content_type == 'Issue'
+        run: |
+          set -euo pipefail
+          # shellcheck source=.github/scripts/project-status-helpers.sh
+          source .github/scripts/project-status-helpers.sh
+
+          ITEM_ID="${{ github.event.projects_v2_item.node_id }}"
+          PROJECT_ID="${{ github.event.projects_v2_item.project_node_id }}"
+
+          # Skip events from projects other than the configured target
+          ACTUAL_NUMBER=$(gh api graphql \
+            -f query='query($id:ID!){node(id:$id){...on ProjectV2{number}}}' \
+            -f id="$PROJECT_ID" \
+            --jq '.data.node.number')
+          if [ "$ACTUAL_NUMBER" != "$PROJECT_NUMBER" ]; then
+            echo "Skipping: item added to project #$ACTUAL_NUMBER, not target #$PROJECT_NUMBER."
+            exit 0
+          fi
+
+          resolve_status_ids "$PROJECT_ID" "Todo"
+
+          gh api graphql \
+            -f query='mutation($p:ID!,$i:ID!,$f:ID!,$o:String!){updateProjectV2ItemFieldValue(input:{projectId:$p,itemId:$i,fieldId:$f,value:{singleSelectOptionId:$o}}){projectV2Item{id}}}' \
+            -f p="$PROJECT_ID" -f i="$ITEM_ID" -f f="$FIELD_ID" -f o="$OPTION_ID"
+          echo "✓ Status set to \"Todo\" for item $ITEM_ID"
+
+      # ── Rules 2 & 3: Issue closed → Done / Issue reopened → In Progress ────────
+      - name: Issue closed or reopened → update Status
+        if: github.event_name == 'issues'
+        run: |
+          set -euo pipefail
+          # shellcheck source=.github/scripts/project-status-helpers.sh
+          source .github/scripts/project-status-helpers.sh
+
+          # Determine target status from the event action
+          if [ "${{ github.event.action }}" = "closed" ]; then
+            TARGET_STATUS="Done"
+          else
+            TARGET_STATUS="In Progress"
+          fi
+
+          ITEM_DATA=$(find_issue_project_item "${{ github.event.issue.node_id }}" "$PROJECT_NUMBER")
+          if [ -z "$ITEM_DATA" ]; then
+            echo "Issue #${{ github.event.issue.number }} is not tracked in project #$PROJECT_NUMBER. Skipping."
+            exit 0
+          fi
+          ITEM_ID=$(echo "$ITEM_DATA" | jq -r '.itemId')
+          PROJECT_ID=$(echo "$ITEM_DATA" | jq -r '.projectId')
+
+          resolve_status_ids "$PROJECT_ID" "$TARGET_STATUS"
+
+          gh api graphql \
+            -f query='mutation($p:ID!,$i:ID!,$f:ID!,$o:String!){updateProjectV2ItemFieldValue(input:{projectId:$p,itemId:$i,fieldId:$f,value:{singleSelectOptionId:$o}}){projectV2Item{id}}}' \
+            -f p="$PROJECT_ID" -f i="$ITEM_ID" -f f="$FIELD_ID" -f o="$OPTION_ID"
+          echo "✓ Status set to \"$TARGET_STATUS\" for issue #${{ github.event.issue.number }}"
+
+      # ── Rule 4: Linked PR opened → In Progress ────────────────────────────────
+      - name: PR opened → set linked issue Status to In Progress
+        if: github.event_name == 'pull_request' && github.event.action == 'opened'
+        run: |
+          set -euo pipefail
+          # shellcheck source=.github/scripts/project-status-helpers.sh
+          source .github/scripts/project-status-helpers.sh
+
+          # Finds a linked issue's project item and sets its Status to "In Progress".
+          set_issue_in_progress() {
+            local issue_id="$1" issue_num="$2"
+            local item_data item_id project_id
+            item_data=$(find_issue_project_item "$issue_id" "$PROJECT_NUMBER")
+            if [ -z "$item_data" ]; then
+              echo "Issue #$issue_num is not tracked in project #$PROJECT_NUMBER. Skipping."
+              return 0
+            fi
+            item_id=$(echo "$item_data" | jq -r '.itemId')
+            project_id=$(echo "$item_data" | jq -r '.projectId')
+
+            resolve_status_ids "$project_id" "In Progress"
+
+            gh api graphql \
+              -f query='mutation($p:ID!,$i:ID!,$f:ID!,$o:String!){updateProjectV2ItemFieldValue(input:{projectId:$p,itemId:$i,fieldId:$f,value:{singleSelectOptionId:$o}}){projectV2Item{id}}}' \
+              -f p="$project_id" -f i="$item_id" -f f="$FIELD_ID" -f o="$OPTION_ID"
+            echo "✓ Status set to \"In Progress\" for issue #$issue_num"
+          }
+
+          # Use closingIssuesReferences to find issues linked via "Closes/Fixes/Resolves #N".
+          # Fetches up to 50 linked issues; if a PR references more than 50 issues, the first
+          # 50 will be processed and any beyond that will be silently skipped.
+          LINKED=$(gh api graphql \
+            -f query='query($owner:String!,$repo:String!,$pr:Int!){repository(owner:$owner,name:$repo){pullRequest(number:$pr){closingIssuesReferences(first:50){nodes{id number}}}}}' \
+            -f owner="${{ github.repository_owner }}" \
+            -f repo="${{ github.event.repository.name }}" \
+            -F pr=${{ github.event.pull_request.number }} \
+            --jq '.data.repository.pullRequest.closingIssuesReferences.nodes')
+
+          if [ "$(echo "$LINKED" | jq 'length')" -eq 0 ]; then
+            echo "No closing issue references found for PR #${{ github.event.pull_request.number }}. Skipping."
+            exit 0
+          fi
+
+          # Process substitution avoids a subshell so set_issue_in_progress failures propagate.
+          while read -r issue; do
+            set_issue_in_progress "$(echo "$issue" | jq -r '.id')" "$(echo "$issue" | jq -r '.number')"
+          done < <(echo "$LINKED" | jq -c '.[]')

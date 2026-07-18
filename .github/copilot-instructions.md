@@ -19,6 +19,9 @@ See [docs/debugging.md](../docs/debugging.md) for the package debugging workflow
 ## External Dependencies
 See [docs/architecture.md](../docs/architecture.md) for the full dependency list and rationale.
 
+## Issue Management
+When creating, updating, or reviewing issues and epics, follow [instructions/issue_management.instructions.md](instructions/issue_management.instructions.md).
+
 ## Agent Tips
 - Preserve exported signatures and documented defaults; they are referenced by examples in [internalData](../internalData).
 

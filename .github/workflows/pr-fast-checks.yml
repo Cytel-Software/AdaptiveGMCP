@@ -2,6 +2,15 @@ name: PR Fast Checks
 
 on:
   pull_request:
+    paths:
+      - R/**
+      - tests/**
+      - DESCRIPTION
+      - NAMESPACE
+      - man/**
+      - tools/ci/**
+      - renv.lock
+      - .github/workflows/pr-fast-checks.yml
   workflow_dispatch:
 
 permissions:

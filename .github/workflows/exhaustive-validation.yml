@@ -2,6 +2,11 @@ name: Exhaustive Validation
 
 on:
   workflow_call:
+    inputs:
+      run-fast-tests:
+        required: false
+        type: boolean
+        default: true
   workflow_dispatch:
   schedule:
     - cron: "0 5 * * *"
@@ -26,11 +31,14 @@ jobs:
           r-version: "4.5.1"
           use-public-rspm: true
 
+          cache: true
       - name: Install R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::devtools, any::testthat
 
+          needs: check
+          cache-version: 1
       - name: Build and install package
         run: |
           R CMD build .
@@ -42,6 +50,7 @@ jobs:
           Rscript -e "library(AdaptGMCP); required <- c('simMAMSMEP','adaptGMCP_CER','adaptGMCP_PC','plotGraph','genPowerTablePlots','AdaptGMCPSimApp'); missing <- setdiff(required, getNamespaceExports('AdaptGMCP')); if (length(missing) > 0) stop(sprintf('Missing expected exports: %s', paste(missing, collapse = ', '))); cat('Smoke check passed. Package loaded and expected exports are available.\\n')"
 
       - name: Run fast test subset
+        if: ${{ github.event_name != 'workflow_call' || (github.event_name == 'workflow_call' && inputs.run-fast-tests) }}
         run: |
           Rscript tools/ci/run_fast_tests.R
 

@@ -15,6 +15,11 @@ permissions:
 jobs:
   exhaustive-validation:
     uses: ./.github/workflows/exhaustive-validation.yml
+    with:
+      run-fast-tests: false
+
+  exhaustive-validation:
+    uses: ./.github/workflows/exhaustive-validation.yml
 
   check-and-release:
     needs: exhaustive-validation
@@ -61,10 +66,6 @@ jobs:
       - name: Smoke check installed package
         run: |
           Rscript -e "library(AdaptGMCP); required <- c('simMAMSMEP','adaptGMCP_CER','adaptGMCP_PC','plotGraph','genPowerTablePlots','AdaptGMCPSimApp'); missing <- setdiff(required, getNamespaceExports('AdaptGMCP')); if (length(missing) > 0) stop(sprintf('Missing expected exports: %s', paste(missing, collapse = ', '))); cat('Smoke check passed. Package loaded and expected exports are available.\\n')"
-
-      - name: Run tests against installed package
-        run: |
-          Rscript -e "testthat::test_package('AdaptGMCP', reporter = 'summary', stop_on_failure = TRUE)"
 
       - name: Extract version and release notes
         id: meta
