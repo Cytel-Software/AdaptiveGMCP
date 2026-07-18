@@ -9,14 +9,16 @@ name: Project Status Automation
 #                              Configure at: Settings > Secrets and variables > Actions > Variables
 #
 # Rules implemented:
-#   1. Issue added to project  → Status = "Todo"
-#   2. Issue closed            → Status = "Done"
-#   3. Issue reopened          → Status = "In Progress"
-#   4. Linked PR opened        → Status = "In Progress" (for each closing-issue reference)
+#   1. Issue closed            → Status = "Done"
+#   2. Issue reopened          → Status = "In Progress"
+#   3. Linked PR opened        → Status = "In Progress" (for each closing-issue reference)
+#
+# Note: GitHub exposes `projects_v2_item` as an organization webhook event, but it is
+# not a supported GitHub Actions workflow trigger. That means "issue added to project
+# -> Todo" cannot be implemented in this workflow without an external webhook receiver
+# or GitHub App.
 
 on:
-  projects_v2_item:
-    types: [created]
   issues:
     types: [closed, reopened]
   pull_request:
@@ -43,37 +45,7 @@ jobs:
             exit 1
           fi
 
-      # ── Rule 1: Issue added to project → Todo ─────────────────────────────────
-      - name: Issue added to project → set Status to Todo
-        if: >-
-          github.event_name == 'projects_v2_item' &&
-          github.event.projects_v2_item.content_type == 'Issue'
-        run: |
-          set -euo pipefail
-          # shellcheck source=.github/scripts/project-status-helpers.sh
-          source .github/scripts/project-status-helpers.sh
-
-          ITEM_ID="${{ github.event.projects_v2_item.node_id }}"
-          PROJECT_ID="${{ github.event.projects_v2_item.project_node_id }}"
-
-          # Skip events from projects other than the configured target
-          ACTUAL_NUMBER=$(gh api graphql \
-            -f query='query($id:ID!){node(id:$id){...on ProjectV2{number}}}' \
-            -f id="$PROJECT_ID" \
-            --jq '.data.node.number')
-          if [ "$ACTUAL_NUMBER" != "$PROJECT_NUMBER" ]; then
-            echo "Skipping: item added to project #$ACTUAL_NUMBER, not target #$PROJECT_NUMBER."
-            exit 0
-          fi
-
-          resolve_status_ids "$PROJECT_ID" "Todo"
-
-          gh api graphql \
-            -f query='mutation($p:ID!,$i:ID!,$f:ID!,$o:String!){updateProjectV2ItemFieldValue(input:{projectId:$p,itemId:$i,fieldId:$f,value:{singleSelectOptionId:$o}}){projectV2Item{id}}}' \
-            -f p="$PROJECT_ID" -f i="$ITEM_ID" -f f="$FIELD_ID" -f o="$OPTION_ID"
-          echo "✓ Status set to \"Todo\" for item $ITEM_ID"
-
-      # ── Rules 2 & 3: Issue closed → Done / Issue reopened → In Progress ────────
+      # ── Rules 1 & 2: Issue closed → Done / Issue reopened → In Progress ────────
       - name: Issue closed or reopened → update Status
         if: github.event_name == 'issues'
         run: |
@@ -103,7 +75,7 @@ jobs:
             -f p="$PROJECT_ID" -f i="$ITEM_ID" -f f="$FIELD_ID" -f o="$OPTION_ID"
           echo "✓ Status set to \"$TARGET_STATUS\" for issue #${{ github.event.issue.number }}"
 
-      # ── Rule 4: Linked PR opened → In Progress ────────────────────────────────
+      # ── Rule 3: Linked PR opened → In Progress ────────────────────────────────
       - name: PR opened → set linked issue Status to In Progress
         if: github.event_name == 'pull_request' && github.event.action == 'opened'
         run: |
