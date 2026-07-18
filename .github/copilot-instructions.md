@@ -13,6 +13,9 @@ See [docs/architecture.md](../docs/architecture.md) for the full architecture ov
 ## Build & Dev Workflow
 See [instructions/build.instructions.md](instructions/build.instructions.md) for the full build, test, lint, and renv workflow.
 
+## Mandatory Git Sync Gate
+Before any file edit, code generation, refactor, test run, or commit-related action, follow [instructions/git_sync_gate.instructions.md](instructions/git_sync_gate.instructions.md).
+
 ## Debugging
 See [docs/debugging.md](../docs/debugging.md) for the package debugging workflow in VS Code.
 
