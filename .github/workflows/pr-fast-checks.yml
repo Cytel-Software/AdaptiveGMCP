@@ -53,3 +53,13 @@ jobs:
       - name: Run fast test subset
         run: |
           Rscript tools/ci/run_fast_tests.R
+
+  ci-gate:
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    needs: fast-checks
+    steps:
+      - name: Fail gate if fast-checks failed
+        run: |
+          echo "fast-checks result: ${{ needs['fast-checks'].result }}"
+          test "${{ needs['fast-checks'].result }}" = "success"
