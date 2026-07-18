@@ -32,7 +32,6 @@ jobs:
         with:
           r-version: "4.5.1"
           use-public-rspm: true
-          cache: true
 
       - name: Install R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
@@ -56,5 +55,10 @@ jobs:
 
   ci-gate:
     runs-on: ubuntu-latest
+    if: ${{ always() }}
+    needs: fast-checks
     steps:
-      - run: echo "CI gate passed"
+      - name: Fail gate if fast-checks failed
+        run: |
+          echo "fast-checks result: ${{ needs['fast-checks'].result }}"
+          test "${{ needs['fast-checks'].result }}" = "success"
