@@ -140,7 +140,7 @@ SetupAnalysis_PC <- function(
   colnames(InvNormWeights) <- paste0("W", seq_len(k))
   rownames(InvNormWeights) <- paste0("Look", seq_len(k))
 
-  W_Norm <- W_Norm[-1, , drop = FALSE]
+  W_Norm <- W_Norm[-1, ]  # Removing the first row; drop = TRUE matches adaptGMCP_PC() behaviour
 
   # Initialize flags
   rej_flag_Prev <- rej_flag_Curr <- DroppedFlag <- rep(FALSE, d)
