@@ -2,22 +2,51 @@ name: PR Fast Checks
 
 on:
   pull_request:
-    paths:
-      - R/**
-      - tests/**
-      - DESCRIPTION
-      - NAMESPACE
-      - man/**
-      - tools/ci/**
-      - renv.lock
-      - .github/workflows/pr-fast-checks.yml
   workflow_dispatch:
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      run_fast_checks: ${{ steps.resolve.outputs.run_fast_checks }}
+    steps:
+      - name: Mark workflow_dispatch as requiring fast checks
+        id: manual
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: echo "run_fast_checks=true" >> "$GITHUB_OUTPUT"
+
+      - name: Detect files relevant to fast checks
+        id: filter
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            fast_checks:
+              - 'R/**'
+              - 'tests/**'
+              - 'DESCRIPTION'
+              - 'NAMESPACE'
+              - 'man/**'
+              - 'tools/ci/**'
+              - 'renv.lock'
+              - '.github/workflows/pr-fast-checks.yml'
+
+      - name: Resolve fast-checks requirement
+        id: resolve
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "run_fast_checks=${{ steps.manual.outputs.run_fast_checks }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "run_fast_checks=${{ steps.filter.outputs.fast_checks }}" >> "$GITHUB_OUTPUT"
+          fi
+
   fast-checks:
+    needs: changes
+    if: ${{ needs.changes.outputs.run_fast_checks == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -56,9 +85,16 @@ jobs:
   ci-gate:
     runs-on: ubuntu-latest
     if: ${{ always() }}
-    needs: fast-checks
+    needs:
+      - changes
+      - fast-checks
     steps:
-      - name: Fail gate if fast-checks failed
+      - name: Enforce fast-checks result when required
         run: |
+          echo "run_fast_checks: ${{ needs.changes.outputs.run_fast_checks }}"
           echo "fast-checks result: ${{ needs['fast-checks'].result }}"
+          if [ "${{ needs.changes.outputs.run_fast_checks }}" != "true" ]; then
+            echo "No relevant changes detected; skipping fast-checks requirement."
+            exit 0
+          fi
           test "${{ needs['fast-checks'].result }}" = "success"
