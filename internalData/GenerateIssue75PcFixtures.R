@@ -274,7 +274,29 @@ GenerateIssue75Fixtures <- function()
         list( p_raw = c( H1 = 0.30, H2 = 0.35, H3 = 0.38, H4 = 0.42 ) ),
         list( p_raw = c( H1 = 0.02, H2 = 0.06, H3 = 0.10, H4 = 0.20 ) )
       )
+    ),
+    list(
+      rowId = "M09",
+      WI = c( 0.5, 0.5, 0, 0 ),
+      G = mGraph4,
+      testType = "Dunnett",
+      alpha = 0.025,
+      infoFrac = c( 0.5, 1.0 ),
+      typeOfDesign = "WT",
+      deltaWT = 0.25,
+      deltaPT1 = 0,
+      gammaA = 2,
+      userAlphaSpending = NULL,
+      correlation = mCorrDefault,
+      multipleWinners = TRUE,
+      lookInputs = list(
+        list( p_raw = c( H1 = 0.28, H2 = 0.32, H3 = 0.36, H4 = 0.40 ) ),
+        list( p_raw = c( H1 = 0.07, H2 = 0.10, H3 = 0.13, H4 = 0.16 ) )
+      )
     )
+    # M10 (PT design) is deferred: rpact requires deltaPT0 which is not yet a
+    # parameter in SetupAnalysis_PC() or adaptGMCP_PC(). Add M10 once deltaPT0
+    # support is added to the API (tracked separately).
   )
 
   for( lScenario in lScenarios )

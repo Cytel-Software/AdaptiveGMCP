@@ -1264,3 +1264,71 @@ testthat::test_that("PC equivalence M24: MultipleWinners FALSE", {
   testthat::expect_true( CompareImportantMcpMembers( state$mcpObj, exp_mcp ) )
 })
 
+############################################################################
+# Issue #75 matrix row M09: WT design with deltaWT parameter
+############################################################################
+testthat::test_that("PC equivalence M09: WT design", {
+  wi <- c(1 / 2, 1 / 2, 0, 0)
+  g <- matrix(
+    c(
+      0, 1 / 2, 1 / 2, 0,
+      1 / 2, 0, 0, 1 / 2,
+      0, 1, 0, 0,
+      1, 0, 0, 0
+    ),
+    byrow = TRUE,
+    nrow = 4
+  )
+
+  corr <- matrix(
+    c(
+      1, 0.5, NA, NA,
+      0.5, 1, NA, NA,
+      NA, NA, 1, 0.5,
+      NA, NA, 0.5, 1
+    ),
+    byrow = TRUE,
+    nrow = 4
+  )
+
+  state <- SetupAnalysis_PC(
+    WI = wi,
+    G = g,
+    test.type = "Dunnett",
+    alpha = 0.025,
+    info_frac = c(0.5, 1.0),
+    typeOfDesign = "WT",
+    deltaWT = 0.25,
+    Correlation = corr,
+    MultipleWinners = TRUE,
+    Selection = FALSE,
+    UpdateStrategy = FALSE,
+    plotGraphs = FALSE
+  )
+
+  state <- AnalyzeLook_PC(
+    state,
+    p_raw = c(H1 = 0.28, H2 = 0.32, H3 = 0.36, H4 = 0.40),
+    plotGraphs = FALSE
+  )
+
+  exp_mcp <- readRDS(testthat::test_path("M09.l1.mcpObj.rds"))
+  testthat::expect_true( CompareImportantMcpMembers( state$mcpObj, exp_mcp ) )
+
+  state <- AnalyzeLook_PC(
+    state,
+    p_raw = c(H1 = 0.07, H2 = 0.10, H3 = 0.13, H4 = 0.16),
+    plotGraphs = FALSE
+  )
+
+  exp_mcp <- readRDS(testthat::test_path("M09.l2.mcpObj.rds"))
+  testthat::expect_true( CompareImportantMcpMembers( state$mcpObj, exp_mcp ) )
+})
+
+############################################################################
+# Issue #75 matrix row M10: PT design — DEFERRED (N/A for this pass)
+# rpact requires deltaPT0 which is not yet exposed by SetupAnalysis_PC() or
+# adaptGMCP_PC(). This row is marked N/A for this pass. Add a fixture-backed
+# equivalence test once deltaPT0 parameter support is added to the API.
+############################################################################
+

@@ -61,7 +61,7 @@ adaptGMCP_PC <- function(
     {
     if(typeOfDesign == "WT"){
       des <- rpact::getDesignGroupSequential(
-        kMax = nLooks, alpha = alpha,
+        kMax = K, alpha = alpha,
         informationRates = info_frac,
         typeOfDesign = typeOfDesign,
         deltaWT = deltaWT
