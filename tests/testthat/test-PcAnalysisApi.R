@@ -1326,6 +1326,228 @@ testthat::test_that("PC equivalence M09: WT design", {
 })
 
 ############################################################################
+# Issue #75 matrix row M13: asUser design with userAlphaSpending
+############################################################################
+testthat::test_that("PC equivalence M13: asUser design", {
+  wi <- c(1 / 2, 1 / 2, 0, 0)
+  g <- matrix(
+    c(
+      0, 1 / 2, 1 / 2, 0,
+      1 / 2, 0, 0, 1 / 2,
+      0, 1, 0, 0,
+      1, 0, 0, 0
+    ),
+    byrow = TRUE,
+    nrow = 4
+  )
+
+  corr <- matrix(
+    c(
+      1, 0.5, NA, NA,
+      0.5, 1, NA, NA,
+      NA, NA, 1, 0.5,
+      NA, NA, 0.5, 1
+    ),
+    byrow = TRUE,
+    nrow = 4
+  )
+
+  state <- SetupAnalysis_PC(
+    WI = wi,
+    G = g,
+    test.type = "Dunnett",
+    alpha = 0.025,
+    info_frac = c(0.5, 1.0),
+    typeOfDesign = "asUser",
+    userAlphaSpending = c(0.008, 0.025),
+    Correlation = corr,
+    MultipleWinners = TRUE,
+    Selection = FALSE,
+    UpdateStrategy = FALSE,
+    plotGraphs = FALSE
+  )
+
+  state <- AnalyzeLook_PC(
+    state,
+    p_raw = c(H1 = 0.29, H2 = 0.33, H3 = 0.37, H4 = 0.41),
+    plotGraphs = FALSE
+  )
+
+  exp_mcp <- readRDS(testthat::test_path("M13.l1.mcpObj.rds"))
+  testthat::expect_true( CompareImportantMcpMembers( state$mcpObj, exp_mcp ) )
+
+  state <- AnalyzeLook_PC(
+    state,
+    p_raw = c(H1 = 0.07, H2 = 0.09, H3 = 0.12, H4 = 0.15),
+    plotGraphs = FALSE
+  )
+
+  exp_mcp <- readRDS(testthat::test_path("M13.l2.mcpObj.rds"))
+  testthat::expect_true( CompareImportantMcpMembers( state$mcpObj, exp_mcp ) )
+})
+
+############################################################################
+# Issue #75 matrix row M17: selection-only adaptation
+############################################################################
+testthat::test_that("PC equivalence M17: selection-only adaptation", {
+  wi <- c(1 / 2, 1 / 2, 0, 0)
+  g <- matrix(
+    c(
+      0, 1 / 2, 1 / 2, 0,
+      1 / 2, 0, 0, 1 / 2,
+      0, 1, 0, 0,
+      1, 0, 0, 0
+    ),
+    byrow = TRUE,
+    nrow = 4
+  )
+
+  corr <- matrix(
+    c(
+      1, 0.5, NA, NA,
+      0.5, 1, NA, NA,
+      NA, NA, 1, 0.5,
+      NA, NA, 0.5, 1
+    ),
+    byrow = TRUE,
+    nrow = 4
+  )
+
+  state <- SetupAnalysis_PC(
+    WI = wi,
+    G = g,
+    test.type = "Dunnett",
+    alpha = 0.025,
+    info_frac = c(0.5, 1.0),
+    typeOfDesign = "asOF",
+    Correlation = corr,
+    MultipleWinners = TRUE,
+    Selection = TRUE,
+    UpdateStrategy = FALSE,
+    plotGraphs = FALSE
+  )
+
+  state <- AnalyzeLook_PC(
+    state,
+    p_raw = c(H1 = 0.21, H2 = 0.24, H3 = 0.30, H4 = 0.35),
+    plotGraphs = FALSE
+  )
+
+  exp_mcp <- readRDS(testthat::test_path("M17.l1.mcpObj.rds"))
+  testthat::expect_true( CompareImportantMcpMembers( state$mcpObj, exp_mcp ) )
+
+  state <- AnalyzeLook_PC(
+    state,
+    p_raw = c(H1 = 0.05, H2 = 0.07, H4 = 0.11),
+    selection = c("H1", "H2", "H4"),
+    plotGraphs = FALSE
+  )
+
+  exp_mcp <- readRDS(testthat::test_path("M17.l2.mcpObj.rds"))
+  testthat::expect_true( CompareImportantMcpMembers( state$mcpObj, exp_mcp ) )
+})
+
+############################################################################
+# Issue #75 matrix row M08: noEarlyEfficacy design
+############################################################################
+testthat::test_that("PC equivalence M08: noEarlyEfficacy design", {
+  wi <- c(1 / 2, 1 / 2, 0, 0)
+  g <- matrix(
+    c(
+      0, 1 / 2, 1 / 2, 0,
+      1 / 2, 0, 0, 1 / 2,
+      0, 1, 0, 0,
+      1, 0, 0, 0
+    ),
+    byrow = TRUE,
+    nrow = 4
+  )
+
+  corr <- matrix(
+    c(
+      1, 0.5, NA, NA,
+      0.5, 1, NA, NA,
+      NA, NA, 1, 0.5,
+      NA, NA, 0.5, 1
+    ),
+    byrow = TRUE,
+    nrow = 4
+  )
+
+  state <- SetupAnalysis_PC(
+    WI = wi,
+    G = g,
+    test.type = "Dunnett",
+    alpha = 0.025,
+    info_frac = c(0.5, 1.0),
+    typeOfDesign = "noEarlyEfficacy",
+    Correlation = corr,
+    MultipleWinners = TRUE,
+    Selection = FALSE,
+    UpdateStrategy = FALSE,
+    plotGraphs = FALSE
+  )
+
+  state <- AnalyzeLook_PC(
+    state,
+    p_raw = c(H1 = 0.31, H2 = 0.34, H3 = 0.38, H4 = 0.43),
+    plotGraphs = FALSE
+  )
+
+  exp_mcp <- readRDS(testthat::test_path("M08.l1.mcpObj.rds"))
+  testthat::expect_true( CompareImportantMcpMembers( state$mcpObj, exp_mcp ) )
+
+  state <- AnalyzeLook_PC(
+    state,
+    p_raw = c(H1 = 0.08, H2 = 0.10, H3 = 0.12, H4 = 0.16),
+    plotGraphs = FALSE
+  )
+
+  exp_mcp <- readRDS(testthat::test_path("M08.l2.mcpObj.rds"))
+  testthat::expect_true( CompareImportantMcpMembers( state$mcpObj, exp_mcp ) )
+})
+
+############################################################################
+# Issue #75 matrix row M02: Sidak baseline fixed-sample
+############################################################################
+testthat::test_that("PC equivalence M02: Sidak baseline", {
+  wi <- c(1 / 2, 1 / 2, 0, 0)
+  g <- matrix(
+    c(
+      0, 1 / 2, 1 / 2, 0,
+      1 / 2, 0, 0, 1 / 2,
+      0, 1, 0, 0,
+      1, 0, 0, 0
+    ),
+    byrow = TRUE,
+    nrow = 4
+  )
+
+  state <- SetupAnalysis_PC(
+    WI = wi,
+    G = g,
+    test.type = "Sidak",
+    alpha = 0.025,
+    info_frac = c(1.0),
+    typeOfDesign = "asOF",
+    MultipleWinners = TRUE,
+    Selection = FALSE,
+    UpdateStrategy = FALSE,
+    plotGraphs = FALSE
+  )
+
+  state <- AnalyzeLook_PC(
+    state,
+    p_raw = c(H1 = 0.01, H2 = 0.02, H3 = 0.03, H4 = 0.04),
+    plotGraphs = FALSE
+  )
+
+  exp_mcp <- readRDS(testthat::test_path("M02.l1.mcpObj.rds"))
+  testthat::expect_true( CompareImportantMcpMembers( state$mcpObj, exp_mcp ) )
+  testthat::expect_true(state$trial_completed)
+})
+
+############################################################################
 # Issue #75 matrix row M10: PT design — DEFERRED (N/A for this pass)
 # rpact requires deltaPT0 which is not yet exposed by SetupAnalysis_PC() or
 # adaptGMCP_PC(). This row is marked N/A for this pass. Add a fixture-backed

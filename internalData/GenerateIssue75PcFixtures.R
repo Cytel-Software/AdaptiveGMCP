@@ -293,6 +293,81 @@ GenerateIssue75Fixtures <- function()
         list( p_raw = c( H1 = 0.28, H2 = 0.32, H3 = 0.36, H4 = 0.40 ) ),
         list( p_raw = c( H1 = 0.07, H2 = 0.10, H3 = 0.13, H4 = 0.16 ) )
       )
+    ),
+    list(
+      rowId = "M13",
+      WI = c( 0.5, 0.5, 0, 0 ),
+      G = mGraph4,
+      testType = "Dunnett",
+      alpha = 0.025,
+      infoFrac = c( 0.5, 1.0 ),
+      typeOfDesign = "asUser",
+      deltaWT = 0,
+      deltaPT1 = 0,
+      gammaA = 2,
+      userAlphaSpending = c( 0.008, 0.025 ),
+      correlation = mCorrDefault,
+      multipleWinners = TRUE,
+      lookInputs = list(
+        list( p_raw = c( H1 = 0.29, H2 = 0.33, H3 = 0.37, H4 = 0.41 ) ),
+        list( p_raw = c( H1 = 0.07, H2 = 0.09, H3 = 0.12, H4 = 0.15 ) )
+      )
+    ),
+    list(
+      rowId = "M17",
+      WI = c( 0.5, 0.5, 0, 0 ),
+      G = mGraph4,
+      testType = "Dunnett",
+      alpha = 0.025,
+      infoFrac = c( 0.5, 1.0 ),
+      typeOfDesign = "asOF",
+      deltaWT = 0,
+      deltaPT1 = 0,
+      gammaA = 2,
+      userAlphaSpending = NULL,
+      correlation = mCorrDefault,
+      multipleWinners = TRUE,
+      lookInputs = list(
+        list( p_raw = c( H1 = 0.21, H2 = 0.24, H3 = 0.30, H4 = 0.35 ) ),
+        list( p_raw = c( H1 = 0.05, H2 = 0.07, H4 = 0.11 ), selection = c( "H1", "H2", "H4" ) )
+      )
+    ),
+    list(
+      rowId = "M08",
+      WI = c( 0.5, 0.5, 0, 0 ),
+      G = mGraph4,
+      testType = "Dunnett",
+      alpha = 0.025,
+      infoFrac = c( 0.5, 1.0 ),
+      typeOfDesign = "noEarlyEfficacy",
+      deltaWT = 0,
+      deltaPT1 = 0,
+      gammaA = 2,
+      userAlphaSpending = NULL,
+      correlation = mCorrDefault,
+      multipleWinners = TRUE,
+      lookInputs = list(
+        list( p_raw = c( H1 = 0.31, H2 = 0.34, H3 = 0.38, H4 = 0.43 ) ),
+        list( p_raw = c( H1 = 0.08, H2 = 0.10, H3 = 0.12, H4 = 0.16 ) )
+      )
+    ),
+    list(
+      rowId = "M02",
+      WI = c( 0.5, 0.5, 0, 0 ),
+      G = mGraph4,
+      testType = "Sidak",
+      alpha = 0.025,
+      infoFrac = c( 1.0 ),
+      typeOfDesign = "asOF",
+      deltaWT = 0,
+      deltaPT1 = 0,
+      gammaA = 2,
+      userAlphaSpending = NULL,
+      correlation = NULL,
+      multipleWinners = TRUE,
+      lookInputs = list(
+        list( p_raw = c( H1 = 0.01, H2 = 0.02, H3 = 0.03, H4 = 0.04 ) )
+      )
     )
     # M10 (PT design) is deferred: rpact requires deltaPT0 which is not yet a
     # parameter in SetupAnalysis_PC() or adaptGMCP_PC(). Add M10 once deltaPT0
