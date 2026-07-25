@@ -1554,3 +1554,718 @@ testthat::test_that("PC equivalence M02: Sidak baseline", {
 # equivalence test once deltaPT0 parameter support is added to the API.
 ############################################################################
 
+############################################################################
+# Issue #67 Phase 1: SetupAnalysis_PC() contract-validation tests
+############################################################################
+
+testthat::test_that("SetupAnalysis_PC: WI validation - type, NA, negativity, and sum", {
+  wi <- c(0.5, 0.5, 0, 0)
+  g <- matrix(
+    c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
+    byrow = TRUE, nrow = 4
+  )
+
+  # Non-numeric WI
+  testthat::expect_error(
+    SetupAnalysis_PC(
+      WI = c("a", "b", "c", "d"), G = g, test.type = "Bonf",
+      alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
+    ),
+    regexp = "numeric, non-negative, and non-NA"
+  )
+
+  # WI with NA
+  testthat::expect_error(
+    SetupAnalysis_PC(
+      WI = c(0.5, NA, 0, 0), G = g, test.type = "Bonf",
+      alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
+    ),
+    regexp = "numeric, non-negative, and non-NA"
+  )
+
+  # WI with negative value
+  testthat::expect_error(
+    SetupAnalysis_PC(
+      WI = c(0.5, -0.1, 0, 0), G = g, test.type = "Bonf",
+      alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
+    ),
+    regexp = "numeric, non-negative, and non-NA"
+  )
+
+  # WI summing to > 1
+  testthat::expect_error(
+    SetupAnalysis_PC(
+      WI = c(0.6, 0.6, 0, 0), G = g, test.type = "Bonf",
+      alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
+    ),
+    regexp = "Sum of WI"
+  )
+
+  # WI dimension mismatch with G: WI has 2 elements, G is 4 x 4
+  testthat::expect_error(
+    SetupAnalysis_PC(
+      WI = c(0.5, 0.5), G = g, test.type = "Bonf",
+      alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
+    ),
+    regexp = "transition matrix"
+  )
+})
+
+testthat::test_that("SetupAnalysis_PC: G validation - matrix requirement and dimensions", {
+  wi <- c(0.5, 0.5, 0, 0)
+
+  # G is not a matrix (vector instead)
+  testthat::expect_error(
+    SetupAnalysis_PC(
+      WI = wi, G = c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
+      test.type = "Bonf", alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
+    ),
+    regexp = "transition matrix"
+  )
+
+  # G has wrong dimensions (3 x 3 instead of 4 x 4)
+  gBad <- matrix(c(0, 0.5, 0.5, 0.5, 0, 0.5, 0.5, 0.5, 0), byrow = TRUE, nrow = 3)
+  testthat::expect_error(
+    SetupAnalysis_PC(
+      WI = wi, G = gBad, test.type = "Bonf",
+      alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
+    ),
+    regexp = "transition matrix"
+  )
+})
+
+testthat::test_that("SetupAnalysis_PC: info_frac validation - length, bounds, and monotonicity", {
+  wi <- c(0.5, 0.5, 0, 0)
+  g <- matrix(
+    c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
+    byrow = TRUE, nrow = 4
+  )
+
+  # Empty info_frac
+  testthat::expect_error(
+    SetupAnalysis_PC(
+      WI = wi, G = g, test.type = "Bonf",
+      alpha = 0.025, info_frac = numeric(0), plotGraphs = FALSE
+    ),
+    regexp = "info_frac must have length"
+  )
+
+  # info_frac contains zero (not in (0, 1])
+  testthat::expect_error(
+    SetupAnalysis_PC(
+      WI = wi, G = g, test.type = "Bonf",
+      alpha = 0.025, info_frac = c(0, 0.5, 1.0), plotGraphs = FALSE
+    ),
+    regexp = "info_frac must be in"
+  )
+
+  # info_frac contains value > 1
+  testthat::expect_error(
+    SetupAnalysis_PC(
+      WI = wi, G = g, test.type = "Bonf",
+      alpha = 0.025, info_frac = c(0.5, 1.2), plotGraphs = FALSE
+    ),
+    regexp = "info_frac must be in"
+  )
+
+  # info_frac not strictly increasing (repeated value)
+  testthat::expect_error(
+    SetupAnalysis_PC(
+      WI = wi, G = g, test.type = "Bonf",
+      alpha = 0.025, info_frac = c(0.5, 0.5, 1.0), plotGraphs = FALSE
+    ),
+    regexp = "strictly increasing"
+  )
+
+  # info_frac not strictly increasing (decreasing segment)
+  testthat::expect_error(
+    SetupAnalysis_PC(
+      WI = wi, G = g, test.type = "Bonf",
+      alpha = 0.025, info_frac = c(0.7, 0.5, 1.0), plotGraphs = FALSE
+    ),
+    regexp = "strictly increasing"
+  )
+})
+
+testthat::test_that("SetupAnalysis_PC: unsupported test.type is rejected", {
+  wi <- c(0.5, 0.5, 0, 0)
+  g <- matrix(
+    c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
+    byrow = TRUE, nrow = 4
+  )
+
+  testthat::expect_error(
+    SetupAnalysis_PC(
+      WI = wi, G = g, test.type = "Unknown",
+      alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
+    ),
+    regexp = "Unsupported test.type"
+  )
+})
+
+testthat::test_that("SetupAnalysis_PC: correlation policy by test.type", {
+  wi <- c(0.5, 0.5, 0, 0)
+  g <- matrix(
+    c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
+    byrow = TRUE, nrow = 4
+  )
+  corr <- matrix(
+    c(1, 0.5, NA, NA, 0.5, 1, NA, NA, NA, NA, 1, 0.5, NA, NA, 0.5, 1),
+    nrow = 4
+  )
+
+  # Dunnett: Correlation must be provided
+  testthat::expect_error(
+    SetupAnalysis_PC(
+      WI = wi, G = g, test.type = "Dunnett",
+      alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
+    ),
+    regexp = "Correlation must be provided"
+  )
+
+  # Partly-Parametric: Correlation must be provided
+  testthat::expect_error(
+    SetupAnalysis_PC(
+      WI = wi, G = g, test.type = "Partly-Parametric",
+      alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
+    ),
+    regexp = "Correlation must be provided"
+  )
+
+  # Dunnett: Correlation must be a d x d matrix (wrong size)
+  testthat::expect_error(
+    SetupAnalysis_PC(
+      WI = wi, G = g, test.type = "Dunnett",
+      alpha = 0.025, info_frac = c(1),
+      Correlation = matrix(c(1, 0.5, 0.5, 1), nrow = 2),
+      plotGraphs = FALSE
+    ),
+    regexp = "Correlation must be a"
+  )
+
+  # Bonf: overrides Correlation to identity with NA off-diagonal
+  stateBonf <- SetupAnalysis_PC(
+    WI = wi, G = g, test.type = "Bonf",
+    alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
+  )
+  corrExpBonf <- diag(4)
+  corrExpBonf[corrExpBonf == 0] <- NA
+  testthat::expect_equal(stateBonf$mcpObj$Correlation, corrExpBonf)
+
+  # Sidak: sets Correlation to NA
+  stateSidak <- SetupAnalysis_PC(
+    WI = wi, G = g, test.type = "Sidak",
+    alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
+  )
+  testthat::expect_true(is.na(stateSidak$mcpObj$Correlation))
+
+  # Simes: sets Correlation to NA
+  stateSimes <- SetupAnalysis_PC(
+    WI = wi, G = g, test.type = "Simes",
+    alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
+  )
+  testthat::expect_true(is.na(stateSimes$mcpObj$Correlation))
+})
+
+testthat::test_that("SetupAnalysis_PC: asUser typeOfDesign requires userAlphaSpending", {
+  wi <- c(0.5, 0.5, 0, 0)
+  g <- matrix(
+    c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
+    byrow = TRUE, nrow = 4
+  )
+  corr <- matrix(
+    c(1, 0.5, NA, NA, 0.5, 1, NA, NA, NA, NA, 1, 0.5, NA, NA, 0.5, 1),
+    nrow = 4
+  )
+
+  # Missing userAlphaSpending when typeOfDesign = 'asUser'
+  testthat::expect_error(
+    SetupAnalysis_PC(
+      WI = wi, G = g, test.type = "Dunnett",
+      alpha = 0.025, info_frac = c(0.5, 1.0),
+      typeOfDesign = "asUser", Correlation = corr,
+      plotGraphs = FALSE
+    ),
+    regexp = "userAlphaSpending"
+  )
+
+  # Valid asUser call does not error
+  testthat::expect_no_error(
+    SetupAnalysis_PC(
+      WI = wi, G = g, test.type = "Dunnett",
+      alpha = 0.025, info_frac = c(0.5, 1.0),
+      typeOfDesign = "asUser",
+      userAlphaSpending = c(0.008, 0.025),
+      Correlation = corr, plotGraphs = FALSE
+    )
+  )
+})
+
+############################################################################
+# Issue #70 Phase 2: AnalyzeLook_PC() input-validation tests
+############################################################################
+
+testthat::test_that("AnalyzeLook_PC: non-PCAnalysisState input is rejected", {
+  testthat::expect_error(
+    AnalyzeLook_PC(list(), p_raw = c(H1 = 0.1), plotGraphs = FALSE),
+    regexp = "PCAnalysisState"
+  )
+
+  testthat::expect_error(
+    AnalyzeLook_PC("not_a_state", p_raw = c(H1 = 0.1), plotGraphs = FALSE),
+    regexp = "PCAnalysisState"
+  )
+})
+
+testthat::test_that("AnalyzeLook_PC: p_raw contract validation", {
+  wi <- c(0.5, 0.5)
+  g <- matrix(c(0, 1, 1, 0), byrow = TRUE, nrow = 2)
+  corr <- matrix(c(1, 0.5, 0.5, 1), byrow = TRUE, nrow = 2)
+
+  state0 <- SetupAnalysis_PC(
+    WI = wi, G = g, test.type = "Partly-Parametric",
+    alpha = 0.025, info_frac = c(0.5, 1.0),
+    Correlation = corr, plotGraphs = FALSE
+  )
+
+  # Non-numeric p_raw
+  testthat::expect_error(
+    AnalyzeLook_PC(state0, p_raw = c(H1 = "a", H2 = "b"), plotGraphs = FALSE),
+    regexp = "p_raw must be numeric"
+  )
+
+  # p_raw contains NA
+  testthat::expect_error(
+    AnalyzeLook_PC(state0, p_raw = c(H1 = 0.1, H2 = NA), plotGraphs = FALSE),
+    regexp = "p_raw cannot contain NA"
+  )
+
+  # p_raw value below 0
+  testthat::expect_error(
+    AnalyzeLook_PC(state0, p_raw = c(H1 = -0.1, H2 = 0.2), plotGraphs = FALSE),
+    regexp = "p_raw values must be in"
+  )
+
+  # p_raw value above 1
+  testthat::expect_error(
+    AnalyzeLook_PC(state0, p_raw = c(H1 = 1.1, H2 = 0.2), plotGraphs = FALSE),
+    regexp = "p_raw values must be in"
+  )
+
+  # Unnamed p_raw with wrong length
+  testthat::expect_error(
+    AnalyzeLook_PC(state0, p_raw = c(0.1, 0.2, 0.3), plotGraphs = FALSE),
+    regexp = "Unnamed p_raw must have length"
+  )
+
+  # Named p_raw with names not matching current IndexSet
+  testthat::expect_error(
+    AnalyzeLook_PC(state0, p_raw = c(X1 = 0.1, X2 = 0.2), plotGraphs = FALSE),
+    regexp = "p_raw names must match"
+  )
+
+  # Unnamed p_raw with correct length succeeds
+  testthat::expect_no_error(
+    AnalyzeLook_PC(state0, p_raw = c(0.1, 0.2), plotGraphs = FALSE)
+  )
+})
+
+testthat::test_that("AnalyzeLook_PC: look 1 adaptation prohibition", {
+  wi <- c(0.5, 0.5, 0, 0)
+  g <- matrix(
+    c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
+    byrow = TRUE, nrow = 4
+  )
+  corr <- matrix(
+    c(1, 0.5, NA, NA, 0.5, 1, NA, NA, NA, NA, 1, 0.5, NA, NA, 0.5, 1),
+    nrow = 4
+  )
+
+  state0 <- SetupAnalysis_PC(
+    WI = wi, G = g, test.type = "Partly-Parametric",
+    alpha = 0.025, info_frac = c(0.5, 1.0),
+    Correlation = corr, plotGraphs = FALSE
+  )
+
+  # selection at look 1 must error
+  testthat::expect_error(
+    AnalyzeLook_PC(
+      state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
+      selection = c("H1", "H2"), plotGraphs = FALSE
+    ),
+    regexp = "selection cannot be applied at look 1"
+  )
+
+  # new_weights/new_G at look 1 must error
+  testthat::expect_error(
+    AnalyzeLook_PC(
+      state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
+      new_weights = c(H1 = 0.5, H2 = 0.5, H3 = 0, H4 = 0),
+      new_G = g, plotGraphs = FALSE
+    ),
+    regexp = "new_weights/new_G cannot be applied at look 1"
+  )
+
+  # new_correlation at look 1 must error
+  testthat::expect_error(
+    AnalyzeLook_PC(
+      state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
+      new_correlation = corr, plotGraphs = FALSE
+    ),
+    regexp = "new_correlation cannot be applied at look 1"
+  )
+})
+
+############################################################################
+# Issue #69 Phase 3: look > 1 adaptation gate and mutation-validation tests
+############################################################################
+
+testthat::test_that("AnalyzeLook_PC: feature-flag gates at look > 1", {
+  wi <- c(0.5, 0.5, 0, 0)
+  g <- matrix(
+    c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
+    byrow = TRUE, nrow = 4
+  )
+  corr <- matrix(
+    c(1, 0.5, NA, NA, 0.5, 1, NA, NA, NA, NA, 1, 0.5, NA, NA, 0.5, 1),
+    nrow = 4
+  )
+
+  # Both feature flags disabled
+  stateNoAdapt <- SetupAnalysis_PC(
+    WI = wi, G = g, test.type = "Dunnett",
+    alpha = 0.025, info_frac = c(0.5, 1.0),
+    Correlation = corr, Selection = FALSE, UpdateStrategy = FALSE,
+    plotGraphs = FALSE
+  )
+  stateNoAdapt <- AnalyzeLook_PC(
+    stateNoAdapt,
+    p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
+    plotGraphs = FALSE
+  )
+
+  # Selection = FALSE: providing selection must error
+  testthat::expect_error(
+    AnalyzeLook_PC(
+      stateNoAdapt,
+      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      selection = c("H1", "H2"), plotGraphs = FALSE
+    ),
+    regexp = "Selection was disabled"
+  )
+
+  # UpdateStrategy = FALSE: providing new_weights/new_G must error
+  testthat::expect_error(
+    AnalyzeLook_PC(
+      stateNoAdapt,
+      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      new_weights = c(H1 = 0.5, H2 = 0.5, H3 = 0, H4 = 0),
+      new_G = g, plotGraphs = FALSE
+    ),
+    regexp = "UpdateStrategy was disabled"
+  )
+})
+
+testthat::test_that("AnalyzeLook_PC: selection validity at look > 1", {
+  wi <- c(0.5, 0.5, 0, 0)
+  g <- matrix(
+    c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
+    byrow = TRUE, nrow = 4
+  )
+  corr <- matrix(
+    c(1, 0.5, NA, NA, 0.5, 1, NA, NA, NA, NA, 1, 0.5, NA, NA, 0.5, 1),
+    nrow = 4
+  )
+
+  state1 <- SetupAnalysis_PC(
+    WI = wi, G = g, test.type = "Dunnett",
+    alpha = 0.025, info_frac = c(0.5, 1.0),
+    Correlation = corr, Selection = TRUE, UpdateStrategy = FALSE,
+    plotGraphs = FALSE
+  )
+  state1 <- AnalyzeLook_PC(
+    state1,
+    p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
+    plotGraphs = FALSE
+  )
+
+  # Non-character selection
+  testthat::expect_error(
+    AnalyzeLook_PC(
+      state1,
+      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      selection = c(1L, 2L), plotGraphs = FALSE
+    ),
+    regexp = "selection must be a character"
+  )
+
+  # selection not a subset of active IndexSet
+  testthat::expect_error(
+    AnalyzeLook_PC(
+      state1,
+      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      selection = c("H1", "H5"), plotGraphs = FALSE
+    ),
+    regexp = "subset of current IndexSet"
+  )
+
+  # Empty selection vector
+  testthat::expect_error(
+    AnalyzeLook_PC(
+      state1,
+      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      selection = character(0), plotGraphs = FALSE
+    ),
+    regexp = "retain at least one hypothesis"
+  )
+
+  # Valid selection proceeds without error
+  testthat::expect_no_error(
+    AnalyzeLook_PC(
+      state1,
+      p_raw = c(H1 = 0.10, H2 = 0.15),
+      selection = c("H1", "H2"), plotGraphs = FALSE
+    )
+  )
+})
+
+testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
+  wi <- c(0.5, 0.5, 0, 0)
+  g <- matrix(
+    c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
+    byrow = TRUE, nrow = 4
+  )
+  corr <- matrix(
+    c(1, 0.5, NA, NA, 0.5, 1, NA, NA, NA, NA, 1, 0.5, NA, NA, 0.5, 1),
+    nrow = 4
+  )
+
+  state1 <- SetupAnalysis_PC(
+    WI = wi, G = g, test.type = "Dunnett",
+    alpha = 0.025, info_frac = c(0.5, 1.0),
+    Correlation = corr, Selection = FALSE, UpdateStrategy = TRUE,
+    plotGraphs = FALSE
+  )
+  state1 <- AnalyzeLook_PC(
+    state1,
+    p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
+    plotGraphs = FALSE
+  )
+
+  vValidNewW <- c(H1 = 0.5, H2 = 0.5, H3 = 0, H4 = 0)
+  gValidNew <- matrix(
+    c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
+    byrow = TRUE, nrow = 4
+  )
+
+  # Only new_weights without new_G must error
+  testthat::expect_error(
+    AnalyzeLook_PC(
+      state1,
+      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      new_weights = vValidNewW, plotGraphs = FALSE
+    ),
+    regexp = "Both new_weights and new_G"
+  )
+
+  # Only new_G without new_weights must error
+  testthat::expect_error(
+    AnalyzeLook_PC(
+      state1,
+      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      new_G = gValidNew, plotGraphs = FALSE
+    ),
+    regexp = "Both new_weights and new_G"
+  )
+
+  # Non-numeric new_weights must error
+  testthat::expect_error(
+    AnalyzeLook_PC(
+      state1,
+      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      new_weights = c(H1 = "a", H2 = "b", H3 = "c", H4 = "d"),
+      new_G = gValidNew, plotGraphs = FALSE
+    ),
+    regexp = "new_weights must be numeric"
+  )
+
+  # Unnamed new_weights with wrong length must error
+  testthat::expect_error(
+    AnalyzeLook_PC(
+      state1,
+      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      new_weights = c(0.5, 0.5),
+      new_G = gValidNew, plotGraphs = FALSE
+    ),
+    regexp = "Unnamed new_weights must have length"
+  )
+
+  # new_weights with names not matching IndexSet must error
+  testthat::expect_error(
+    AnalyzeLook_PC(
+      state1,
+      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      new_weights = c(X1 = 0.5, X2 = 0.5, X3 = 0, X4 = 0),
+      new_G = gValidNew, plotGraphs = FALSE
+    ),
+    regexp = "new_weights names must match"
+  )
+
+  # new_weights summing to > 1 must error
+  testthat::expect_error(
+    AnalyzeLook_PC(
+      state1,
+      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      new_weights = c(H1 = 0.7, H2 = 0.7, H3 = 0, H4 = 0),
+      new_G = gValidNew, plotGraphs = FALSE
+    ),
+    regexp = "new_weights must sum"
+  )
+
+  # new_G not a matrix must error
+  testthat::expect_error(
+    AnalyzeLook_PC(
+      state1,
+      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      new_weights = vValidNewW,
+      new_G = c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
+      plotGraphs = FALSE
+    ),
+    regexp = "new_G must be a matrix"
+  )
+
+  # new_G with wrong dimensions must error
+  testthat::expect_error(
+    AnalyzeLook_PC(
+      state1,
+      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      new_weights = vValidNewW,
+      new_G = matrix(c(0, 0.5, 0.5, 0.5, 0, 0.5, 0.5, 0.5, 0), byrow = TRUE, nrow = 3),
+      plotGraphs = FALSE
+    ),
+    regexp = "square matrix of size"
+  )
+
+  # new_G with negative entries must error
+  gNeg <- gValidNew
+  gNeg[1, 2] <- -0.1
+  testthat::expect_error(
+    AnalyzeLook_PC(
+      state1,
+      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      new_weights = vValidNewW,
+      new_G = gNeg, plotGraphs = FALSE
+    ),
+    regexp = "new_G must be non-negative"
+  )
+
+  # new_G with row sum > 1 must error
+  gBadRowSum <- matrix(
+    c(0, 0.8, 0.8, 0, 0.5, 0, 0, 0.5, 0, 0, 0, 1, 0, 0, 1, 0),
+    byrow = TRUE, nrow = 4
+  )
+  testthat::expect_error(
+    AnalyzeLook_PC(
+      state1,
+      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      new_weights = vValidNewW,
+      new_G = gBadRowSum, plotGraphs = FALSE
+    ),
+    regexp = "row sum"
+  )
+})
+
+testthat::test_that("AnalyzeLook_PC: correlation update validity at look > 1", {
+  wi <- c(0.5, 0.5, 0, 0)
+  g <- matrix(
+    c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
+    byrow = TRUE, nrow = 4
+  )
+  corr <- matrix(
+    c(1, 0.5, NA, NA, 0.5, 1, NA, NA, NA, NA, 1, 0.5, NA, NA, 0.5, 1),
+    nrow = 4
+  )
+
+  state1 <- SetupAnalysis_PC(
+    WI = wi, G = g, test.type = "Dunnett",
+    alpha = 0.025, info_frac = c(0.5, 1.0),
+    Correlation = corr, Selection = FALSE, UpdateStrategy = FALSE,
+    plotGraphs = FALSE
+  )
+  state1 <- AnalyzeLook_PC(
+    state1,
+    p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
+    plotGraphs = FALSE
+  )
+
+  # new_correlation not a matrix must error
+  testthat::expect_error(
+    AnalyzeLook_PC(
+      state1,
+      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      new_correlation = c(1, 0.5, 0.5, 1), plotGraphs = FALSE
+    ),
+    regexp = "new_correlation must be a matrix"
+  )
+
+  # Wrong dimensions (2 x 2 instead of 4 x 4) must error
+  testthat::expect_error(
+    AnalyzeLook_PC(
+      state1,
+      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      new_correlation = matrix(c(1, 0.5, 0.5, 1), nrow = 2),
+      plotGraphs = FALSE
+    ),
+    regexp = "new_correlation must have dimensions"
+  )
+
+  # Non-symmetric new_correlation must error
+  corrAsym <- corr
+  corrAsym[1, 2] <- 0.3  # differs from corrAsym[2, 1] = 0.5
+  testthat::expect_error(
+    AnalyzeLook_PC(
+      state1,
+      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      new_correlation = corrAsym, plotGraphs = FALSE
+    ),
+    regexp = "new_correlation must be symmetric"
+  )
+
+  # Diagonal not equal to 1 must error
+  corrBadDiag <- corr
+  corrBadDiag[1, 1] <- 0.9
+  testthat::expect_error(
+    AnalyzeLook_PC(
+      state1,
+      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      new_correlation = corrBadDiag, plotGraphs = FALSE
+    ),
+    regexp = "diagonal must be 1"
+  )
+
+  # Entry outside [-1, 1] must error
+  corrOutOfRange <- corr
+  corrOutOfRange[1, 2] <- corrOutOfRange[2, 1] <- 1.5
+  testthat::expect_error(
+    AnalyzeLook_PC(
+      state1,
+      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      new_correlation = corrOutOfRange, plotGraphs = FALSE
+    ),
+    regexp = "entries must be in"
+  )
+
+  # Valid new_correlation proceeds without error
+  corrValid <- matrix(
+    c(1, 0.3, NA, NA, 0.3, 1, NA, NA, NA, NA, 1, 0.4, NA, NA, 0.4, 1),
+    nrow = 4
+  )
+  testthat::expect_no_error(
+    AnalyzeLook_PC(
+      state1,
+      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      new_correlation = corrValid, plotGraphs = FALSE
+    )
+  )
+})
+
