@@ -1571,7 +1571,7 @@ testthat::test_that("SetupAnalysis_PC: WI validation - type, NA, negativity, and
       WI = c("a", "b", "c", "d"), G = g, test.type = "Bonf",
       alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
     ),
-    regexp = "WI must be numeric"
+    regexp = "numeric, non-negative, and non-NA"
   )
 
   # WI with NA
@@ -1580,7 +1580,7 @@ testthat::test_that("SetupAnalysis_PC: WI validation - type, NA, negativity, and
       WI = c(0.5, NA, 0, 0), G = g, test.type = "Bonf",
       alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
     ),
-    regexp = "WI must be numeric"
+    regexp = "numeric, non-negative, and non-NA"
   )
 
   # WI with negative value
@@ -1589,7 +1589,7 @@ testthat::test_that("SetupAnalysis_PC: WI validation - type, NA, negativity, and
       WI = c(0.5, -0.1, 0, 0), G = g, test.type = "Bonf",
       alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
     ),
-    regexp = "WI must be numeric"
+    regexp = "numeric, non-negative, and non-NA"
   )
 
   # WI summing to > 1
@@ -2108,7 +2108,7 @@ testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
       new_weights = c(X1 = 0.5, X2 = 0.5, X3 = 0, X4 = 0),
       new_G = gValidNew, plotGraphs = FALSE
     ),
-    regexp = "new_weights"
+    regexp = "new_weights names must match"
   )
 
   # new_weights summing to > 1 must error
