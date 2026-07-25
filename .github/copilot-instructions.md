@@ -30,3 +30,8 @@ When creating, updating, or reviewing issues and epics, follow [instructions/iss
 
 ## Style Guide
 - Always follow the R style guide described in [instructions/r_coding_conventions.instructions.md](instructions/r_coding_conventions.instructions.md) while generating new code or refactoring / changing existing code for any purpose. This includes naming conventions, indentation, and commenting practices to maintain consistency across the codebase.
+
+## Governance
+- Follow all governance rules defined in copilot-instructions.md and all referenced instruction files as mandatory constraints.
+- Before finishing, run and report a Governance Checklist proving each applicable rule was applied, including issue type, labels, hierarchy, state updates, and required docs updates.
+- Task is incomplete unless governance checklist is reported and all applicable governance actions are done.

@@ -83,7 +83,7 @@ Update status as work progresses.
 | G2 | Create living plan document under docs | TBD | Done | #93 | Closed after creating this living plan file |
 | I1 | Create enrichment epic (PC analysis) | TBD | Done | #87 | Epic created with epic label |
 | I2 | Create sub-issues and set Type | TBD | Done | #93-#102 | Sub-issues created with explicit Type values |
-| R1 | Regression gate review (#30, #66) | TBD | Done | #94 | Completed: baseline green; #31 parallel, #67/#70/#69 required as merge-gate coverage |
+| R1 | Regression gate review (#30, #66) | TBD | Done | #94 | Completed: baseline green; #31 parallel; merge-gate coverage #67/#70/#69 now implemented and closed |
 | D1 | Document simple-case enrichment logic | TBD | Not Started | #97 | Include stage-1 alpha split explanation |
 | V1 | EAST reference example creation | User/TBD | Not Started | #95 | Source of numerical truth cases |
 | V2 | EAST fixture integration and tolerance rules | TBD | Not Started | #96 | Reproducible comparison fixtures |
@@ -98,3 +98,4 @@ Update status as work progresses.
 - 2026-07-25: Initial living plan created.
 - 2026-07-25: Created epic #87 and sub-issues #92-#102; closed #92 and #93 after completion in this phase.
 - 2026-07-25: Completed regression gate review (#94), posted blocker/parallel triage, and closed #94.
+- 2026-07-25: Verified progress for #67/#69/#70, posted completion evidence comments, and closed all three issues.
