@@ -2,192 +2,192 @@ AdaptGMCP Meeting-20260714_190809-Meeting Recording
 July 14, 2026, 1:38PM
 38m 9s
 
-Ani Deshmukh started transcription
+A.D. started transcription
 
-Ani Deshmukh   0:03
+A.D.   0:03
 Yeah.
 Yeah, I'll just repeat what we just said. So yeah, so we discussed that we should implement Martin's formula for the correlation because we have verified that that formula works for population enrichment, whereas P1 Anderson's formula does not work well for population enrichment. So that is one change.
 The second change is we want to implement the interactive analysis interface for CR method as well. Then we also discussed that we should start getting ready to make a package release. So, you know, there are certain things that need to be done for that. So that also needs to be done.
 Ohh.
 
-Cyrus Mehta   0:46
+C.M.   0:46
 So, we can make the package even before we have survival, and maybe we should we should have population enrichment in the package, and we can then, you know, work on survival.
 
-Ani Deshmukh   0:51
+A.D.   0:51
 Yeah.
 Okay.
 Yeah, OK, yeah.
 
-Cyrus Mehta   1:00
+C.M.   1:00
 Why is it complicated, Pralay? It is not complicated in terms of the analysis, right? The analysis is already done, same as any other analysis with normal approximation. It is because of the simulation, correct?
 
-Pralay Senchaudhuri   1:14
+P.S.   1:14
 It is simulation, yeah.
 
-Cyrus Mehta   1:15
+C.M.   1:15
 That we want to.
 
-Pralay Senchaudhuri   1:16
+P.S.   1:16
 I need to keep the, yeah, basically, which is the simulation part.
 
-Ani Deshmukh   1:18
+A.D.   1:18
 Mm.
 Singh.
 
-Cyrus Mehta   1:22
+C.M.   1:22
 We want to enter into it like the trade-off between study duration and sample size.
 
-Pralay Senchaudhuri   1:31
+P.S.   1:31
 Sample size, yeah, those things are there, I mean, yeah.
 I don't know. I think even for the regular adaptive design Cyrus, I think we always do the sample size. I mean.
 estimation, but I don't know how important it is, but I think that it will be quite good to find out whether to increase the follow-up time or increase the duration or not, and how does that affect the number of events.
 
-Cyrus Mehta   2:02
+C.M.   2:02
 Well, I mean, in the simulation, the important thing is that we can have...
 We have to have different functions, maybe a more general function for the survival curve, right? So it is not proportional hazard and it can be any.
 
-Pralay Senchaudhuri   2:15
+P.S.   2:15
 Yeah.
 Yeah, that is another part, yeah, non-professional results.
 
-Cyrus Mehta   2:20
+C.M.   2:20
 It can be any any survival curve, right?
 
-Pralay Senchaudhuri   2:23
+P.S.   2:23
 That you can do, because now all those packages are available, RMST and weighted log rank, max combo, all those R code is available, so you can do that.
 
-Cyrus Mehta   2:33
+C.M.   2:33
 Yeah.
 
-Pralay Senchaudhuri   2:33
+P.S.   2:33
 That you can do, non-protocol, non-protional hazard models and all these.
 
-Cyrus Mehta   2:39
+C.M.   2:39
 But those, they are using different analysis. RMST analysis is different from.
 
-Pralay Senchaudhuri   2:45
+P.S.   2:45
 Analysis is different, but...
 
-Cyrus Mehta   2:46
+C.M.   2:46
 Log right.
 We are using log rank and weighted log.
 
-Pralay Senchaudhuri   2:49
+P.S.   2:49
 Analysis is different, but but there is a no different method. Yeah, it is not logged in different method, but they also compute the how, whether it is different or not. They don't go for the estimating the hazard ratio.
 Is it not?
 
-Cyrus Mehta   3:05
+C.M.   3:05
 But yeah, I mean that that that's a whole more more difficult thing, right? Maybe we won't go that far yet, right? We'll go with log rank, I think.
 
-Pralay Senchaudhuri   3:09
+P.S.   3:09
 Different, yeah, yeah.
 Yeah.
 Or, yeah.
 
-Cyrus Mehta   3:18
+C.M.   3:18
 Waited, waited log, right? Yeah.
 
-Pralay Senchaudhuri   3:21
+P.S.   3:21
 Yeah.
 
-Cyrus Mehta   3:21
+C.M.   3:21
 And then, and then we can see, you know, how, how, how it that's an ongoing things, very, I don't know what are what are people doing in in East Horizon.
 
-Pralay Senchaudhuri   3:24
+P.S.   3:24
 Yeah.
 
-Cyrus Mehta   3:35
+C.M.   3:35
 Are you are you in touch with are you are you at least in in that project at all Pralay? You should be on that project, so you at least can report to us what.
 
-Pralay Senchaudhuri   3:42
+P.S.   3:42
 No, no, I mean, I'm here as a consultant, sort of. If they want me, they call me and they ask me.
 
-Ani Deshmukh   3:45
+A.D.   3:45
 Yes.
 
-Cyrus Mehta   3:48
+C.M.   3:48
 But why don't you go to for the some of the meetings like?
 
-Pralay Senchaudhuri   3:54
+P.S.   3:54
 Which meeting?
 
-Cyrus Mehta   3:55
+C.M.   3:55
 I mean, when they are discussing like what they are doing.
 
-Pralay Senchaudhuri   3:58
+P.S.   3:58
 I don't know when the meetings are, Cyrus. I mean, the thing is that I don't know when the meetings are.
 
-Cyrus Mehta   4:05
+C.M.   4:05
 Okay. I mean, I'm not talking about all the AI and all that stuff.
 
-Pralay Senchaudhuri   4:11
+P.S.   4:11
 Not AI, I mean, not AI.
 
-Cyrus Mehta   4:12
+C.M.   4:12
 I mean, just for so, just like for basic what they are doing with the basic statistics.
 
-Pralay Senchaudhuri   4:18
+P.S.   4:18
 Yeah, yeah, no, Cyrus, I don't know when they do they have the meeting. Sometimes they call me, sometimes they don't.
 
-Cyrus Mehta   4:25
+C.M.   4:25
 But, but, but, but do you know what is in East Horizon in terms of the basic statistics stuff?
 
-Pralay Senchaudhuri   4:33
+P.S.   4:33
 I know what is there right now, but I don't know what is the plan, what is going on in the basic status in the statistics side.
 
-Ani Deshmukh   4:43
+A.D.   4:43
 Yeah, and today, Vidyadhar is not in this call. He has a conflict, but, but he, he, he should also.
 
-Cyrus Mehta   4:45
+C.M.   4:45
 OK, Vidyadhar is part of that, right? So, we should be we should we we he should be a liaison, and you know we need we need someone to tell us you know about the survival part and what how how they're how they're thinking about it and and also multiple they're doing a they've done a multiple comparison.
 
-Pralay Senchaudhuri   4:48
+P.S.   4:48
 Yeah.
 
-Ani Deshmukh   4:50
+A.D.   4:50
 Yeah, yeah.
 
-Pralay Senchaudhuri   4:51
+P.S.   4:51
 Yeah.
 Help.
 
-Ani Deshmukh   5:05
+A.D.   5:05
 Yeah, correct, correct.
 
-Cyrus Mehta   5:05
+C.M.   5:05
 Module.
 
-Pralay Senchaudhuri   5:06
+P.S.   5:06
 Yeah.
 
-Cyrus Mehta   5:10
+C.M.   5:10
 Which, which we should know about.
 
-Ani Deshmukh   5:14
+A.D.   5:14
 Yeah.
 
-Pralay Senchaudhuri   5:15
+P.S.   5:15
 Yeah, I know about that, multiple comparison, what they have done. What is the plan after that? I don't know.
 
-Cyrus Mehta   5:24
+C.M.   5:24
 Well, we should know what what we how we add to value to it.
 
-Pralay Senchaudhuri   5:32
+P.S.   5:32
 Yeah, adapt GMC. We can use that as a function for, I mean, as a method for testing the P-values.
 
-Cyrus Mehta   5:40
+C.M.   5:40
 Yeah, and that's one of the things that they said that they would do for us is give it.
 as an R function that you can use from East Horizon, right, through the synergy or something.
 
-Pralay Senchaudhuri   5:50
+P.S.   5:50
 Yeah.
 Yeah.
 Yeah.
 
-Cyrus Mehta   5:57
+C.M.   5:57
 Okay, all right. So all those things are there. Maybe that's one thing you can put on your list, Ani, which is related to making a package, is making it available through the R capability of East Horizon.
 
-Ani Deshmukh   5:59
+A.D.   5:59
 One.
 Ohh.
 Yeah, yeah.
@@ -196,891 +196,877 @@ Yeah, OK, so they there are two ways to use it in this, right? One of them is cu
 virtual machine or server where it is running. So yeah, so we can get our package installed on that machine and then that should work. And then there is the other one called doing your own design that is currently, I mean the development hasn't begun on that, but once
 That is developed, I guess we should, I mean, that will be another way.
 
-Pralay Senchaudhuri   7:11
+P.S.   7:11
 Yeah, bring your own design when it is there that time to add up GSP as it is we can use there, you know what I mean?
 
-Ani Deshmukh   7:16
+A.D.   7:16
 Correct. Yeah.
 
-Pralay Senchaudhuri   7:17
+P.S.   7:17
 But that's what we want, yeah. No, other than that, other than that also, I mean, if that, I don't know how far we can go, that there is a GMCP function in East Horizon. I mean, one test is they're using GMCP.
 
-Cyrus Mehta   7:17
+C.M.   7:17
 So that's what we want, right? And then if they're working on it.
 
-Ani Deshmukh   7:20
+A.D.   7:20
 Yeah.
 Mm.
 
-Pralay Senchaudhuri   7:39
+P.S.   7:39
 I think in that place, possibly in using this R function capability, we can call the adapt GMCP also for the correlated data.
 
-Ani Deshmukh   7:39
+A.D.   7:39
 And...
 Yeah.
 Right, right, yeah.
 
-Pralay Senchaudhuri   7:48
+P.S.   7:48
 Donn.
 
-Ani Deshmukh   7:50
+A.D.   7:50
 Be possible, right?
 
-Pralay Senchaudhuri   7:51
+P.S.   7:51
 It is this thing, given that multiple endpoint which is correlated, we will work there and you have the code, just call our function.
 
-Ani Deshmukh   7:54
+A.D.   7:54
 And.
 And.
 Yeah, yeah, arun.
 Yeah, and they don't have CR method in this, so we can, yeah.
 
-Pralay Senchaudhuri   8:06
+P.S.   8:06
 Yeah.
 
-Cyrus Mehta   8:07
+C.M.   8:07
 The CER method we know is a superior.
 
-Pralay Senchaudhuri   8:11
+P.S.   8:11
 Yeah.
 
-Ani Deshmukh   8:12
+A.D.   8:12
 Correct.
 Yeah.
 And.
 
-Cyrus Mehta   8:18
+C.M.   8:18
 Okay.
 So, so all right, so we have those notes as things that are, they are these things that these are like the things about the interface more than about the actual stats, right? So...
 
-Ani Deshmukh   8:35
+A.D.   8:35
 Yeah, yeah.
 
-Pralay Senchaudhuri   8:36
+P.S.   8:36
 Yeah.
 
-Cyrus Mehta   8:37
+C.M.   8:37
 So for the stats, which we are now working on population enrichment, right? Making it available. I thought we are first doing it, are we doing it for P-value combination of?
 
-Ani Deshmukh   8:44
+A.D.   8:44
 Yeah.
 Yeah, and I'll just bring up my screen and share. I opened that document that Cyrus you had prepared and submitted earlier this evening. So, right, so we have this example and...
 
-Cyrus Mehta   9:04
+C.M.   9:04
 Yeah, yeah, yeah, this example, right?
 
-Ani Deshmukh   9:11
+A.D.   9:11
 There is going to be our, I guess, leading sample for that. But I think somewhere at the bottom you have that list, what all we're going to do.
 No, sorry, not here. Maybe it's at the top only.
 Yeah.
 Right. So we did this expansion of the package to handle mixed normal and binomial data that we have done. Then, yeah, installed on GitHub. So this will happen. That's okay. But let's go. You were also
 
-Cyrus Mehta   9:49
+C.M.   9:49
 I haven't given any webinar yet. I mean, I mean, you know, that's not important, I don't think. Let's go on to four.
 
-Ani Deshmukh   9:50
+A.D.   9:50
 But somebody said that, OK.
 Okay.
 All right, then this is the one really, yeah. Operation enrichment for normal binomial and mixed endpoint designs. So that is the target for this year. And then similarly, this also, time to end points.
 
-Cyrus Mehta   10:13
+C.M.   10:13
 Only multi-arm single endpoint adaptive table. Yeah, well, we don't know how far we will go. We had a delay because of, you know, this.
 
-Ani Deshmukh   10:14
+A.D.   10:14
 Yeah, but.
 Mm.
 Yeah, so.
 Phadke.
 Pralay.
 
-Pralay Senchaudhuri   10:25
+P.S.   10:25
 Yeah.
 
-Cyrus Mehta   10:26
+C.M.   10:26
 And textbook is textbook is also, I mean, it's very close to completion. So let's we're working on them. We're working on them. Let's just say. So we have to work on this population enrichment now. I think we said we will try to take a simple example first, right, of
 
-Ani Deshmukh   10:26
+A.D.   10:26
 Yeah, but these...
 Yeah.
 Yeah, yeah.
 Okay.
 Yeah, yeah.
 
-Cyrus Mehta   10:45
+C.M.   10:45
 But.
 just two treatments and primary, I mean, full population and subpopulation, that example.
 
-Ani Deshmukh   10:51
+A.D.   10:51
 Yeah.
 Thanki.
 Yeah, yeah, so right.
 
-Cyrus Mehta   11:02
+C.M.   11:02
 So, where are we with that?
 
-Ani Deshmukh   11:03
+A.D.   11:03
 So.
 Uh, yeah, so, yeah, this one is more complex, yeah, but uh, yeah, so...
 
-Cyrus Mehta   11:04
+C.M.   11:04
 No, this one is too, this one is more.
 Yeah, yeah.
 It's only this part, left, left part, right? Left part.
 
-Ani Deshmukh   11:14
+A.D.   11:14
 Yeah, left part, but where instead of two endpoints, you have two treatments and...
 
-Cyrus Mehta   11:17
+C.M.   11:17
 Do, do, do treatments, do treatments.
 and then two endpoints.
 
-Ani Deshmukh   11:22
+A.D.   11:22
 Yeah.
 Uh, sub-population rate or two population, not endpoints, yeah, in endpoint, but two treatments and two populations, yeah.
 
-Cyrus Mehta   11:26
+C.M.   11:26
 Yeah, yeah, say one one endpoint.
 Yeah.
 
-Ani Deshmukh   11:35
+A.D.   11:35
 Yeah, that's the one, right? Yeah, so, no, so I need to begin working on that, and you know, so I guess first step will be to implement Martin formulas so that we have the correct correlation computation.
 
-Cyrus Mehta   11:49
+C.M.   11:49
 Yeah.
 
-Ani Deshmukh   11:50
+A.D.   11:50
 And then we can test analysis right with that.
 
-Cyrus Mehta   11:53
+C.M.   11:53
 First analysis and then the simulation.
 
-Ani Deshmukh   11:56
+A.D.   11:56
 The simulation, yeah, and...
 
-Cyrus Mehta   11:58
+C.M.   11:58
 So, we had some issue with the with the inputs, right?
 
-Ani Deshmukh   12:04
+A.D.   12:04
 Yes, yes.
 
-Cyrus Mehta   12:05
+C.M.   12:05
 So, should I?
 Right, so...
 
-Ani Deshmukh   12:09
+A.D.   12:09
 For analysis, there is no problem. I guess it's in simulations, right, where we have to...
 Ohh.
 
-Cyrus Mehta   12:16
+C.M.   12:16
 Well, well, I mean, so what happens at the primary and at the first stage, you're getting these four P-values, right?
 
-Ani Deshmukh   12:26
+A.D.   12:26
 Mhm.
 
-Cyrus Mehta   12:27
+C.M.   12:27
 So, you get 4 P-values, and then you have to, you have to decide, like...
 
-Ani Deshmukh   12:27
+A.D.   12:27
 Right.
 Yeah.
 
-Cyrus Mehta   12:36
+C.M.   12:36
 I mean, you have to do the hypothesis test.
 
-Ani Deshmukh   12:40
+A.D.   12:40
 Yeah.
 Yes.
 
-Cyrus Mehta   12:44
+C.M.   12:44
 to see whether any of them will be rejected.
 
-Ani Deshmukh   12:45
+A.D.   12:45
 Home.
 Mm.
 Yeah.
 
-Cyrus Mehta   12:52
+C.M.   12:52
 You know.
 So imagine that we didn't have any, imagine that we didn't have a second stage. If we only had one stage and we had these four P-values,
 
-Ani Deshmukh   13:04
+A.D.   13:04
 Mm-hmm.
 Yeah.
 
-Cyrus Mehta   13:10
+C.M.   13:10
 Then you would just do a closed test, right?
 
-Ani Deshmukh   13:14
+A.D.   13:14
 Yeah, right, yes.
 
-Cyrus Mehta   13:17
+C.M.   13:17
 We would have the correct correlations now, which we, that's what we did not have.
 
-Ani Deshmukh   13:19
+A.D.   13:19
 Yeah.
 Yeah, right. So this other document has those correct collisions. You had shared this extract from your book. Yeah.
 
-Cyrus Mehta   13:27
+C.M.   13:27
 Yeah.
 I have a more updated version, I think. I have a more updated version of this capability, but I think those correlations are important right now.
 
-Ani Deshmukh   13:30
+A.D.   13:30
 Which has the region formulas?
 Okay.
 In.
 
-Cyrus Mehta   13:46
+C.M.   13:46
 And.
 
-Ani Deshmukh   13:47
+A.D.   13:47
 So yeah, and that we had verified that time that these coalitions are correct. So yeah, that's it.
 
-Cyrus Mehta   13:50
+C.M.   13:50
 No.
 So, if, if you had no, if you had no, if you had no...
 interim analysis, you would put, in any case, the first stage is you do a closed test of all the...
 
-Ani Deshmukh   13:57
+A.D.   13:57
 It.
 
-Cyrus Mehta   14:05
+C.M.   14:05
 Four hypotheses, and you eliminate some that are that are successful, then you then you drop then you drop some.
 
-Ani Deshmukh   14:05
+A.D.   14:05
 Okay.
 Yeah.
 Mhm.
 In.
 
-Cyrus Mehta   14:16
+C.M.   14:16
 And then you go to the second stage.
 Uhh...
 
-Ani Deshmukh   14:20
+A.D.   14:20
 Yeah.
 
-Cyrus Mehta   14:24
+C.M.   14:24
 So essentially it is like what we have for.
 Two endpoints.
 
-Ani Deshmukh   14:30
+A.D.   14:30
 Mm.
 
-Pralay Senchaudhuri   14:31
+P.S.   14:31
 Except that whenever you are doing the test, if you are not doing for efficacy, then it is like whatever we have for two endpoints.
 No question is that, do you want to do the significance test for the efficacy or not in the first stage?
 Is loser.
 
-Cyrus Mehta   14:46
+C.M.   14:46
 Well, we are doing it right by closed testing. We don't have to spend alpha if we don't want to.
 
-Pralay Senchaudhuri   14:54
+P.S.   14:54
 Yeah, that's what let them in.
 
-Cyrus Mehta   14:55
+C.M.   14:55
 There's an option in our adapt GMCP that we don't spend alpha.
 So if we don't spend alpha, the only thing we'll do is selection, right?
 
-Pralay Senchaudhuri   15:06
+P.S.   15:06
 Yeah.
 
-Ani Deshmukh   15:09
+A.D.   15:09
 And.
 
-Pralay Senchaudhuri   15:10
+P.S.   15:10
 And still it can be anything, it doesn't have to be a significant that type of test of hypothesis, no?
 
-Ani Deshmukh   15:11
+A.D.   15:11
 You.
 
-Cyrus Mehta   15:16
+C.M.   15:16
 Yeah, so there's two things. One is hypothesis test and the other is selection. And if you know, if you specify that there is no alpha spent, there is only selection.
 
-Pralay Senchaudhuri   15:23
+P.S.   15:23
 Yeah.
 
-Ani Deshmukh   15:24
+A.D.   15:24
 Mhm.
 
-Pralay Senchaudhuri   15:31
+P.S.   15:31
 Yeah.
 
-Cyrus Mehta   15:32
+C.M.   15:32
 If you specify there is alpha spend, then you have choice for both.
 
-Ani Deshmukh   15:32
+A.D.   15:32
 And.
 
-Pralay Senchaudhuri   15:36
+P.S.   15:36
 Then you have to ask for both, and yeah, that's correct.
 
-Ani Deshmukh   15:37
+A.D.   15:37
 Good.
 
-Pralay Senchaudhuri   15:41
+P.S.   15:41
 But then...
 
-Cyrus Mehta   15:41
+C.M.   15:41
 You shouldn't spend alpha if you're not going to do any efficacy. Why should you spend alpha?
 
-Pralay Senchaudhuri   15:46
+P.S.   15:46
 No, we should not. And we are not doing that in the two endpoints, whatever we have in East, we don't do the efficacy test in the first stage. It is only for selection.
 
-Cyrus Mehta   15:57
+C.M.   15:57
 OK, alright, but I'm not saying that we, but we shouldn't make that.
 We should give that flexibility, right, to people if they want to spend alpha.
 Why, why, why would you not give them that choice?
 
-Pralay Senchaudhuri   16:16
+P.S.   16:16
 No, no, I mean we should give, I agree we should give, but I'm saying that at in East Horizon, as of now we don't give. I don't know what complete, whether there will be any complications or not, because when you are doing the P-hello combination, you are taking some first stage and second stage, and then you are doing this combination. All those things are there, so.
 
-Cyrus Mehta   16:23
+C.M.   16:23
 Okay.
 
-Pralay Senchaudhuri   16:37
+P.S.   16:37
 That part I don't know. Yeah, yeah, yeah.
 
-Cyrus Mehta   16:37
+C.M.   16:37
 We'll see, we'll find out when we start working on it, whether we are getting any complication.
 
-Pralay Senchaudhuri   16:43
+P.S.   16:43
 Yeah.
 
-Ani Deshmukh   16:44
+A.D.   16:44
 Mhm.
 
-Cyrus Mehta   16:46
+C.M.   16:46
 So, so I think Ani, if I remember correctly, we we we just got started on that simple example, right?
 
-Ani Deshmukh   16:51
+A.D.   16:51
 Alright.
 Yeah, yeah, got it.
 
-Cyrus Mehta   16:55
+C.M.   16:55
 So why don't we look at that one and see, you know, how to implement it?
 
-Ani Deshmukh   16:58
+A.D.   16:58
 Yeah.
 Sure, sure.
 I'll work on that, start working on that.
 Yeah, okay.
 
-Cyrus Mehta   17:11
+C.M.   17:11
 Do you use uh Ani, do you use uh ChatGPT to uh give you like code or uh?
 
-Ani Deshmukh   17:18
+A.D.   17:18
 Oh yeah, yeah, I do. So I use a different tool called GitHub Copilot. ChatGPT is also good. GitHub Copilot is better, especially for developers. So, you know, because it has some additional capabilities that ChatGPT does not have. And yeah, we use that quite a lot.
 
-Pralay Senchaudhuri   17:20
+P.S.   17:20
 Mm.
 
-Cyrus Mehta   17:36
+C.M.   17:36
 So, is that is that changing? Is it changing the way that developers are using code writing code?
 
-Pralay Senchaudhuri   17:37
+P.S.   17:37
 But the.
 
-Ani Deshmukh   17:41
+A.D.   17:41
 Oh, by a lot. I mean, it's really a very different way of working. And it started with writing code, but now it is allowing you to use AI all across the entire software development lifecycle. You can generate new requirements, you can generate new tests, you can automate the tests, you can, of course, write code.
 You can create new software design, you can automate deployments, yeah, all kinds of things.
 
-Pralay Senchaudhuri   18:02
+P.S.   18:02
 It can get the whole paper, it can write the whole to paper.
 What is that, Claude and all this? They can write the paper also, if you get the idea.
 
-Ani Deshmukh   18:08
+A.D.   18:08
 Yeah.
 Okay.
 The Lord, yeah.
 
-Cyrus Mehta   18:13
+C.M.   18:13
 Yeah, but there's no food.
 
-Ani Deshmukh   18:14
+A.D.   18:14
 Yeah.
 
-Pralay Senchaudhuri   18:14
+P.S.   18:14
 By the way, Ani, now that you that ChatGPT, I just once asked ChatGPT, I used to quite often just for understanding, and I to avoid reading all the papers, I have ChatGPT that, okay, I have this problem that I have two levels of simulation.
 
-Ani Deshmukh   18:18
+A.D.   18:18
 Yeah.
 Yeah.
 Mm.
 Yeah.
 And.
 
-Pralay Senchaudhuri   18:35
+P.S.   18:35
 In the first level, I do 1000 simulations and then conditionally for some situation in that first level, I go to the second level system simulations. I mean, the problem that we have right now. So this is the way we parallelize because there are many ways you can do the parallelization, I think. I ask.
 
-Ani Deshmukh   18:44
+A.D.   18:44
 Mmh.
 Yeah, yeah, yeah.
 
-Pralay Senchaudhuri   18:55
+P.S.   18:55
 This is what we do right now.
 
-Ani Deshmukh   18:55
+A.D.   18:55
 Trimm.
 
-Pralay Senchaudhuri   18:58
+P.S.   18:58
 Can you suggest something better?
 
-Ani Deshmukh   18:58
+A.D.   18:58
 Mm.
 Mm.
 
-Pralay Senchaudhuri   19:01
+P.S.   19:01
 And it gives a nice, simple solution.
 What it said is that, you know, whenever there's a condition, whenever you have to go to the second stage simulation, why don't you just keep that data for which you're going to use in the second stage simulation, finish all the first stage simulation, then you have a big chunk of data for which you have to do the second stage simulation.
 
-Ani Deshmukh   19:04
+A.D.   19:04
 Mhm.
 Mm.
 
-Pralay Senchaudhuri   19:24
+P.S.   19:24
 And now you can do the second stage simulation in parallel.
 
-Ani Deshmukh   19:25
+A.D.   19:25
 Mm.
 Oh.
 Interesting, yeah, yeah.
 
-Pralay Senchaudhuri   19:31
+P.S.   19:31
 Okay, I mean, I thought this is a very simple idea.
 
-Cyrus Mehta   19:34
+C.M.   19:34
 Yeah, you mean you save you save many second stage simulations.
 
-Ani Deshmukh   19:35
+A.D.   19:35
 Yeah, I mean.
 
-Pralay Senchaudhuri   19:39
+P.S.   19:39
 Not, I mean, even do the second stage simulations in parallel, not the saving it, but do the second stage simulation parallel. Today, what happens is that we do the first stage simulations in parallel. Second stage becomes like in one compressor, you do 1000 simulations.
 
-Ani Deshmukh   19:39
+A.D.   19:39
 Many five-state solutions, yeah.
 You?
 Yeah.
 Yeah.
 
-Pralay Senchaudhuri   19:53
+P.S.   19:53
 whether we can make it better or not.
 
-Ani Deshmukh   19:56
+A.D.   19:56
 Because we do it as a nested simulation, instead you do it in two parts: first, simulate only the stage one in parallel, and then stage two in parallel, so yeah, and then combine them.
 
-Pralay Senchaudhuri   19:59
+P.S.   19:59
 In 2 parts, yeah.
 Exactly.
 
-Cyrus Mehta   20:05
+C.M.   20:05
 But I see.
 
-Pralay Senchaudhuri   20:08
+P.S.   20:08
 It needs more space. I think you have to keep the data.
 
-Ani Deshmukh   20:08
+A.D.   20:08
 Because I...
 
-Cyrus Mehta   20:09
+C.M.   20:09
 But what do you have to, you have to come, you have to combine now?
 
-Ani Deshmukh   20:10
+A.D.   20:10
 Yeah, storage and memory are cheap now. Yeah.
 
-Cyrus Mehta   20:13
+C.M.   20:13
 Pralay.
 Yeah.
 
-Ani Deshmukh   20:26
+A.D.   20:26
 Yeah.
 
-Pralay Senchaudhuri   20:26
+P.S.   20:26
 Like, test statistics computed conditional power, whatever you need, maybe the whole data, I don't know, may not that may not be needed for the binomial and continuous case, and keep all those information somewhere in the file or something back up, finish all the first stage.
 
-Cyrus Mehta   20:35
+C.M.   20:35
 Yeah.
 Yeah.
 
-Pralay Senchaudhuri   20:46
+P.S.   20:46
 So in the first stage, if there are 1000 simulations, maybe you will get a lot of some of the stuff will be removed. And you have some maybe some 700, maybe simulations for the second stage. And now those 700 simulations you do in parallel.
 
-Cyrus Mehta   20:54
+C.M.   20:54
 Yeah.
 Yeah.
 
-Ani Deshmukh   21:01
+A.D.   21:01
 Mm.
 Yeah.
 Yeah, and that each of those 700 will have, let's say, 100 or 1000 simulations of its own, but now they are all running in parallel, so they are also utilizing the multiple processes that you have. And so, yeah, I mean, that's very elegant and interesting. Yeah.
 
-Pralay Senchaudhuri   21:11
+P.S.   21:11
 Yeah, exactly. That can be done in parallel.
 In Padilla, yeah, yeah, exactly.
 Interesting idea. I thought this is good. I will need to discuss either. I need to tell it Tony.
 
-Ani Deshmukh   21:27
+A.D.   21:27
 Yeah, yeah, well, we can definitely try this, and...
 
-Pralay Senchaudhuri   21:29
+P.S.   21:29
 If we can, if we get a summer intern or something, maybe you can ask that guy to do it. He'll be...
 
-Ani Deshmukh   21:33
+A.D.   21:33
 Yeah.
 Yeah, yeah, I mean, the AI is getting amazing at such things. You know, it actually is like, you know, a partner in development, and you can you can use it as a fellow statistician, as a fellow software engineer, as a fellow architect, as a fellow fellow tester, as a fellow product manager, all kinds of things. You know, I mean, it's really amazing how much it has evolved in a matter of...
 
-Pralay Senchaudhuri   21:39
+P.S.   21:39
 Yeah, yeah.
 Yeah.
 Yeah.
 
-Ani Deshmukh   22:00
+A.D.   22:00
 Like, you know, like a year or so.
 
-Pralay Senchaudhuri   22:02
+P.S.   22:02
 Yeah.
 
-Ani Deshmukh   22:03
+A.D.   22:03
 Yeah, incredible.
 
-Pralay Senchaudhuri   22:05
+P.S.   22:05
 I mean, you can use it like a knowledgeable assistant. Don't believe everything.
 
-Ani Deshmukh   22:09
+A.D.   22:09
 Yeah, yeah, yeah, like...
 
-Pralay Senchaudhuri   22:11
+P.S.   22:11
 And someone very new, then, but he has a lot of knowledge, yeah.
 
-Ani Deshmukh   22:13
+A.D.   22:13
 You, you are responsible for for it. Finally, it's only a tool, but yeah, right, but it's it's very smart, yeah.
 
-Pralay Senchaudhuri   22:19
+P.S.   22:19
 Like, like one of my friends said that, okay, now I don't need any entry-level developer. I use the add to the entry-level development and then I correct the code.
 
-Ani Deshmukh   22:25
+A.D.   22:25
 Oh yeah, unfortunately that is happening.
 Yeah.
 
-Pralay Senchaudhuri   22:29
+P.S.   22:29
 He does Python and R coding, data science.
 
-Cyrus Mehta   22:32
+C.M.   22:32
 I've been using it in the book, in you know, for because I don't know how to write R code. It does it develops a first draft of the code for me, and then I for I for creating pictures, graphs, or examples, but I'm not, but you know, develop.
 
-Ani Deshmukh   22:32
+A.D.   22:32
 Yeah.
 Mm.
 
-Pralay Senchaudhuri   22:41
+P.S.   22:41
 Yeah, yeah, yeah.
 
-Ani Deshmukh   22:43
+A.D.   22:43
 Yeah.
 Mm.
 Right.
 
-Cyrus Mehta   22:51
+C.M.   22:51
 But, but then you know developers probably use it in a much more sophisticated way.
 
-Ani Deshmukh   22:58
+A.D.   22:58
 Yeah, I mean, there are there are use cases where you know it can get extremely sophisticated. I was reading a McKinsey article recently where some companies have transformed their, you know, operations so much that what they do is that during the day shift, the human engineers, all they do is create specifications for the AI.
 And then they submit all these specifications to the AI as they close their day at the end of their eight hours. And then AI agents take over and do all the development through the night. And then tomorrow morning you come and you verify what the AI has done. If there is something that you don't like, then you update the AI's guardrails and instructions.
 and then the iteration continues. So what we used to do over a sprint of two weeks, or most companies used to do, they are now doing it over a sprint of one day. And basically they are working around the clock, you know, 24 by 7, because during the off hours for humans, AI agents work.
 And during the standard working time, humans work at, you know, creating specifications for AI, reviewing what AI has done, improving the guardrails so that it does not do something weird and all that, you know. So it's incredible and they're just getting tons of productivity through this way.
 
-Cyrus Mehta   24:18
+C.M.   24:18
 Yeah.
 
-Ani Deshmukh   24:19
+A.D.   24:19
 Yeah.
 Yeah.
 really transforming the way things work. But yeah, like Pralay says, unfortunately, entry level jobs are becoming scarce. So it's a big problem for, you know, people who are passing out from universities and all that, you know, unless you are really bright, it's difficult to find a job.
 
-Pralay Senchaudhuri   24:35
+P.S.   24:35
 Yeah.
 
-Cyrus Mehta   24:39
+C.M.   24:39
 So how will they get, I mean, they will still need programmers and they will need those people who are creating the specifications and putting the guardrails and checking that what was done is correct. So how will those people come up if they don't come up from doing basic?
 
-Ani Deshmukh   24:50
+A.D.   24:50
 Correct, yeah.
 Right.
 Yeah.
 
-Cyrus Mehta   24:59
+C.M.   24:59
 Programming.
 
-Ani Deshmukh   25:00
+A.D.   25:00
 Right, yeah, but, but...
 
-Pralay Senchaudhuri   25:00
+P.S.   25:00
 No, you know, Cyrus, if you think you may not, I mean, if you are subject matter expert, then possibly you can ask AI to, you can ask AI to do all the initial work, all the, but you have to look at it. Maybe you have to know what AI is doing, like if it is generating an R code, it would test it, you have to.
 
-Cyrus Mehta   25:05
+C.M.   25:05
 Yeah.
 
-Pralay Senchaudhuri   25:19
+P.S.   25:19
 and check it that note, yeah, this is what I wanted. Those things you have to do.
 
-Cyrus Mehta   25:20
+C.M.   25:20
 Yeah.
 Exactly, so that that's what I'm doing, but I...
 Now, that will not take me to an R programmer, and so, but, but, but, but to do something like what Ani is to do something like what Ani is doing, you would need to start out already as a good R programmer, otherwise you will.
 
-Pralay Senchaudhuri   25:29
+P.S.   25:29
 But that will not make you our programmer.
 
-Ani Deshmukh   25:32
+A.D.   25:32
 And also there is a question of succession, right? Yeah.
 Right, right, so it's a it's a question of succession.
 
-Cyrus Mehta   25:42
+C.M.   25:42
 And how is how is such people come up?
 
-Ani Deshmukh   25:45
+A.D.   25:45
 Right, right, so, uh, so no, so you do hire, but you hiring much smaller numbers than before.
 
-Pralay Senchaudhuri   25:51
+P.S.   25:51
 Yeah.
 
-Ani Deshmukh   25:52
+A.D.   25:52
 And so, you know, so basically there are just fewer jobs outside. I mean, now it's really the employer.
 Excuse me.
 employers market so companies are extremely choosing how much they're hiring and who they're hiring.
 Than before, you know, and you probably, you know, get by hiring just 20 or 30% of what you were hiring in the past, you know, from all these campuses.
 
-Cyrus Mehta   26:17
-Well, are we doing that at Cytel?
+C.M.   26:17
+[redacted - internal company discussion]
 
-Ani Deshmukh   26:17
-And.
-Our hiring has already reduced A lot. In fact, there are, there is like for the last couple of years, we have, we are not, we are largely not replacing people who are leaving. We're just closing those positions because we just don't need so many people.
+A.D.   26:17
+[redacted - internal company discussion]
 
-Cyrus Mehta   26:37
-Oh.
+C.M.   28:29
+[redacted - internal company discussion]
 
-Ani Deshmukh   26:38
-Yeah, it's happening.
-Mm.
-Of course, they are saying that like with every technological revolution, you know, here also new jobs will emerge that today we cannot imagine. And you know, so there are people on both sides, some are spelling doom. They are saying that this is really terrible for humanity. There are others who say that, no, I mean, it will transform the way we work, but it will also create new opportunities and hence new jobs and all that. So
-One big problem right now is happening like 2 things. One is, you know, like it just...
-consuming huge amount of resources like electricity and the water and send that, you know, because these are computationally very expensive things. All this AI, you know, the hardware that they need, GPUs and send that. And so that is becoming like a constraint, you know, a limiting factor for how much AI can expand.
-And there is a cost. It is becoming now, as companies are adopting it more and more, AI is also becoming quite expensive. It happened for us. Our monthly bill with AI has jumped three times since May. What we are paying every month, let's say till May,
-It suddenly jumped three times starting June because they just changed the pricing model. Earlier, you know, these companies were giving a lot of discount because they were promoting these tools. But now that the tools have been adopted by a large number of companies and they have become part of their workflows, they cannot be replaced. These companies are now saying, AI companies are saying that, oh, we cannot afford
-To give give the tools to you at the same price, so now we have to charge you more and more, meaning it is three times as much as three times as before, you know, so yeah.
+A.D.   28:33
+[redacted - internal company discussion]
 
-Cyrus Mehta   28:29
-Really? Yeah, for the same amount of compute, three times the amount in price.
-
-Ani Deshmukh   28:33
-For the same amount, yes, because they are saying that you were heavily discounted earlier, and you know, we cannot do that anymore. We have to charge you more, so...
-
-Cyrus Mehta   28:43
+C.M.   28:43
 Wow, and there is no limit, right? They can go again.
 
-Pralay Senchaudhuri   28:44
+P.S.   28:44
 And also I think also I think there's some problem with this a lot of I mean it needs a lot of water and that's why the it is affecting the agriculture and all this also.
 
-Ani Deshmukh   28:47
+A.D.   28:47
 Yeah.
 Yeah.
 Yeah, they they we they we need a more data center and send that in the communities protesting against that. They are saying we don't want it in our region, you know.
 
-Pralay Senchaudhuri   29:04
+P.S.   29:04
 Yeah.
 It happened there, and then there are other noise pollutions and all those things are there. I think in this country, I see, I hear those two situations. They're OK. There are some some small community data start data center.
 
-Ani Deshmukh   29:13
+A.D.   29:13
 And then.
 
-Pralay Senchaudhuri   29:22
+P.S.   29:22
 And that creates a lot of noise, etcetera.
 in Atlanta or in Virginia, they're protesting that, okay, stop that noise pollution. Then they, this, from as they work, putting all those installations as much as possible.
 
-Ani Deshmukh   29:26
+A.D.   29:26
 Yeah.
 Yeah.
 
-Pralay Senchaudhuri   29:38
+P.S.   29:38
 So that makes it much costlier to, I think, generate the power, I think.
 
-Ani Deshmukh   29:41
+A.D.   29:41
 And.
 Yeah.
 
-Cyrus Mehta   29:47
+C.M.   29:47
 Okay.
 
-Ani Deshmukh   29:50
+A.D.   29:50
 But it's extremely interesting. I mean, it just, you know, for an experienced person, it just provides so much power in their hand because now they can just do so many things independently without needing to, you know, without needing a lot of people or without needing to work with a lot.
 
-Pralay Senchaudhuri   29:52
+P.S.   29:52
 Yeah.
 
-Ani Deshmukh   30:08
+A.D.   30:08
 people and that's happening.
 
-Cyrus Mehta   30:09
+C.M.   30:09
 Will you will that happen with with what what you are doing with Adapt GMCP?
 
-Ani Deshmukh   30:15
+A.D.   30:15
 Hey.
 Yeah, I mean, I'm already using it a lot of AI here, and like...
 R code for me. What if this is my prior development experience? Because of that, I can understand that code well. So I can figure out whether if it is not doing something right, you know, and that's adequate. You don't necessarily need to know the syntax by heart anymore. Like it was earlier. That is not required.
 
-Cyrus Mehta   30:42
+C.M.   30:42
 Yeah.
 
-Pralay Senchaudhuri   30:48
+P.S.   30:48
 Yeah.
 
-Ani Deshmukh   30:53
+A.D.   30:53
 So, there is this, you know, a very popular joke about it. They say that the most the most popular programming language these days is English, not Python or C.
 
-Pralay Senchaudhuri   31:03
+P.S.   31:03
 Exactly, yeah.
 
-Cyrus Mehta   31:04
+C.M.   31:04
 Yeah.
 It's interesting isn't it that since you can talk to it in with large language models.
 
-Ani Deshmukh   31:06
+A.D.   31:06
 It's English, yeah.
 Very lucky.
 But I...
 
-Cyrus Mehta   31:15
+C.M.   31:15
 Oh.
 
-Ani Deshmukh   31:18
+A.D.   31:18
 Yeah.
 
-Cyrus Mehta   31:18
+C.M.   31:18
 Hey, can I just get back to your issue?
 So if you run all the second stage in parallel by itself, how do you then connect them up with the first stage? Is it just you just run an independent bunch of first stage?
 
-Pralay Senchaudhuri   31:26
+P.S.   31:26
 Yeah.
 No, you keep the whenever you are doing this second stage simulation, you are carrying some information from the first stage, like what is the conditional error, so you stored them in a somewhere in the in backup.
 
-Cyrus Mehta   31:37
+C.M.   31:37
 Yeah.
 Yeah.
 Yeah, you are right.
 
-Ani Deshmukh   31:46
+A.D.   31:46
 Yeah.
 
-Cyrus Mehta   31:47
+C.M.   31:47
 Yeah, you store them. You store all the first stage simulations somewhere.
 
-Pralay Senchaudhuri   31:51
+P.S.   31:51
 Yeah, and then use each of them whenever you need, because that time you may not need the full data, or if you need, OK, maybe all the data generator, if you want, you can store them possibly, but for I think that for continuous and binary case, you need only the test statistics, because you're going to do the P-value combination in the second stage.
 
-Cyrus Mehta   32:11
+C.M.   32:11
 Yeah, so.
 
-Pralay Senchaudhuri   32:12
+P.S.   32:12
 Okay, so you need the, you don't need the full data, you just need the test statistics conditional error.
 
-Cyrus Mehta   32:16
+C.M.   32:16
 Right.
 
-Pralay Senchaudhuri   32:17
+P.S.   32:17
 And they keep them.
 
-Cyrus Mehta   32:19
+C.M.   32:19
 You keep them.
 
-Pralay Senchaudhuri   32:20
+P.S.   32:20
 Give them in a big array or in a stack.
 
-Cyrus Mehta   32:22
+C.M.   32:22
 So you keep all the conditional errors and save them.
 
-Pralay Senchaudhuri   32:26
+P.S.   32:26
 Yeah, yeah, which already, yeah, for which you are going to go to the second stage, keep all those conditional error and all of the information in a big array or a big stack, and then now you take each of them.
 
-Cyrus Mehta   32:30
+C.M.   32:30
 Yeah.
 
-Ani Deshmukh   32:33
+A.D.   32:33
 Mm.
 
-Cyrus Mehta   32:33
+C.M.   32:33
 Yeah, yeah.
 Yeah.
 
-Pralay Senchaudhuri   32:39
+P.S.   32:39
 You finish all the first stage. In first is that what you have done is that you can computed only the simulations which cross the efficacy and you can calculated that information. You can give that kept that information.
 
-Cyrus Mehta   32:53
+C.M.   32:53
 Right, right.
 
-Pralay Senchaudhuri   32:53
+P.S.   32:53
 Right now, for the second stage, you have all the information that you need from first stage to run the solution in the.
 
-Ani Deshmukh   32:55
+A.D.   32:55
 Help.
 Thank you.
 
-Cyrus Mehta   33:00
+C.M.   33:00
 You take them one at a time, you're saying, take them.
 
-Ani Deshmukh   33:01
+A.D.   33:01
 Very good.
 
-Pralay Senchaudhuri   33:02
+P.S.   33:02
 One at a time, and then this thousand simulations or whatever you do, you can do that in parallel.
 
-Ani Deshmukh   33:03
+A.D.   33:03
 If.
 
-Cyrus Mehta   33:10
+C.M.   33:10
 Ah, oh yeah, we weren't doing that. Yeah, we were not doing that. Yeah, we were not doing that.
 
-Ani Deshmukh   33:11
+A.D.   33:11
 But.
 Yeah.
 
-Pralay Senchaudhuri   33:13
+P.S.   33:13
 Yeah.
 
-Ani Deshmukh   33:15
+A.D.   33:15
 Yeah, so it should certainly be faster than what we're doing today. Yeah, I mean, yeah.
 
-Pralay Senchaudhuri   33:18
+P.S.   33:18
 Hopefully, I'm not sure what.
 
-Cyrus Mehta   33:19
+C.M.   33:19
 That's true. We were doing one, we were not, we were not doing in parallel. Okay, I see. Okay.
 
-Pralay Senchaudhuri   33:23
+P.S.   33:23
 Yeah, yeah.
 
-Ani Deshmukh   33:25
+A.D.   33:25
 Will need more memory or storage, but hopefully less compute, yeah, yeah, couple time, yeah.
 
-Pralay Senchaudhuri   33:28
+P.S.   33:28
 Yeah, yeah.
 
-Cyrus Mehta   33:34
+C.M.   33:34
 OK, OK, look guys, so do we need to have more discussion today about what's to be done?
 
-Ani Deshmukh   33:35
+A.D.   33:35
 Yeah, right.
 No, I think it's clear to me and I'll start working on this thing and you know, we'll meet next week again. So if I have some questions that time we can discuss that.
 
-Pralay Senchaudhuri   33:51
+P.S.   33:51
 And I think Cyrus, if you are doing the simulations, we have to, for even the population boundary, maybe you should set the boundary or the work first, what do we want to do? Because then the population enrichment also, as I said, that okay, we are not doing the significance test in the first stage.
 But you want to do it, that means you will need to do some theoretical work possibly. Then there are some paper I have seen that were not the only the two populations, they are working with them. I think Fiti has a paper where you take the multiple population nested and all these.
 And then you do the Posch and the enrichment.
 
-Cyrus Mehta   34:32
+C.M.   34:32
 I want to see that. I like, I like his work very much. He is very good, that Tim Friede. I met him in last in March in Germany. He invited me to give a seminar. Yeah, yeah.
 
-Pralay Senchaudhuri   34:33
+P.S.   34:33
 Yeah, sure.
 Yeah, yeah.
 Yeah.
@@ -1088,127 +1074,127 @@ Mhm.
 Yeah.
 And I, and I think he's also using the, I have to have to read thoroughly, he's also using conditional error.
 
-Cyrus Mehta   34:59
+C.M.   34:59
 CER method, yeah.
 
-Pralay Senchaudhuri   35:00
+P.S.   35:00
 CR method. I can send you that paper, are you sure?
 
-Cyrus Mehta   35:01
+C.M.   35:01
 Send me, send me, send me, send me that, so that paper is on population enrichment without first stage alpha spending, you're saying?
 
-Pralay Senchaudhuri   35:10
+P.S.   35:10
 Yeah, yeah.
 
-Cyrus Mehta   35:12
+C.M.   35:12
 Okay, let's have a look at it. Maybe we can implement that too.
 
-Pralay Senchaudhuri   35:14
+P.S.   35:14
 Yeah.
 Sure, yeah.
 So, that's why I think you need to, we need to do think how do we go for that? Maybe first we do for the two subgroup do that and then go for the.
 
-Cyrus Mehta   35:29
+C.M.   35:29
 The ICH, ICH EE6 or E I don't know which one that we have a new consultant for Cytel called Jurgen Hommez. He he's a German guy and he he gave a little presentation of.
 
-Pralay Senchaudhuri   35:43
+P.S.   35:43
 Mhm.
 
-Cyrus Mehta   35:47
+C.M.   35:47
 of the, you know, the ICH guidance is, and they're emphasizing population enrichment and sample size re-estimation as the key things for adaptive designs. So, yeah, it's good to know more about it. Yeah, send me, send me Tim Friede's paper, I will read it.
 
-Pralay Senchaudhuri   35:59
+P.S.   35:59
 Yeah.
 Sue.
 Sure, and I think this latest issue, I'll find out that one also. There's a paper on that population enrichment with a significance test in the first stage.
 
-Cyrus Mehta   36:18
+C.M.   36:18
 Well, that's what we are doing, Pralay. How is that different than what we are doing?
 
-Pralay Senchaudhuri   36:21
+P.S.   36:21
 No test of efficacy in the first stage.
 so that it can stop early.
 
-Cyrus Mehta   36:24
+C.M.   36:24
 Yeah.
 Well, well, that that's what that's what we have right now, closed testing.
 Right, and so we can.
 
-Pralay Senchaudhuri   36:33
+P.S.   36:33
 Yeah, we have to do that. We are not doing it in East Horizon.
 
-Cyrus Mehta   36:39
+C.M.   36:39
 Now you're saying there's another paper, that's what I'm, but that paper that the paper that I published with Martin, that can do that.
 
-Pralay Senchaudhuri   36:40
+P.S.   36:40
 Yeah, yeah, yeah.
 Yeah.
 But you will not go for the proposition enrichment, no, so.
 
-Cyrus Mehta   36:54
+C.M.   36:54
 We didn't give an example with population enrichment. We gave an example only with. Yeah, it'd be good to have, if we have a code with it, we can even write a little bit more.
 
-Pralay Senchaudhuri   36:56
+P.S.   36:56
 Yeah.
 Yeah.
 Sure, yeah, that's what, yeah.
 
-Cyrus Mehta   37:08
+C.M.   37:08
 Okay, but Ani, can I ask you, is 930 too late for you?
 
-Pralay Senchaudhuri   37:19
+P.S.   37:19
 You are on, you are on mute, honey.
 
-Ani Deshmukh   37:23
+A.D.   37:23
 Oh sorry, no, no, 930 works quite well. No, it's not late. This is fine.
 
-Cyrus Mehta   37:26
+C.M.   37:26
 Can we do 930s and maybe when daylight after daylight saving it becomes late for you, I think, but...
 
-Ani Deshmukh   37:29
+A.D.   37:29
 Sure.
 I think it will be okay. We can see that time, but I'll change it to 9.30 for now at least.
 
-Cyrus Mehta   37:41
+C.M.   37:41
 It'll, it'll be.
 
-Pralay Senchaudhuri   37:41
+P.S.   37:41
 I mean, when daylight saving is off, that time it will be 8 o'clock, no, for you, Ani.
 
-Ani Deshmukh   37:42
+A.D.   37:42
 Yeah.
 
-Cyrus Mehta   37:48
+C.M.   37:48
 Yeah, so we won't do it, we won't do it then.
 
-Ani Deshmukh   37:48
+A.D.   37:48
 Yeah, but it's OK. It's OK. Yeah, OK. Yeah, but for now, I'll shift the entire series to 9:30. Yeah, OK.
 
-Pralay Senchaudhuri   37:50
+P.S.   37:50
 Yeah.
 
-Cyrus Mehta   37:57
+C.M.   37:57
 Okay.
 
-Pralay Senchaudhuri   37:58
+P.S.   37:58
 Okay.
 
-Cyrus Mehta   38:00
+C.M.   38:00
 Okay, thank you, Ani.
 
-Ani Deshmukh   38:02
+A.D.   38:02
 All right, thank you, Cyrus. Thank you, Pralay. Have a good day.
 
-Cyrus Mehta   38:03
+C.M.   38:03
 Hi.
 
-Pralay Senchaudhuri   38:03
+P.S.   38:03
 Okay, Cyrus. Thanks. Bye. Bye, honey. Bye, Cyrus.
 
-Cyrus Mehta   38:04
+C.M.   38:04
 Thank you.
 
-Ani Deshmukh   38:05
+A.D.   38:05
 Go back.
 
-Ani Deshmukh stopped transcription
+A.D. stopped transcription
