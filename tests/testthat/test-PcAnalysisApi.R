@@ -1743,6 +1743,19 @@ testthat::test_that("SetupAnalysis_PC: correlation policy by test.type", {
     regexp = "Correlation must be a"
   )
 
+  # Dunnett with NA correlation warns and is converted to Partly-Parametric
+  testthat::expect_warning(
+    stateDunnettNA <- SetupAnalysis_PC(
+      WI = wi, G = g, test.type = "Dunnett",
+      alpha = 0.025, info_frac = c(0.5, 1),
+      Correlation = corr,
+      plotGraphs = FALSE
+    ),
+    regexp = "converted to 'Partly-Parametric'"
+  )
+  testthat::expect_identical(stateDunnettNA$mcpObj$test.type, "Partly-Parametric")
+  testthat::expect_identical(stateDunnettNA$design_params$test.type, "Partly-Parametric")
+
   # Bonf: overrides Correlation to identity with NA off-diagonal
   stateBonf <- SetupAnalysis_PC(
     WI = wi, G = g, test.type = "Bonf",
@@ -2182,7 +2195,7 @@ testthat::test_that("AnalyzeLook_PC: correlation update validity at look > 1", {
     byrow = TRUE, nrow = 4
   )
   corr <- matrix(
-    c(1, 0.5, NA, NA, 0.5, 1, NA, NA, NA, NA, 1, 0.5, NA, NA, 0.5, 1),
+    c(1, 0.5, 0.2, 0.2, 0.5, 1, 0.2, 0.2, 0.2, 0.2, 1, 0.5, 0.2, 0.2, 0.5, 1),
     nrow = 4
   )
 
@@ -2260,12 +2273,53 @@ testthat::test_that("AnalyzeLook_PC: correlation update validity at look > 1", {
     c(1, 0.3, NA, NA, 0.3, 1, NA, NA, NA, NA, 1, 0.4, NA, NA, 0.4, 1),
     nrow = 4
   )
-  testthat::expect_no_error(
+  testthat::expect_warning(
+    state2 <- AnalyzeLook_PC(
+      state1,
+      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      new_correlation = corrValid, plotGraphs = FALSE
+    ),
+    regexp = "converted to 'Partly-Parametric'"
+  )
+  testthat::expect_identical(state2$mcpObj$test.type, "Partly-Parametric")
+  testthat::expect_identical(state2$design_params$test.type, "Partly-Parametric")
+})
+
+testthat::test_that("AnalyzeLook_PC: Dunnett stays Dunnett when updated correlation is fully specified", {
+  wi <- c(0.5, 0.5, 0, 0)
+  g <- matrix(
+    c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
+    byrow = TRUE, nrow = 4
+  )
+  corr <- matrix(
+    c(1, 0.5, 0.2, 0.2, 0.5, 1, 0.2, 0.2, 0.2, 0.2, 1, 0.5, 0.2, 0.2, 0.5, 1),
+    nrow = 4
+  )
+
+  state1 <- SetupAnalysis_PC(
+    WI = wi, G = g, test.type = "Dunnett",
+    alpha = 0.025, info_frac = c(0.5, 1.0),
+    Correlation = corr, Selection = FALSE, UpdateStrategy = FALSE,
+    plotGraphs = FALSE
+  )
+  state1 <- AnalyzeLook_PC(
+    state1,
+    p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
+    plotGraphs = FALSE
+  )
+
+  corrValid <- matrix(
+    c(1, 0.3, 0.2, 0.2, 0.3, 1, 0.2, 0.2, 0.2, 0.2, 1, 0.4, 0.2, 0.2, 0.4, 1),
+    nrow = 4
+  )
+  state2 <- testthat::expect_no_warning(
     AnalyzeLook_PC(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
       new_correlation = corrValid, plotGraphs = FALSE
     )
   )
+  testthat::expect_identical(state2$mcpObj$test.type, "Dunnett")
+  testthat::expect_identical(state2$design_params$test.type, "Dunnett")
 })
 

@@ -87,6 +87,21 @@ validate_transition_matrix <- function(new_G, index_set) {
   return(new_G)
 }
 
+normalize_dunnett_correlation <- function(test.type, correlation, arg_name = "Correlation") {
+  if (!identical(test.type, "Dunnett") || is.null(correlation) || !anyNA(correlation)) {
+    return(list(test.type = test.type, correlation = correlation))
+  }
+
+  warning(
+    "test.type = 'Dunnett' requires a fully specified ", arg_name, " matrix. ",
+    "Because ", arg_name, " contains NA entries, test.type has been converted to ",
+    "'Partly-Parametric'.",
+    call. = FALSE
+  )
+
+  return(list(test.type = "Partly-Parametric", correlation = correlation))
+}
+
 applySelection <- function(mcpObj, selected_hyps, look) {
   if (is.null(selected_hyps)) return(mcpObj)
   if (!is.character(selected_hyps)) stop("selection must be a character vector")
@@ -164,7 +179,13 @@ applyCorrelationUpdate <- function(mcpObj, new_correlation) {
   }
 
   rownames(new_correlation) <- colnames(new_correlation) <- mcpObj$IntialHypothesis
-  mcpObj$Correlation <- new_correlation
+  normalized <- normalize_dunnett_correlation(
+    test.type = mcpObj$test.type,
+    correlation = new_correlation,
+    arg_name = "new_correlation"
+  )
+  mcpObj$test.type <- normalized$test.type
+  mcpObj$Correlation <- normalized$correlation
   return(mcpObj)
 }
 

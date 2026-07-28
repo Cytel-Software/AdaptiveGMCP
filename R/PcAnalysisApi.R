@@ -27,6 +27,8 @@
 #' @param gammaA Parameter for typeOfDesign = "asHSD" or "asKD".
 #' @param userAlphaSpending Alpha spending values for typeOfDesign = "asUser".
 #' @param Correlation Correlation matrix (NA allowed for unknown correlations).
+#'   If `test.type = "Dunnett"` and `Correlation` contains `NA`, a warning is
+#'   issued and `test.type` is converted to `"Partly-Parametric"`.
 #' @param MultipleWinners Logical; TRUE means reject as many hypotheses as possible, 
 #'        FALSE means reject at most one hypothesis
 #' @param Selection Logical; TRUE if selection of hypotheses is allowed at interim looks
@@ -43,7 +45,9 @@ SetupAnalysis_PC <- function(
       0, 1, 0, 0,
       1, 0, 0, 0
     ), byrow = TRUE, nrow = 4),
-    test.type = "Partly-Parametric",
+    test.type = "Partly-Parametric", # TODO: Check if Partly-Parametric and Dunnett types are really required
+                                     # since they can be derived from the correlation matrix provided by the user.
+                                     # Only Bonf, Sidak, and Simes are strictly necessary to be specified.
     alpha = 0.025,
     info_frac = c(0.5, 1.0),
     typeOfDesign = "asOF",
@@ -53,8 +57,8 @@ SetupAnalysis_PC <- function(
     userAlphaSpending = NULL,
     Correlation = NULL,
     MultipleWinners = TRUE,
-    Selection = TRUE,
-    UpdateStrategy = TRUE,
+    Selection = TRUE, # TODO: Check if Selection parameter is really required at setup stage.
+    UpdateStrategy = TRUE, # TODO: Check if UpdateStrategy parameter is really required at setup stage.
     plotGraphs = TRUE) {
   if (!is.numeric(WI) || anyNA(WI) || any(WI < 0)) stop("WI must be numeric, non-negative, and non-NA")
   if (sum(WI) > 1) stop("Sum of WI (weights) must be less than or equal to 1")
@@ -85,6 +89,13 @@ SetupAnalysis_PC <- function(
       stop("Correlation must be a ", d, " x ", d, " matrix")
     }
     rownames(Correlation) <- colnames(Correlation) <- GlobalIndexSet
+    normalized <- normalize_dunnett_correlation(
+      test.type = test.type,
+      correlation = Correlation,
+      arg_name = "Correlation"
+    )
+    test.type <- normalized$test.type
+    Correlation <- normalized$correlation
   } else {
     stop("Unsupported test.type: ", test.type)
   }
@@ -233,6 +244,9 @@ SetupAnalysis_PC <- function(
 #' @param new_weights Optional numeric vector of new weights for continuing hypotheses.
 #' @param new_G Optional transition matrix for continuing hypotheses.
 #' @param new_correlation Optional updated D x D correlation matrix.
+#'   If the current `test.type` is `"Dunnett"` and `new_correlation` contains
+#'   `NA`, a warning is issued and `test.type` is converted to
+#'   `"Partly-Parametric"`.
 #' @param plotGraphs Logical; if TRUE, plots graphs at key points.
 #'
 #' @return Updated "PCAnalysisState".
@@ -348,6 +362,7 @@ AnalyzeLook_PC <- function(
 
   state$completed_looks <- next_look
   state$mcpObj <- mcpObj
+  state$design_params$test.type <- mcpObj$test.type
 
   state$look_history[[next_look]] <- list(
     mcpObj = mcpObj,

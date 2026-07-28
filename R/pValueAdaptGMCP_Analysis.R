@@ -15,7 +15,9 @@
 #' @param deltaPT1 Parameter for alpha spending function for typeOfDesign = "PT"
 #' @param gammaA 	Parameter for alpha spending function for typeOfDesign = "asHSD" & "asKD"
 #' @param userAlphaSpending Parameter for alpha spending function for typeOfDesign = "asUser"
-#' @param Correlation Matrix of correlation between test statistics, NA if the correlation is unknown
+#' @param Correlation Matrix of correlation between test statistics, NA if the correlation is unknown.
+#'   If `test.type = "Dunnett"` and `Correlation` contains `NA`, a warning is
+#'   issued and `test.type` is converted to `"Partly-Parametric"`.
 #' @param MultipleWinners Logical: TRUE if multiple winners over the looks is required.
 #' @param Selection Logical: TRUE if selection required at interim(default = FALSE)
 #' @param UpdateStrategy Logical: TRUE if modification of weights and testing strategy is required at interim(default = FALSE)
@@ -127,6 +129,13 @@ adaptGMCP_PC <- function(
     Correlation <- NA
   } else if (test.type == "Dunnett" || test.type == "Partly-Parametric") {
     rownames(Correlation) <- colnames(Correlation) <- GlobalIndexSet
+    normalized <- normalize_dunnett_correlation(
+      test.type = test.type,
+      correlation = Correlation,
+      arg_name = "Correlation"
+    )
+    test.type <- normalized$test.type
+    Correlation <- normalized$correlation
   }
 
 
@@ -272,6 +281,7 @@ adaptGMCP_PC <- function(
         # Modify the correlation for parametric tests
         if (test.type == "Dunnett" || test.type == "Partly-Parametric") {
           mcpObj <- do_modifyCorrelation(mcpObj)
+          test.type <- mcpObj$test.type
         }
         look <- look + 1
       } else if (curLkUserInp == "n") # terminate the trial

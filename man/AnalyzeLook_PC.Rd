@@ -34,7 +34,10 @@ If \code{NULL} (default), the look number is inferred from the state.}
 
 \item{new_G}{Optional transition matrix for continuing hypotheses.}
 
-\item{new_correlation}{Optional updated D x D correlation matrix.}
+\item{new_correlation}{Optional updated D x D correlation matrix.
+If the current \code{test.type} is \code{"Dunnett"} and
+\code{new_correlation} contains \code{NA}, a warning is issued and
+\code{test.type} is converted to \code{"Partly-Parametric"}.}
 
 \item{plotGraphs}{Logical; if TRUE, plots graphs at key points.}
 }

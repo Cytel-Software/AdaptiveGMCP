@@ -84,7 +84,7 @@ Update status as work progresses.
 | I1 | Create enrichment epic (PC analysis) | TBD | Done | #87 | Epic created with epic label |
 | I2 | Create sub-issues and set Type | TBD | Done | #93-#102 | Sub-issues created with explicit Type values |
 | R1 | Regression gate review (#30, #66) | TBD | Done | #94 | Completed: baseline green; #31 parallel; merge-gate coverage #67/#70/#69 now implemented and closed |
-| D1 | Document simple-case enrichment logic | TBD | Not Started | #97 | Include stage-1 alpha split explanation |
+| D1 | Document simple-case enrichment logic | TBD | Done | #97 | Final D1 sign-off draft completed with explicit acceptance thresholds and decision log |
 | V1 | EAST reference example creation | User/TBD | Not Started | #95 | Source of numerical truth cases |
 | V2 | EAST fixture integration and tolerance rules | TBD | Not Started | #96 | Reproducible comparison fixtures |
 | T1 | Non-interactive normal endpoint (TDD) | TBD | Not Started | #98 | First implementation slice |
@@ -99,3 +99,5 @@ Update status as work progresses.
 - 2026-07-25: Created epic #87 and sub-issues #92-#102; closed #92 and #93 after completion in this phase.
 - 2026-07-25: Completed regression gate review (#94), posted blocker/parallel triage, and closed #94.
 - 2026-07-25: Verified progress for #67/#69/#70, posted completion evidence comments, and closed all three issues.
+- 2026-07-25: Started D1 (#97); added draft design spec at docs/pop_enrichment_simple_case_pc_design.md and set D1 status to In Progress.
+- 2026-07-25: Finalized D1 sign-off content for #97 by adding explicit acceptance thresholds and decision logs in docs/pop_enrichment_simple_case_pc_design.md; updated D1 status to Done.
