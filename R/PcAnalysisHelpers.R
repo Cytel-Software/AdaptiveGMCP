@@ -99,7 +99,7 @@ normalize_dunnett_correlation <- function(test.type, correlation, arg_name = "Co
     call. = FALSE
   )
 
-  list(test.type = "Partly-Parametric", correlation = correlation)
+  return(list(test.type = "Partly-Parametric", correlation = correlation))
 }
 
 applySelection <- function(mcpObj, selected_hyps, look) {
