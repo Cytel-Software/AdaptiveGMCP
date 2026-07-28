@@ -416,7 +416,13 @@ do_modifyCorrelation <- function(mcpObj) {
     # rownames(new_Corr) <- colnames(new_Corr) <- paste('H',m,sep = '')
 
     if (countModified == 0) cat("Modification not required \n")
-    mcpObj$Correlation <- new_Corr
+    normalized <- normalize_dunnett_correlation(
+      test.type = mcpObj$test.type,
+      correlation = new_Corr,
+      arg_name = "Correlation"
+    )
+    mcpObj$test.type <- normalized$test.type
+    mcpObj$Correlation <- normalized$correlation
     return(mcpObj)
   } else {
     return(mcpObj)
