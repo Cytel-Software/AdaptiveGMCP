@@ -18,6 +18,8 @@ Behavior depends on `test.type`:
 - `"Dunnett"` and `"Partly-Parametric"`:
   - `Correlation` must be provided as a `d x d` matrix.
   - It is treated as the planned dependence structure among the test statistics.
+  - If `test.type = "Dunnett"` and `Correlation` contains any `NA`, the code issues a warning and converts `test.type` to `"Partly-Parametric"`.
+  - Aside from that warning-and-convert step, the new API does not apply distinct computational logic to these two labels at setup.
 - `"Bonf"`:
   - The code replaces `Correlation` with a diagonal/`NA` matrix.
   - This effectively removes parametric dependence borrowing across different hypotheses.
@@ -37,6 +39,7 @@ Key code:
 - It must be a symmetric `d x d` matrix with diagonal equal to 1.
 - Entries must lie in `[-1, 1]` or be `NA`.
 - Once accepted, it replaces `mcpObj$Correlation`.
+- If the current `test.type` is `"Dunnett"` and `new_correlation` contains any `NA`, the code issues a warning and converts `test.type` to `"Partly-Parametric"` before storing the replacement matrix.
 
 Important detail:
 
@@ -57,6 +60,8 @@ At each look, `PerLookMCPAnalysis()` passes `mcpObj$Correlation` into `compute_a
   - If a subset has known correlations, it uses a parametric multivariate normal probability calculation via `mvtnorm::pmvnorm()`.
   - If some pairwise correlations are unknown (`NA`), the code partitions the hypotheses into cliques of mutually known correlations.
   - Singletons or disconnected pieces fall back to Bonferroni-like handling for those pieces.
+- After that conversion step, a `Dunnett` analysis with `NA` entries is effectively handled as mixed / partly-parametric for the affected intersections rather than using a distinct Dunnett-only rule.
+- More generally, once the warning/normalization step is past, the downstream adjusted p-value computation does not distinguish between `"Dunnett"` and `"Partly-Parametric"`; the actual behavior is driven by the supplied correlation matrix and where it contains known values versus `NA`.
 
 This means the correlation matrix controls how much parametric dependence information is used when computing adjusted p-values for intersection hypotheses.
 
