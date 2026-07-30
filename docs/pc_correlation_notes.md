@@ -1,51 +1,56 @@
 # PC Analysis Correlation Notes
 
-This note explains the role of `Correlation` in `SetupAnalysis_PC()` and `new_correlation` in `AnalyzeLook_PC()`.
+This note explains the role of `Correlation` in the stateless PC analysis API.
 
 ## Summary
 
-- `Correlation` is the baseline correlation matrix for the hypothesis test statistics.
-- `new_correlation` is an optional replacement matrix that can be supplied before analyzing a later look.
+- `SetupAnalysis_PC()` no longer accepts a `Correlation` argument.
+- `AnalyzeLook_PC()` accepts `Correlation` as a look-level input.
+- For `test.type = "Dunnett"` or `"Partly-Parametric"`, `Correlation` is mandatory at look 1.
+- For later looks, `Correlation` is optional; if omitted, the most recently stored matrix is reused.
 - These matrices affect the multiplicity-adjusted intersection p-values used by the p-value combination analysis.
 - They do not directly change graph weights, transition rules, alpha-spending boundaries, or selection decisions.
 
 ## `Correlation` in `SetupAnalysis_PC()`
 
-`SetupAnalysis_PC()` stores the initial correlation structure in `mcpObj$Correlation`.
+`SetupAnalysis_PC()` does not accept user-supplied correlation input.
 
 Behavior depends on `test.type`:
 
 - `"Dunnett"` and `"Partly-Parametric"`:
-  - `Correlation` must be provided as a `d x d` matrix.
-  - It is treated as the planned dependence structure among the test statistics.
+  - `mcpObj$Correlation` is initialized to `NULL`.
+  - The required matrix is supplied at look 1 through `AnalyzeLook_PC(Correlation = ...)`.
 - `"Bonf"`:
-  - The code replaces `Correlation` with a diagonal/`NA` matrix.
+  - `mcpObj$Correlation` is initialized to a diagonal/`NA` matrix.
   - This effectively removes parametric dependence borrowing across different hypotheses.
 - `"Sidak"` and `"Simes"`:
-  - `Correlation` is set to `NA` and is not meaningfully used in the adjusted p-value calculation.
+  - `mcpObj$Correlation` is initialized to `NA` and is not meaningfully used in the adjusted p-value calculation.
 
 Key code:
 
 - `R/PcAnalysisApi.R`: correlation setup and storage in `mcpObj$Correlation`
 - `R/pValueAdaptGmcpHelper.R`: downstream use in adjusted p-value calculations
 
-## `new_correlation` in `AnalyzeLook_PC()`
+## `Correlation` in `AnalyzeLook_PC()`
 
-`AnalyzeLook_PC()` allows `new_correlation` only for looks after look 1.
+`AnalyzeLook_PC()` accepts `Correlation` as a look-level argument.
 
-- If provided, it is validated by `applyCorrelationUpdate()`.
+- At look 1, `Correlation` is required for `test.type = "Dunnett"` and `"Partly-Parametric"`.
+- At look > 1, `Correlation` is optional for those test types.
+- If supplied, it is validated by `applyCorrelationUpdate()` and replaces the stored matrix.
+- If omitted at look > 1, the previously stored matrix remains in effect.
 - It must be a symmetric `d x d` matrix with diagonal equal to 1.
 - Entries must lie in `[-1, 1]` or be `NA`.
-- Once accepted, it replaces `mcpObj$Correlation`.
+- If the current `test.type` is `"Dunnett"` and `Correlation` contains any `NA`, the code issues a warning and converts `test.type` to `"Partly-Parametric"` before storing the replacement matrix.
 
 Important detail:
 
-- `new_correlation` is a full replacement, not an incremental patch.
+- `Correlation` is a full replacement when provided, not an incremental patch.
 - The matrix dimension stays tied to the full initial hypothesis set, not only the currently active hypotheses.
 
 Key code:
 
-- `R/PcAnalysisApi.R`: applies `new_correlation` before per-look analysis
+- `R/PcAnalysisApi.R`: applies `Correlation` before per-look analysis/adaptation
 - `R/PcAnalysisHelpers.R`: `applyCorrelationUpdate()`
 
 ## How Correlation Is Used in the Analysis
@@ -57,6 +62,8 @@ At each look, `PerLookMCPAnalysis()` passes `mcpObj$Correlation` into `compute_a
   - If a subset has known correlations, it uses a parametric multivariate normal probability calculation via `mvtnorm::pmvnorm()`.
   - If some pairwise correlations are unknown (`NA`), the code partitions the hypotheses into cliques of mutually known correlations.
   - Singletons or disconnected pieces fall back to Bonferroni-like handling for those pieces.
+- After that conversion step, a `Dunnett` analysis with `NA` entries is effectively handled as mixed / partly-parametric for the affected intersections rather than using a distinct Dunnett-only rule.
+- More generally, once the warning/normalization step is past, the downstream adjusted p-value computation does not distinguish between `"Dunnett"` and `"Partly-Parametric"`; the actual behavior is driven by the supplied correlation matrix and where it contains known values versus `NA`.
 
 This means the correlation matrix controls how much parametric dependence information is used when computing adjusted p-values for intersection hypotheses.
 
@@ -67,7 +74,7 @@ The p-value combination method works in two layers:
 1. At each look, compute adjusted p-values for each relevant intersection hypothesis.
 2. From look 2 onward, combine look-wise adjusted p-values across looks using the inverse-normal method.
 
-`Correlation` and `new_correlation` matter in step 1:
+`Correlation` matters in step 1:
 
 - They determine the adjusted p-values produced at the current look.
 - Those adjusted p-values are then carried forward into the inverse-normal combination step.
@@ -82,6 +89,6 @@ By contrast, these inputs do not directly control:
 
 ## Practical Interpretation
 
-Use `Correlation` to encode the planned dependence structure of the test statistics at setup.
+For `"Dunnett"` and `"Partly-Parametric"`, supply `Correlation` at look 1.
 
-Use `new_correlation` when that dependence structure should change between looks, for example because the analysis assumptions or the effective testing structure changed and the current look should use a different full correlation matrix.
+At later looks, supply `Correlation` only when the dependence structure needs to change; otherwise omit it to keep using the current stored matrix.

@@ -26,9 +26,6 @@
 #' @param deltaPT1 Parameter for typeOfDesign = "PT".
 #' @param gammaA Parameter for typeOfDesign = "asHSD" or "asKD".
 #' @param userAlphaSpending Alpha spending values for typeOfDesign = "asUser".
-#' @param Correlation Correlation matrix (NA allowed for unknown correlations).
-#'   If `test.type = "Dunnett"` and `Correlation` contains `NA`, a warning is
-#'   issued and `test.type` is converted to `"Partly-Parametric"`.
 #' @param MultipleWinners Logical; TRUE means reject as many hypotheses as possible, 
 #'        FALSE means reject at most one hypothesis
 #' @param Selection Logical; TRUE if selection of hypotheses is allowed at interim looks
@@ -55,7 +52,6 @@ SetupAnalysis_PC <- function(
     deltaPT1 = 0,
     gammaA = 2,
     userAlphaSpending = NULL,
-    Correlation = NULL,
     MultipleWinners = TRUE,
     Selection = TRUE, # TODO: Check if Selection parameter is really required at setup stage.
     UpdateStrategy = TRUE, # TODO: Check if UpdateStrategy parameter is really required at setup stage.
@@ -82,20 +78,7 @@ SetupAnalysis_PC <- function(
   } else if (test.type == "Sidak" || test.type == "Simes") {
     Correlation <- NA
   } else if (test.type == "Dunnett" || test.type == "Partly-Parametric") {
-    if (is.null(Correlation)) {
-      stop("Correlation must be provided for Dunnett or Partly-Parametric tests")
-    }
-    if (!is.matrix(Correlation) || !all(dim(Correlation) == c(d, d))) {
-      stop("Correlation must be a ", d, " x ", d, " matrix")
-    }
-    rownames(Correlation) <- colnames(Correlation) <- GlobalIndexSet
-    normalized <- normalize_dunnett_correlation(
-      test.type = test.type,
-      correlation = Correlation,
-      arg_name = "Correlation"
-    )
-    test.type <- normalized$test.type
-    Correlation <- normalized$correlation
+    Correlation <- NULL
   } else {
     stop("Unsupported test.type: ", test.type)
   }
@@ -201,7 +184,6 @@ SetupAnalysis_PC <- function(
     deltaPT1 = deltaPT1,
     gammaA = gammaA,
     userAlphaSpending = userAlphaSpending,
-    Correlation = Correlation,
     MultipleWinners = MultipleWinners,
     Selection = Selection,
     UpdateStrategy = UpdateStrategy
@@ -234,6 +216,11 @@ SetupAnalysis_PC <- function(
 #' @param state A "PCAnalysisState" object.
 #' @param p_raw Named numeric vector of raw p-values for the current look, for the
 #'   currently active hypotheses (state$mcpObj$IndexSet).
+#' @param Correlation Optional D x D correlation matrix. This input is mandatory
+#'   at look 1 when \code{test.type} is \code{"Dunnett"} or \code{"Partly-Parametric"}.
+#'   For subsequent looks, if supplied for those test types it updates the
+#'   correlation used in analysis; if \code{NULL}, the most recently stored
+#'   correlation is used.
 #' @param look Optional positive integer explicitly naming the current look number.
 #'   When provided, it must match the look number implied by the state object
 #'   (i.e. \code{state$completed_looks + 1}). This argument exists purely for
@@ -243,10 +230,6 @@ SetupAnalysis_PC <- function(
 #'   (only meaningful when look > 1). NULL means no selection.
 #' @param new_weights Optional numeric vector of new weights for continuing hypotheses.
 #' @param new_G Optional transition matrix for continuing hypotheses.
-#' @param new_correlation Optional updated D x D correlation matrix.
-#'   If the current `test.type` is `"Dunnett"` and `new_correlation` contains
-#'   `NA`, a warning is issued and `test.type` is converted to
-#'   `"Partly-Parametric"`.
 #' @param plotGraphs Logical; if TRUE, plots graphs at key points.
 #'
 #' @return Updated "PCAnalysisState".
@@ -254,11 +237,11 @@ SetupAnalysis_PC <- function(
 AnalyzeLook_PC <- function(
     state,
     p_raw,
+    Correlation = NULL,
     look = NULL,
     selection = NULL,
     new_weights = NULL,
     new_G = NULL,
-    new_correlation = NULL,
     plotGraphs = TRUE) {
   if (!inherits(state, "PCAnalysisState")) stop("state must be a PCAnalysisState object")
 
@@ -289,10 +272,21 @@ AnalyzeLook_PC <- function(
     }
   }
 
+  if (next_look == 1 &&
+      mcpObj$test.type %in% c("Dunnett", "Partly-Parametric") &&
+      is.null(Correlation)) {
+    stop("Correlation must be provided at look 1 for Dunnett or Partly-Parametric tests")
+  }
+
+  if (!is.null(Correlation) &&
+      mcpObj$test.type %in% c("Dunnett", "Partly-Parametric")) {
+    mcpObj <- applyCorrelationUpdate(mcpObj, Correlation)
+  }
+
   # Apply optional changes before analyzing look > 1
   if (next_look > 1) {
     if (!is.null(selection)) {
-      if (!isTRUE(state$design_params$Selection)) {
+      if (!isTRUE(state$design_params$Selection)) { 
         stop("selection cannot be applied: Selection was disabled in SetupAnalysis_PC()")
       }
       mcpObj <- applySelection(mcpObj, selection, look = next_look)
@@ -316,10 +310,6 @@ AnalyzeLook_PC <- function(
         )
       }
     }
-
-    if (!is.null(new_correlation)) {
-      mcpObj <- applyCorrelationUpdate(mcpObj, new_correlation)
-    }
   } else {
     # For look 1, adaptation inputs are invalid and must be rejected.
     if (!is.null(selection)) {
@@ -327,9 +317,6 @@ AnalyzeLook_PC <- function(
     }
     if (!is.null(new_weights) || !is.null(new_G)) {
       stop("new_weights/new_G cannot be applied at look 1.")
-    }
-    if (!is.null(new_correlation)) {
-      stop("new_correlation cannot be applied at look 1.")
     }
   }
 
@@ -368,10 +355,10 @@ AnalyzeLook_PC <- function(
     mcpObj = mcpObj,
     inputs = list(
       p_raw = p_raw,
+      Correlation = Correlation,
       selection = selection,
       new_weights = new_weights,
-      new_G = new_G,
-      new_correlation = new_correlation
+      new_G = new_G
     )
   )
 

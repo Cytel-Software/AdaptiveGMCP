@@ -47,7 +47,6 @@ testthat::test_that("Test 1: PC analysis API scaffolds", {
     alpha = alp,
     info_frac = t,
     typeOfDesign = des,
-    Correlation = corr,
     plotGraphs = FALSE
   )
 
@@ -58,6 +57,7 @@ testthat::test_that("Test 1: PC analysis API scaffolds", {
   state <- AnalyzeLook_PC(
     state,
     p_raw = c(H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30),
+    Correlation = corr,
     plotGraphs = FALSE
   )
 
@@ -144,7 +144,6 @@ testthat::test_that("Test 2: PC analysis API scaffolds (strategy modification)",
     alpha = alp,
     info_frac = t,
     typeOfDesign = des,
-    Correlation = corr,
     plotGraphs = FALSE,
     MultipleWinners = FALSE
   )
@@ -153,6 +152,7 @@ testthat::test_that("Test 2: PC analysis API scaffolds (strategy modification)",
   state <- AnalyzeLook_PC(
     state,
     p_raw = c(H1 = 0.03, H2 = 0.20, H3 = 0.10, H4 = 0.25),
+    Correlation = corr,
     plotGraphs = FALSE
   )
 
@@ -220,7 +220,6 @@ testthat::test_that("Test 3: PC analysis API scaffolds (full transition at look 
     alpha = alp,
     info_frac = t,
     typeOfDesign = des,
-    Correlation = corr,
     plotGraphs = FALSE,
     MultipleWinners = TRUE
   )
@@ -232,6 +231,7 @@ testthat::test_that("Test 3: PC analysis API scaffolds (full transition at look 
   state <- AnalyzeLook_PC(
     state,
     p_raw = c(H1 = 0.04, H2 = 0.18, H3 = 0.12, H4 = 0.22),
+    Correlation = corr,
     plotGraphs = FALSE
   )
 
@@ -251,9 +251,9 @@ testthat::test_that("Test 3: PC analysis API scaffolds (full transition at look 
   ), byrow = TRUE, nrow = 3)
 
   # 3) correlation update (example: tweak H1-H2 and H1-H3)
-  new_correlation <- corr
-  new_correlation[1, 2] <- new_correlation[2, 1] <- 0.3
-  new_correlation[1, 3] <- new_correlation[3, 1] <- 0.4
+  Correlation <- corr
+  Correlation[1, 2] <- Correlation[2, 1] <- 0.3
+  Correlation[1, 3] <- Correlation[3, 1] <- 0.4
 
   state <- AnalyzeLook_PC(
     state,
@@ -261,7 +261,7 @@ testthat::test_that("Test 3: PC analysis API scaffolds (full transition at look 
     selection = selection,
     new_weights = new_weights,
     new_G = new_G,
-    new_correlation = new_correlation,
+    Correlation = Correlation,
     plotGraphs = FALSE
   )
 
@@ -286,10 +286,9 @@ testthat::test_that("AnalyzeLook_PC: look argument validation and error handling
   state0 <- SetupAnalysis_PC(
     WI = wi,
     G = g,
-    test.type = "Partly-Parametric",
+    test.type = "Bonf",
     alpha = 0.025,
     info_frac = c(0.5, 1.0),
-    Correlation = corr,
     plotGraphs = FALSE
   )
 
@@ -365,10 +364,9 @@ testthat::test_that("AnalyzeLook_PC: structural invariants hold across looks", {
   state <- SetupAnalysis_PC(
     WI = wi,
     G = g,
-    test.type = "Partly-Parametric",
+    test.type = "Bonf",
     alpha = 0.025,
     info_frac = c(0.5, 1.0),
-    Correlation = corr,
     plotGraphs = FALSE
   )
 
@@ -597,7 +595,6 @@ testthat::test_that("Test 7: Dunnett, group-sequential, 2-look, no selection/upd
     alpha = alp,
     info_frac = t,
     typeOfDesign = des,
-    Correlation = corr,
     MultipleWinners = TRUE,
     plotGraphs = FALSE
   )
@@ -611,6 +608,7 @@ testthat::test_that("Test 7: Dunnett, group-sequential, 2-look, no selection/upd
   state <- AnalyzeLook_PC(
     state,
     p_raw = c(H1 = 0.00045, H2 = 0.0952, H3 = 0.0225, H4 = 0.1104),
+    Correlation = corr,
     plotGraphs = FALSE
   )
 
@@ -674,7 +672,6 @@ testthat::test_that("Test 8: Dunnett, group-sequential, 2-look, weight modificat
     alpha = alp,
     info_frac = t,
     typeOfDesign = des,
-    Correlation = corr,
     MultipleWinners = TRUE,
     plotGraphs = FALSE
   )
@@ -683,6 +680,7 @@ testthat::test_that("Test 8: Dunnett, group-sequential, 2-look, weight modificat
   state <- AnalyzeLook_PC(
     state,
     p_raw = c(H1 = 0.00045, H2 = 0.0952, H3 = 0.0225, H4 = 0.1104),
+    Correlation = corr,
     plotGraphs = FALSE
   )
 
@@ -811,7 +809,6 @@ testthat::test_that("Test 10: Dunnett, fixed-sample, 4-hypo, full correlation", 
     test.type = tt,
     alpha = alp,
     info_frac = t,
-    Correlation = corr,
     plotGraphs = FALSE
   )
 
@@ -823,6 +820,7 @@ testthat::test_that("Test 10: Dunnett, fixed-sample, 4-hypo, full correlation", 
   state <- AnalyzeLook_PC(
     state,
     p_raw = c(H1 = 0.01, H2 = 0.02, H3 = 0.005, H4 = 0.5),
+    Correlation = corr,
     plotGraphs = FALSE
   )
 
@@ -874,7 +872,6 @@ testthat::test_that("Test 11: Dunnett, fixed-sample, 4-hypo, equal weights", {
     test.type = tt,
     alpha = alp,
     info_frac = t,
-    Correlation = corr,
     plotGraphs = FALSE
   )
 
@@ -887,6 +884,7 @@ testthat::test_that("Test 11: Dunnett, fixed-sample, 4-hypo, equal weights", {
   state <- AnalyzeLook_PC(
     state,
     p_raw = c(H1 = 0.638, H2 = 0.01, H3 = 0.007, H4 = 3.959e-4),
+    Correlation = corr,
     plotGraphs = FALSE
   )
 
@@ -931,7 +929,6 @@ testthat::test_that("PC equivalence M07: asP design", {
     alpha = 0.025,
     info_frac = c(0.5, 1.0),
     typeOfDesign = "asP",
-    Correlation = corr,
     MultipleWinners = TRUE,
     Selection = FALSE,
     UpdateStrategy = FALSE,
@@ -941,6 +938,7 @@ testthat::test_that("PC equivalence M07: asP design", {
   state <- AnalyzeLook_PC(
     state,
     p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
+    Correlation = corr,
     plotGraphs = FALSE
   )
 
@@ -992,7 +990,6 @@ testthat::test_that("PC equivalence M11: asHSD design", {
     info_frac = c(0.5, 1.0),
     typeOfDesign = "asHSD",
     gammaA = 2.5,
-    Correlation = corr,
     MultipleWinners = TRUE,
     Selection = FALSE,
     UpdateStrategy = FALSE,
@@ -1002,6 +999,7 @@ testthat::test_that("PC equivalence M11: asHSD design", {
   state <- AnalyzeLook_PC(
     state,
     p_raw = c(H1 = 0.25, H2 = 0.30, H3 = 0.35, H4 = 0.40),
+    Correlation = corr,
     plotGraphs = FALSE
   )
 
@@ -1053,7 +1051,6 @@ testthat::test_that("PC equivalence M12: asKD design", {
     info_frac = c(0.5, 1.0),
     typeOfDesign = "asKD",
     gammaA = 2.5,
-    Correlation = corr,
     MultipleWinners = TRUE,
     Selection = FALSE,
     UpdateStrategy = FALSE,
@@ -1063,6 +1060,7 @@ testthat::test_that("PC equivalence M12: asKD design", {
   state <- AnalyzeLook_PC(
     state,
     p_raw = c(H1 = 0.28, H2 = 0.31, H3 = 0.33, H4 = 0.37),
+    Correlation = corr,
     plotGraphs = FALSE
   )
 
@@ -1124,7 +1122,6 @@ testthat::test_that("PC equivalence M19: correlation-only adaptation", {
     alpha = 0.025,
     info_frac = c(0.5, 1.0),
     typeOfDesign = "asOF",
-    Correlation = corr,
     MultipleWinners = TRUE,
     Selection = FALSE,
     UpdateStrategy = FALSE,
@@ -1134,6 +1131,7 @@ testthat::test_that("PC equivalence M19: correlation-only adaptation", {
   state <- AnalyzeLook_PC(
     state,
     p_raw = c(H1 = 0.26, H2 = 0.29, H3 = 0.34, H4 = 0.38),
+    Correlation = corr,
     plotGraphs = FALSE
   )
 
@@ -1143,7 +1141,7 @@ testthat::test_that("PC equivalence M19: correlation-only adaptation", {
   state <- AnalyzeLook_PC(
     state,
     p_raw = c(H1 = 0.07, H2 = 0.08, H3 = 0.11, H4 = 0.14),
-    new_correlation = new_corr,
+    Correlation = new_corr,
     plotGraphs = FALSE
   )
 
@@ -1185,7 +1183,6 @@ testthat::test_that("PC equivalence M22: early-stop efficacy path", {
     alpha = 0.025,
     info_frac = c(0.5, 1.0),
     typeOfDesign = "asOF",
-    Correlation = corr,
     MultipleWinners = FALSE,
     Selection = FALSE,
     UpdateStrategy = FALSE,
@@ -1195,6 +1192,7 @@ testthat::test_that("PC equivalence M22: early-stop efficacy path", {
   state <- AnalyzeLook_PC(
     state,
     p_raw = c(H1 = 1e-4, H2 = 0.40, H3 = 0.45, H4 = 0.50),
+    Correlation = corr,
     plotGraphs = FALSE
   )
 
@@ -1238,7 +1236,6 @@ testthat::test_that("PC equivalence M24: MultipleWinners FALSE", {
     alpha = 0.025,
     info_frac = c(0.5, 1.0),
     typeOfDesign = "asOF",
-    Correlation = corr,
     MultipleWinners = FALSE,
     Selection = FALSE,
     UpdateStrategy = FALSE,
@@ -1248,6 +1245,7 @@ testthat::test_that("PC equivalence M24: MultipleWinners FALSE", {
   state <- AnalyzeLook_PC(
     state,
     p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.38, H4 = 0.42),
+    Correlation = corr,
     plotGraphs = FALSE
   )
 
@@ -1299,7 +1297,6 @@ testthat::test_that("PC equivalence M09: WT design", {
     info_frac = c(0.5, 1.0),
     typeOfDesign = "WT",
     deltaWT = 0.25,
-    Correlation = corr,
     MultipleWinners = TRUE,
     Selection = FALSE,
     UpdateStrategy = FALSE,
@@ -1309,6 +1306,7 @@ testthat::test_that("PC equivalence M09: WT design", {
   state <- AnalyzeLook_PC(
     state,
     p_raw = c(H1 = 0.28, H2 = 0.32, H3 = 0.36, H4 = 0.40),
+    Correlation = corr,
     plotGraphs = FALSE
   )
 
@@ -1360,7 +1358,6 @@ testthat::test_that("PC equivalence M13: asUser design", {
     info_frac = c(0.5, 1.0),
     typeOfDesign = "asUser",
     userAlphaSpending = c(0.008, 0.025),
-    Correlation = corr,
     MultipleWinners = TRUE,
     Selection = FALSE,
     UpdateStrategy = FALSE,
@@ -1370,6 +1367,7 @@ testthat::test_that("PC equivalence M13: asUser design", {
   state <- AnalyzeLook_PC(
     state,
     p_raw = c(H1 = 0.29, H2 = 0.33, H3 = 0.37, H4 = 0.41),
+    Correlation = corr,
     plotGraphs = FALSE
   )
 
@@ -1420,7 +1418,6 @@ testthat::test_that("PC equivalence M17: selection-only adaptation", {
     alpha = 0.025,
     info_frac = c(0.5, 1.0),
     typeOfDesign = "asOF",
-    Correlation = corr,
     MultipleWinners = TRUE,
     Selection = TRUE,
     UpdateStrategy = FALSE,
@@ -1430,6 +1427,7 @@ testthat::test_that("PC equivalence M17: selection-only adaptation", {
   state <- AnalyzeLook_PC(
     state,
     p_raw = c(H1 = 0.21, H2 = 0.24, H3 = 0.30, H4 = 0.35),
+    Correlation = corr,
     plotGraphs = FALSE
   )
 
@@ -1481,7 +1479,6 @@ testthat::test_that("PC equivalence M08: noEarlyEfficacy design", {
     alpha = 0.025,
     info_frac = c(0.5, 1.0),
     typeOfDesign = "noEarlyEfficacy",
-    Correlation = corr,
     MultipleWinners = TRUE,
     Selection = FALSE,
     UpdateStrategy = FALSE,
@@ -1491,6 +1488,7 @@ testthat::test_that("PC equivalence M08: noEarlyEfficacy design", {
   state <- AnalyzeLook_PC(
     state,
     p_raw = c(H1 = 0.31, H2 = 0.34, H3 = 0.38, H4 = 0.43),
+    Correlation = corr,
     plotGraphs = FALSE
   )
 
@@ -1709,52 +1707,18 @@ testthat::test_that("SetupAnalysis_PC: correlation policy by test.type", {
     c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
     byrow = TRUE, nrow = 4
   )
-  corr <- matrix(
-    c(1, 0.5, NA, NA, 0.5, 1, NA, NA, NA, NA, 1, 0.5, NA, NA, 0.5, 1),
-    nrow = 4
+  # Dunnett and Partly-Parametric defer Correlation to AnalyzeLook_PC
+  stateDunnett <- SetupAnalysis_PC(
+    WI = wi, G = g, test.type = "Dunnett",
+    alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
   )
+  testthat::expect_null(stateDunnett$mcpObj$Correlation)
 
-  # Dunnett: Correlation must be provided
-  testthat::expect_error(
-    SetupAnalysis_PC(
-      WI = wi, G = g, test.type = "Dunnett",
-      alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
-    ),
-    regexp = "Correlation must be provided"
+  statePP <- SetupAnalysis_PC(
+    WI = wi, G = g, test.type = "Partly-Parametric",
+    alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
   )
-
-  # Partly-Parametric: Correlation must be provided
-  testthat::expect_error(
-    SetupAnalysis_PC(
-      WI = wi, G = g, test.type = "Partly-Parametric",
-      alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
-    ),
-    regexp = "Correlation must be provided"
-  )
-
-  # Dunnett: Correlation must be a d x d matrix (wrong size)
-  testthat::expect_error(
-    SetupAnalysis_PC(
-      WI = wi, G = g, test.type = "Dunnett",
-      alpha = 0.025, info_frac = c(1),
-      Correlation = matrix(c(1, 0.5, 0.5, 1), nrow = 2),
-      plotGraphs = FALSE
-    ),
-    regexp = "Correlation must be a"
-  )
-
-  # Dunnett with NA correlation warns and is converted to Partly-Parametric
-  testthat::expect_warning(
-    stateDunnettNA <- SetupAnalysis_PC(
-      WI = wi, G = g, test.type = "Dunnett",
-      alpha = 0.025, info_frac = c(0.5, 1),
-      Correlation = corr,
-      plotGraphs = FALSE
-    ),
-    regexp = "converted to 'Partly-Parametric'"
-  )
-  testthat::expect_identical(stateDunnettNA$mcpObj$test.type, "Partly-Parametric")
-  testthat::expect_identical(stateDunnettNA$design_params$test.type, "Partly-Parametric")
+  testthat::expect_null(statePP$mcpObj$Correlation)
 
   # Bonf: overrides Correlation to identity with NA off-diagonal
   stateBonf <- SetupAnalysis_PC(
@@ -1786,17 +1750,12 @@ testthat::test_that("SetupAnalysis_PC: asUser typeOfDesign requires userAlphaSpe
     c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
     byrow = TRUE, nrow = 4
   )
-  corr <- matrix(
-    c(1, 0.5, NA, NA, 0.5, 1, NA, NA, NA, NA, 1, 0.5, NA, NA, 0.5, 1),
-    nrow = 4
-  )
-
   # Missing userAlphaSpending when typeOfDesign = 'asUser'
   testthat::expect_error(
     SetupAnalysis_PC(
       WI = wi, G = g, test.type = "Dunnett",
       alpha = 0.025, info_frac = c(0.5, 1.0),
-      typeOfDesign = "asUser", Correlation = corr,
+      typeOfDesign = "asUser",
       plotGraphs = FALSE
     ),
     regexp = "userAlphaSpending"
@@ -1809,7 +1768,7 @@ testthat::test_that("SetupAnalysis_PC: asUser typeOfDesign requires userAlphaSpe
       alpha = 0.025, info_frac = c(0.5, 1.0),
       typeOfDesign = "asUser",
       userAlphaSpending = c(0.008, 0.025),
-      Correlation = corr, plotGraphs = FALSE
+      plotGraphs = FALSE
     )
   )
 })
@@ -1833,12 +1792,11 @@ testthat::test_that("AnalyzeLook_PC: non-PCAnalysisState input is rejected", {
 testthat::test_that("AnalyzeLook_PC: p_raw contract validation", {
   wi <- c(0.5, 0.5)
   g <- matrix(c(0, 1, 1, 0), byrow = TRUE, nrow = 2)
-  corr <- matrix(c(1, 0.5, 0.5, 1), byrow = TRUE, nrow = 2)
 
   state0 <- SetupAnalysis_PC(
-    WI = wi, G = g, test.type = "Partly-Parametric",
+    WI = wi, G = g, test.type = "Bonf",
     alpha = 0.025, info_frac = c(0.5, 1.0),
-    Correlation = corr, plotGraphs = FALSE
+    plotGraphs = FALSE
   )
 
   # Non-numeric p_raw
@@ -1883,7 +1841,7 @@ testthat::test_that("AnalyzeLook_PC: p_raw contract validation", {
   )
 })
 
-testthat::test_that("AnalyzeLook_PC: look 1 adaptation prohibition", {
+testthat::test_that("AnalyzeLook_PC: look 1 adaptation prohibition and correlation requirement", {
   wi <- c(0.5, 0.5, 0, 0)
   g <- matrix(
     c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
@@ -1897,13 +1855,22 @@ testthat::test_that("AnalyzeLook_PC: look 1 adaptation prohibition", {
   state0 <- SetupAnalysis_PC(
     WI = wi, G = g, test.type = "Partly-Parametric",
     alpha = 0.025, info_frac = c(0.5, 1.0),
-    Correlation = corr, plotGraphs = FALSE
+    plotGraphs = FALSE
+  )
+
+  testthat::expect_error(
+    AnalyzeLook_PC(
+      state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
+      plotGraphs = FALSE
+    ),
+    regexp = "Correlation must be provided at look 1"
   )
 
   # selection at look 1 must error
   testthat::expect_error(
     AnalyzeLook_PC(
       state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
+      Correlation = corr,
       selection = c("H1", "H2"), plotGraphs = FALSE
     ),
     regexp = "selection cannot be applied at look 1"
@@ -1913,19 +1880,19 @@ testthat::test_that("AnalyzeLook_PC: look 1 adaptation prohibition", {
   testthat::expect_error(
     AnalyzeLook_PC(
       state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
+      Correlation = corr,
       new_weights = c(H1 = 0.5, H2 = 0.5, H3 = 0, H4 = 0),
       new_G = g, plotGraphs = FALSE
     ),
     regexp = "new_weights/new_G cannot be applied at look 1"
   )
 
-  # new_correlation at look 1 must error
-  testthat::expect_error(
+  # Correlation at look 1 is valid
+  testthat::expect_no_error(
     AnalyzeLook_PC(
       state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
-      new_correlation = corr, plotGraphs = FALSE
-    ),
-    regexp = "new_correlation cannot be applied at look 1"
+      Correlation = corr, plotGraphs = FALSE
+    )
   )
 })
 
@@ -1948,12 +1915,13 @@ testthat::test_that("AnalyzeLook_PC: feature-flag gates at look > 1", {
   stateNoAdapt <- SetupAnalysis_PC(
     WI = wi, G = g, test.type = "Dunnett",
     alpha = 0.025, info_frac = c(0.5, 1.0),
-    Correlation = corr, Selection = FALSE, UpdateStrategy = FALSE,
+    Selection = FALSE, UpdateStrategy = FALSE,
     plotGraphs = FALSE
   )
   stateNoAdapt <- AnalyzeLook_PC(
     stateNoAdapt,
     p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
+    Correlation = corr,
     plotGraphs = FALSE
   )
 
@@ -1993,12 +1961,13 @@ testthat::test_that("AnalyzeLook_PC: selection validity at look > 1", {
   state1 <- SetupAnalysis_PC(
     WI = wi, G = g, test.type = "Dunnett",
     alpha = 0.025, info_frac = c(0.5, 1.0),
-    Correlation = corr, Selection = TRUE, UpdateStrategy = FALSE,
+    Selection = TRUE, UpdateStrategy = FALSE,
     plotGraphs = FALSE
   )
   state1 <- AnalyzeLook_PC(
     state1,
     p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
+    Correlation = corr,
     plotGraphs = FALSE
   )
 
@@ -2056,12 +2025,13 @@ testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
   state1 <- SetupAnalysis_PC(
     WI = wi, G = g, test.type = "Dunnett",
     alpha = 0.025, info_frac = c(0.5, 1.0),
-    Correlation = corr, Selection = FALSE, UpdateStrategy = TRUE,
+    Selection = FALSE, UpdateStrategy = TRUE,
     plotGraphs = FALSE
   )
   state1 <- AnalyzeLook_PC(
     state1,
     p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
+    Correlation = corr,
     plotGraphs = FALSE
   )
 
@@ -2202,23 +2172,24 @@ testthat::test_that("AnalyzeLook_PC: correlation update validity at look > 1", {
   state1 <- SetupAnalysis_PC(
     WI = wi, G = g, test.type = "Dunnett",
     alpha = 0.025, info_frac = c(0.5, 1.0),
-    Correlation = corr, Selection = FALSE, UpdateStrategy = FALSE,
+    Selection = FALSE, UpdateStrategy = FALSE,
     plotGraphs = FALSE
   )
   state1 <- AnalyzeLook_PC(
     state1,
     p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
+    Correlation = corr,
     plotGraphs = FALSE
   )
 
-  # new_correlation not a matrix must error
+  # Correlation not a matrix must error
   testthat::expect_error(
     AnalyzeLook_PC(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      new_correlation = c(1, 0.5, 0.5, 1), plotGraphs = FALSE
+      Correlation = c(1, 0.5, 0.5, 1), plotGraphs = FALSE
     ),
-    regexp = "new_correlation must be a matrix"
+    regexp = "Correlation must be a matrix"
   )
 
   # Wrong dimensions (2 x 2 instead of 4 x 4) must error
@@ -2226,22 +2197,22 @@ testthat::test_that("AnalyzeLook_PC: correlation update validity at look > 1", {
     AnalyzeLook_PC(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      new_correlation = matrix(c(1, 0.5, 0.5, 1), nrow = 2),
+      Correlation = matrix(c(1, 0.5, 0.5, 1), nrow = 2),
       plotGraphs = FALSE
     ),
-    regexp = "new_correlation must have dimensions"
+    regexp = "Correlation must have dimensions"
   )
 
-  # Non-symmetric new_correlation must error
+  # Non-symmetric Correlation must error
   corrAsym <- corr
   corrAsym[1, 2] <- 0.3  # differs from corrAsym[2, 1] = 0.5
   testthat::expect_error(
     AnalyzeLook_PC(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      new_correlation = corrAsym, plotGraphs = FALSE
+      Correlation = corrAsym, plotGraphs = FALSE
     ),
-    regexp = "new_correlation must be symmetric"
+    regexp = "Correlation must be symmetric"
   )
 
   # Diagonal not equal to 1 must error
@@ -2251,7 +2222,7 @@ testthat::test_that("AnalyzeLook_PC: correlation update validity at look > 1", {
     AnalyzeLook_PC(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      new_correlation = corrBadDiag, plotGraphs = FALSE
+      Correlation = corrBadDiag, plotGraphs = FALSE
     ),
     regexp = "diagonal must be 1"
   )
@@ -2263,12 +2234,12 @@ testthat::test_that("AnalyzeLook_PC: correlation update validity at look > 1", {
     AnalyzeLook_PC(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      new_correlation = corrOutOfRange, plotGraphs = FALSE
+      Correlation = corrOutOfRange, plotGraphs = FALSE
     ),
     regexp = "entries must be in"
   )
 
-  # Valid new_correlation proceeds without error
+  # Valid Correlation proceeds without error
   corrValid <- matrix(
     c(1, 0.3, NA, NA, 0.3, 1, NA, NA, NA, NA, 1, 0.4, NA, NA, 0.4, 1),
     nrow = 4
@@ -2277,7 +2248,7 @@ testthat::test_that("AnalyzeLook_PC: correlation update validity at look > 1", {
     state2 <- AnalyzeLook_PC(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      new_correlation = corrValid, plotGraphs = FALSE
+      Correlation = corrValid, plotGraphs = FALSE
     ),
     regexp = "converted to 'Partly-Parametric'"
   )
@@ -2299,12 +2270,13 @@ testthat::test_that("AnalyzeLook_PC: Dunnett stays Dunnett when updated correlat
   state1 <- SetupAnalysis_PC(
     WI = wi, G = g, test.type = "Dunnett",
     alpha = 0.025, info_frac = c(0.5, 1.0),
-    Correlation = corr, Selection = FALSE, UpdateStrategy = FALSE,
+    Selection = FALSE, UpdateStrategy = FALSE,
     plotGraphs = FALSE
   )
   state1 <- AnalyzeLook_PC(
     state1,
     p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
+    Correlation = corr,
     plotGraphs = FALSE
   )
 
@@ -2316,7 +2288,7 @@ testthat::test_that("AnalyzeLook_PC: Dunnett stays Dunnett when updated correlat
     AnalyzeLook_PC(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      new_correlation = corrValid, plotGraphs = FALSE
+      Correlation = corrValid, plotGraphs = FALSE
     )
   )
   testthat::expect_identical(state2$mcpObj$test.type, "Dunnett")
