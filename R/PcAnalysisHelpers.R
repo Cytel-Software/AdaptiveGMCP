@@ -172,7 +172,7 @@ applyCorrelationUpdate <- function(mcpObj, Correlation) {
     stop("Correlation entries must be in [-1, 1] (or NA)")
   }
 
-  if (any(diag(Correlation) != 1)) stop("Correlation diagonal must be 1")
+  if (any(is.na(diag(Correlation)) | diag(Correlation) != 1)) stop("Correlation diagonal must be 1")
 
   if (!isTRUE(all.equal(Correlation, t(Correlation), tolerance = 1e-12, check.attributes = FALSE))) {
     stop("Correlation must be symmetric")
