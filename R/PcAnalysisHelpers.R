@@ -162,7 +162,7 @@ applyStrategyUpdate <- function(mcpObj, new_weights, new_G) {
 applyCorrelationUpdate <- function(mcpObj, Correlation) {
   if (is.null(Correlation)) return(mcpObj)
   if (!is.matrix(Correlation)) stop("Correlation must be a matrix")
-
+  if (!is.numeric(Correlation)) stop("Correlation must be a numeric matrix")
   d <- length(mcpObj$IntialHypothesis)
   if (!all(dim(Correlation) == c(d, d))) {
     stop("Correlation must have dimensions ", d, " x ", d)
