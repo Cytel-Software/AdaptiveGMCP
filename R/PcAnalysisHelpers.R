@@ -159,30 +159,30 @@ applyStrategyUpdate <- function(mcpObj, new_weights, new_G) {
   return(modified$mcpObj)
 }
 
-applyCorrelationUpdate <- function(mcpObj, new_correlation) {
-  if (is.null(new_correlation)) return(mcpObj)
-  if (!is.matrix(new_correlation)) stop("new_correlation must be a matrix")
+applyCorrelationUpdate <- function(mcpObj, Correlation) {
+  if (is.null(Correlation)) return(mcpObj)
+  if (!is.matrix(Correlation)) stop("Correlation must be a matrix")
 
   d <- length(mcpObj$IntialHypothesis)
-  if (!all(dim(new_correlation) == c(d, d))) {
-    stop("new_correlation must have dimensions ", d, " x ", d)
+  if (!all(dim(Correlation) == c(d, d))) {
+    stop("Correlation must have dimensions ", d, " x ", d)
   }
 
-  if (any(!is.na(new_correlation) & (new_correlation < -1 | new_correlation > 1))) {
-    stop("new_correlation entries must be in [-1, 1] (or NA)")
+  if (any(!is.na(Correlation) & (Correlation < -1 | Correlation > 1))) {
+    stop("Correlation entries must be in [-1, 1] (or NA)")
   }
 
-  if (any(diag(new_correlation) != 1)) stop("new_correlation diagonal must be 1")
+  if (any(diag(Correlation) != 1)) stop("Correlation diagonal must be 1")
 
-  if (!isTRUE(all.equal(new_correlation, t(new_correlation), tolerance = 1e-12, check.attributes = FALSE))) {
-    stop("new_correlation must be symmetric")
+  if (!isTRUE(all.equal(Correlation, t(Correlation), tolerance = 1e-12, check.attributes = FALSE))) {
+    stop("Correlation must be symmetric")
   }
 
-  rownames(new_correlation) <- colnames(new_correlation) <- mcpObj$IntialHypothesis
+  rownames(Correlation) <- colnames(Correlation) <- mcpObj$IntialHypothesis
   normalized <- normalize_dunnett_correlation(
     test.type = mcpObj$test.type,
-    correlation = new_correlation,
-    arg_name = "new_correlation"
+    correlation = Correlation,
+    arg_name = "Correlation"
   )
   mcpObj$test.type <- normalized$test.type
   mcpObj$Correlation <- normalized$correlation

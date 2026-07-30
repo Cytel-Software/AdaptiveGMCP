@@ -7,11 +7,11 @@
 AnalyzeLook_PC(
   state,
   p_raw,
+  Correlation = NULL,
   look = NULL,
   selection = NULL,
   new_weights = NULL,
   new_G = NULL,
-  new_correlation = NULL,
   plotGraphs = TRUE
 )
 }
@@ -21,10 +21,16 @@ AnalyzeLook_PC(
 \item{p_raw}{Named numeric vector of raw p-values for the current look, for the
 currently active hypotheses (state$mcpObj$IndexSet).}
 
+\item{Correlation}{Optional D x D correlation matrix. This input is mandatory
+at look 1 when `test.type` is `"Dunnett"` or `"Partly-Parametric"`.
+For subsequent looks, if supplied for those test types it updates the
+correlation used in analysis; if `NULL`, the most recently stored
+correlation is used.}
+
 \item{look}{Optional positive integer explicitly naming the current look number.
 When provided, it must match the look number implied by the state object
 (i.e. \code{state$completed_looks + 1}). This argument exists purely for
-readability of user scripts — it does not change program logic.
+readability of user scripts - it does not change program logic.
 If \code{NULL} (default), the look number is inferred from the state.}
 
 \item{selection}{Optional character vector of hypotheses to retain for this look
@@ -33,11 +39,6 @@ If \code{NULL} (default), the look number is inferred from the state.}
 \item{new_weights}{Optional numeric vector of new weights for continuing hypotheses.}
 
 \item{new_G}{Optional transition matrix for continuing hypotheses.}
-
-\item{new_correlation}{Optional updated D x D correlation matrix.
-If the current \code{test.type} is \code{"Dunnett"} and
-\code{new_correlation} contains \code{NA}, a warning is issued and
-\code{test.type} is converted to \code{"Partly-Parametric"}.}
 
 \item{plotGraphs}{Logical; if TRUE, plots graphs at key points.}
 }

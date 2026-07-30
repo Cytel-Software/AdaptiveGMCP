@@ -16,7 +16,6 @@ SetupAnalysis_PC(
   deltaPT1 = 0,
   gammaA = 2,
   userAlphaSpending = NULL,
-  Correlation = NULL,
   MultipleWinners = TRUE,
   Selection = TRUE,
   UpdateStrategy = TRUE,
@@ -50,11 +49,6 @@ Supported values: "OF" (O'Brien & Fleming), "P" (Pocock), "WT" (Wang & Tsiatis D
 \item{gammaA}{Parameter for typeOfDesign = "asHSD" or "asKD".}
 
 \item{userAlphaSpending}{Alpha spending values for typeOfDesign = "asUser".}
-
-\item{Correlation}{Correlation matrix (NA allowed for unknown correlations).
-If \code{test.type = "Dunnett"} and \code{Correlation} contains \code{NA},
-a warning is issued and \code{test.type} is converted to
-\code{"Partly-Parametric"}.}
 
 \item{MultipleWinners}{Logical; TRUE means reject as many hypotheses as possible, 
 FALSE means reject at most one hypothesis}
