@@ -286,7 +286,7 @@ AnalyzeLook_PC <- function(
   # Apply optional changes before analyzing look > 1
   if (next_look > 1) {
     if (!is.null(selection)) {
-      if (identical(state$design_params$Selection, FALSE)) {
+      if (!isTRUE(state$design_params$Selection)) {
         stop("selection cannot be applied: Selection was disabled in SetupAnalysis_PC()")
       }
       mcpObj <- applySelection(mcpObj, selection, look = next_look)
