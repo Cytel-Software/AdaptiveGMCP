@@ -47,9 +47,8 @@ adaptGMCP_PC(
 \item{userAlphaSpending}{Parameter for alpha spending function for typeOfDesign = "asUser"}
 
 \item{Correlation}{Matrix of correlation between test statistics, NA if the correlation is unknown.
-If \code{test.type = "Dunnett"} and \code{Correlation} contains \code{NA},
-a warning is issued and \code{test.type} is converted to
-\code{"Partly-Parametric"}.}
+If `test.type = "Dunnett"` and `Correlation` contains `NA`, a warning is
+issued and `test.type` is converted to `"Partly-Parametric"`.}
 
 \item{MultipleWinners}{Logical: TRUE if multiple winners over the looks is required.}
 
