@@ -4,9 +4,24 @@
 #
 # --------------------------------------------------------------------------------------------------
 
-ValidatePeSampleSizes <- function(full_d, full_0, sub_d, sub_0)
+ValidatePESampleSizes <- function(fullpop_sample_sizes, subpop_sample_sizes)
 {
-  vArgs <- c(full_d = full_d, full_0 = full_0, sub_d = sub_d, sub_0 = sub_0)
+  if( !is.numeric( fullpop_sample_sizes ) || !is.numeric( subpop_sample_sizes ) )
+  {
+    stop( "fullpop_sample_sizes and subpop_sample_sizes must be numeric vectors." )
+  }
+
+  if( length( fullpop_sample_sizes ) != length( subpop_sample_sizes ) )
+  {
+    stop( "fullpop_sample_sizes and subpop_sample_sizes must have the same length." )
+  }
+
+  if( length( fullpop_sample_sizes ) < 2 )
+  {
+    stop( "Sample size vectors must include a control arm and at least one treatment arm." )
+  }
+
+  vArgs <- c( fullpop_sample_sizes, subpop_sample_sizes )
 
   if( anyNA( vArgs ) || !all( is.finite( vArgs ) ) )
   {
@@ -18,7 +33,7 @@ ValidatePeSampleSizes <- function(full_d, full_0, sub_d, sub_0)
     stop( "Sample sizes must be strictly positive." )
   }
 
-  if( sub_d > full_d || sub_0 > full_0 )
+  if( any( subpop_sample_sizes > fullpop_sample_sizes ) )
   {
     stop( "Subgroup sample sizes must not exceed full-population sample sizes." )
   }
@@ -26,40 +41,191 @@ ValidatePeSampleSizes <- function(full_d, full_0, sub_d, sub_0)
   return( invisible( TRUE ) )
 }
 
-ComputeMartinCorrelation <- function(full_d, full_0, sub_d, sub_0)
+ComputePETreatmentCorrelation <- function(sample_sizes, treatment_index_1, treatment_index_2)
 {
-  ValidatePeSampleSizes(
-    full_d = full_d,
-    full_0 = full_0,
-    sub_d = sub_d,
-    sub_0 = sub_0
+  control_size <- sample_sizes[ 1 ]
+  treatment_size_1 <- sample_sizes[ 1 + treatment_index_1 ]
+  treatment_size_2 <- sample_sizes[ 1 + treatment_index_2 ]
+
+  dCorr <- 1 / control_size / sqrt(
+    ( 1 / control_size + 1 / treatment_size_1 ) *
+      ( 1 / control_size + 1 / treatment_size_2 )
   )
 
-  dRho <- sqrt( ( 1 / full_d + 1 / full_0 ) / ( 1 / sub_d + 1 / sub_0 ) )
+  if( !is.finite( dCorr ) || dCorr <= 0 || dCorr > 1 )
+  {
+    stop( "Derived treatment correlation is outside the valid range (0, 1]." )
+  }
+
+  return( dCorr )
+}
+
+ComputePENestedPopulationCorrelation <- function(fullpop_sample_sizes, subpop_sample_sizes, treatment_index)
+{
+  dRho <- sqrt(
+    ( 1 / fullpop_sample_sizes[ 1 + treatment_index ] + 1 / fullpop_sample_sizes[ 1 ] ) /
+      ( 1 / subpop_sample_sizes[ 1 + treatment_index ] + 1 / subpop_sample_sizes[ 1 ] )
+  )
 
   if( !is.finite( dRho ) || dRho <= 0 || dRho > 1 )
   {
-    stop( "Derived Martin correlation is outside the valid range (0, 1]." )
+    stop( "Derived population correlation is outside the valid range (0, 1]." )
   }
 
   return( dRho )
 }
 
+BuildPECorrelationMatrix <- function(
+    fullpop_sample_sizes,
+    subpop_sample_sizes,
+    n_hypotheses,
+    hypothesis_names = NULL)
+{
+  ValidatePESampleSizes(
+    fullpop_sample_sizes = fullpop_sample_sizes,
+    subpop_sample_sizes = subpop_sample_sizes
+  )
+
+  n_treatments <- length( fullpop_sample_sizes ) - 1L
+  if( n_treatments < 1L )
+  {
+    stop( "Sample size vectors must contain at least one treatment arm." )
+  }
+
+  if( length( n_hypotheses ) != 1 || !is.numeric( n_hypotheses ) ||
+      is.na( n_hypotheses ) || n_hypotheses <= 0 || n_hypotheses != as.integer( n_hypotheses ) )
+  {
+    stop( "n_hypotheses must be a single positive integer value." )
+  }
+
+  n_hypotheses <- as.integer( n_hypotheses )
+
+  n_populations <- 2L
+
+  if( n_hypotheses %% n_populations != 0 )
+  {
+    stop( "The number of hypotheses must be divisible by 2 populations." )
+  }
+
+  if( ( n_hypotheses / n_populations ) %% n_treatments != 0 )
+  {
+    stop(
+      "n_hypotheses divided by 2 must be an integer multiple of the number of treatment arms."
+    )
+  }
+
+  n_endpoints <- ( n_hypotheses / n_populations ) / n_treatments
+  if( n_endpoints < 1 )
+  {
+    stop( "At least one endpoint is required to build the PE correlation matrix." )
+  }
+
+  dCorrelation <- matrix( NA_real_, nrow = n_hypotheses, ncol = n_hypotheses )
+  diag( dCorrelation ) <- 1
+
+  dPopulationBlockSize <- n_endpoints * n_treatments
+
+  GetHypothesisIndex <- function(population_index, endpoint_index, arm_index)
+  {
+    ( population_index - 1L ) * dPopulationBlockSize +
+      ( endpoint_index - 1L ) * n_treatments +
+      arm_index
+  }
+
+  for( iEndpoint in seq_len( n_endpoints ) )
+  {
+    for( iArm in seq_len( n_treatments ) )
+    {
+      for( jArm in seq_len( n_treatments ) )
+      {
+        if( iArm == jArm )
+        {
+          next
+        }
+
+        dFullIdx1 <- GetHypothesisIndex( 1L, iEndpoint, iArm )
+        dFullIdx2 <- GetHypothesisIndex( 1L, iEndpoint, jArm )
+        dSubIdx1 <- GetHypothesisIndex( 2L, iEndpoint, iArm )
+        dSubIdx2 <- GetHypothesisIndex( 2L, iEndpoint, jArm )
+
+        dFullCorr <- ComputePETreatmentCorrelation(
+          sample_sizes = fullpop_sample_sizes,
+          treatment_index_1 = iArm,
+          treatment_index_2 = jArm
+        )
+        dSubCorr <- ComputePETreatmentCorrelation(
+          sample_sizes = subpop_sample_sizes,
+          treatment_index_1 = iArm,
+          treatment_index_2 = jArm
+        )
+
+        dCorrelation[ dFullIdx1, dFullIdx2 ] <- dFullCorr
+        dCorrelation[ dFullIdx2, dFullIdx1 ] <- dFullCorr
+        dCorrelation[ dSubIdx1, dSubIdx2 ] <- dSubCorr
+        dCorrelation[ dSubIdx2, dSubIdx1 ] <- dSubCorr
+
+        dCrossCorr <- sqrt(
+          ComputePENestedPopulationCorrelation(
+            fullpop_sample_sizes = fullpop_sample_sizes,
+            subpop_sample_sizes = subpop_sample_sizes,
+            treatment_index = iArm
+          ) *
+            ComputePENestedPopulationCorrelation(
+              fullpop_sample_sizes = fullpop_sample_sizes,
+              subpop_sample_sizes = subpop_sample_sizes,
+              treatment_index = jArm
+            )
+        ) * sqrt( dFullCorr * dSubCorr )
+
+        dCorrelation[ dFullIdx1, dSubIdx2 ] <- dCrossCorr
+        dCorrelation[ dSubIdx2, dFullIdx1 ] <- dCrossCorr
+      }
+
+      dFullNested <- ComputePENestedPopulationCorrelation(
+        fullpop_sample_sizes = fullpop_sample_sizes,
+        subpop_sample_sizes = subpop_sample_sizes,
+        treatment_index = iArm
+      )
+
+      dFullIdx <- GetHypothesisIndex( 1L, iEndpoint, iArm )
+      dSubIdx <- GetHypothesisIndex( 2L, iEndpoint, iArm )
+
+      dCorrelation[ dFullIdx, dSubIdx ] <- dFullNested
+      dCorrelation[ dSubIdx, dFullIdx ] <- dFullNested
+    }
+  }
+
+  if( !is.null( hypothesis_names ) )
+  {
+    if( length( hypothesis_names ) != n_hypotheses )
+    {
+      stop( "Length of hypothesis_names must equal n_hypotheses." )
+    }
+
+    rownames( dCorrelation ) <- hypothesis_names
+    colnames( dCorrelation ) <- hypothesis_names
+  }
+
+  return( dCorrelation )
+}
+
 #' Setup analysis object for population enrichment (P-value combination method)
 #'
-#' Creates a non-interactive population-enrichment analysis state object. This
-#' interface computes the full/subgroup correlation internally using Martin's
-#' nested-population formula and delegates the core analysis setup to
-#' [SetupAnalysis_PC()].
+#' Creates a non-interactive population-enrichment analysis state object.
+#' The look-specific correlation matrix is computed in [AnalyzeLook_PE_PC()] so
+#' setup remains design-only.
 #'
-#' This first implementation slice supports only the simple case:
+#' PE wrapper contract:
+#' - [SetupAnalysis_PE_PC()] does not compute or store a correlation matrix.
+#' - [AnalyzeLook_PE_PC()] requires look-specific population sample sizes and
+#'   computes the correlation matrix for that look.
+#' - Sample-size vectors follow order \code{(n0, n1, n2, ...)} where \code{n0}
+#'   is the control arm.
+#' - Hypothesis ordering is endpoint-major, treatment-minor, with a full-
+#'   population block followed by a subgroup block.
 #'
-#' - one treatment arm
-#' - one endpoint
-#' - two populations (full and subgroup)
-#'
-#' @param WI Vector of node weights for the initial graph. Must have length 2.
-#' @param G Transition matrix for the graph. Must be a 2 x 2 matrix.
+#' @param WI Vector of node weights for the initial graph.
+#' @param G Transition matrix for the graph.
 #' @param test.type Character specifying test type.
 #' Supported values: "Bonf", "Sidak", "Simes", "Dunnett", "Partly-Parametric".
 #' @param alpha One-sided type-1 error.
@@ -69,10 +235,6 @@ ComputeMartinCorrelation <- function(full_d, full_0, sub_d, sub_0)
 #' @param deltaPT1 Parameter for typeOfDesign = "PT".
 #' @param gammaA Parameter for typeOfDesign = "asHSD" or "asKD".
 #' @param userAlphaSpending Alpha spending values for typeOfDesign = "asUser".
-#' @param full_d Full-population treatment-arm sample size.
-#' @param full_0 Full-population control-arm sample size.
-#' @param sub_d Subgroup treatment-arm sample size.
-#' @param sub_0 Subgroup control-arm sample size.
 #' @param MultipleWinners Logical; TRUE means reject as many hypotheses as
 #' possible, FALSE means reject at most one hypothesis.
 #' @param Selection Logical; TRUE if selection of hypotheses is allowed at
@@ -94,41 +256,11 @@ SetupAnalysis_PE_PC <- function(
     deltaPT1 = 0,
     gammaA = 2,
     userAlphaSpending = NULL,
-    full_d,
-    full_0,
-    sub_d,
-    sub_0,
     MultipleWinners = TRUE,
     Selection = TRUE,
     UpdateStrategy = TRUE,
     plotGraphs = TRUE )
 {
-  if( length( WI ) != 2 )
-  {
-    stop( "SetupAnalysis_PE_PC currently supports exactly 2 hypotheses (H1 full, H2 subgroup)." )
-  }
-
-  if( !is.matrix( G ) || !all( dim( G ) == c( 2, 2 ) ) )
-  {
-    stop( "SetupAnalysis_PE_PC currently requires a 2 x 2 transition matrix." )
-  }
-
-  dRho <- ComputeMartinCorrelation(
-    full_d = full_d,
-    full_0 = full_0,
-    sub_d = sub_d,
-    sub_0 = sub_0
-  )
-
-  mCorrelation <- matrix(
-    c( 1, dRho,
-       dRho, 1 ),
-    byrow = TRUE,
-    nrow = 2
-  )
-
-  rownames( mCorrelation ) <- colnames( mCorrelation ) <- c( "H1", "H2" )
-
   state <- SetupAnalysis_PC(
     WI = WI,
     G = G,
@@ -140,23 +272,10 @@ SetupAnalysis_PE_PC <- function(
     deltaPT1 = deltaPT1,
     gammaA = gammaA,
     userAlphaSpending = userAlphaSpending,
-    Correlation = mCorrelation,
     MultipleWinners = MultipleWinners,
     Selection = Selection,
     UpdateStrategy = UpdateStrategy,
     plotGraphs = plotGraphs
-  )
-
-  state$pe_metadata <- list(
-    sample_sizes = c(
-      full_d = full_d,
-      full_0 = full_0,
-      sub_d = sub_d,
-      sub_0 = sub_0
-    ),
-    martin_rho = dRho,
-    endpoint_correlation = NA_real_,
-    endpoint_correlation_policy = "unknown_as_na"
   )
 
   return( state )
@@ -165,10 +284,20 @@ SetupAnalysis_PE_PC <- function(
 #' Analyze one look for population enrichment (P-value combination method)
 #'
 #' Advances an existing [SetupAnalysis_PE_PC()] state object by exactly one
-#' look. This wrapper delegates the per-look analysis to [AnalyzeLook_PC()].
+#' look. The look-specific population correlation matrix is derived from the
+#' supplied full- and sub-population sample sizes and then passed to
+#' [AnalyzeLook_PC()].
+#'
+#' The two sample-size vectors must follow \code{(n0, n1, n2, ...)} where
+#' \code{n0} is the control arm and subsequent entries correspond to treatment
+#' arms in the same order used to define hypotheses.
 #'
 #' @param state A "PCAnalysisState" object created by [SetupAnalysis_PE_PC()].
 #' @param p_raw Named numeric vector of raw p-values for active hypotheses.
+#' @param fullpop_sample_sizes Numeric vector of full-population sample sizes
+#' ordered as control first, then treatment arms.
+#' @param subpop_sample_sizes Numeric vector of subgroup sample sizes ordered as
+#' control first, then treatment arms.
 #' @param look Optional positive integer naming the current look number.
 #' @param selection Optional character vector of hypotheses to retain for this
 #' look (only meaningful when look > 1).
@@ -182,22 +311,71 @@ SetupAnalysis_PE_PC <- function(
 AnalyzeLook_PE_PC <- function(
     state,
     p_raw,
+    fullpop_sample_sizes,
+    subpop_sample_sizes,
     look = NULL,
     selection = NULL,
     new_weights = NULL,
     new_G = NULL,
     plotGraphs = TRUE )
 {
+  if( !is.null( new_weights ) )
+  {
+    n_hypotheses <- length( new_weights )
+  } else if( state$completed_looks == 0L )
+  {
+    n_hypotheses <- length( state$mcpObj$IntialWeights )
+  } else
+  {
+    n_hypotheses <- length( state$mcpObj$IndexSet )
+  }
+
+  hypothesis_names <- names( new_weights )
+  if( is.null( hypothesis_names ) || !all( nzchar( hypothesis_names, keepNA = TRUE ) ) )
+  {
+    hypothesis_names <- names( p_raw )
+  }
+
+  if( is.null( hypothesis_names ) || !all( nzchar( hypothesis_names, keepNA = TRUE ) ) )
+  {
+    hypothesis_names <- state$mcpObj$IndexSet
+  }
+
+  if( length( hypothesis_names ) != n_hypotheses && length( state$mcpObj$IndexSet ) == n_hypotheses )
+  {
+    hypothesis_names <- state$mcpObj$IndexSet
+  }
+
+  if( length( hypothesis_names ) != n_hypotheses && length( names( p_raw ) ) == n_hypotheses )
+  {
+    hypothesis_names <- names( p_raw )
+  }
+
+  if( length( hypothesis_names ) != n_hypotheses )
+  {
+    hypothesis_names <- paste0( "H", seq_len( n_hypotheses ) )
+  }
+
+  dCorrelation <- BuildPECorrelationMatrix(
+    fullpop_sample_sizes = fullpop_sample_sizes,
+    subpop_sample_sizes = subpop_sample_sizes,
+    n_hypotheses = n_hypotheses,
+    hypothesis_names = hypothesis_names
+  )
+
   return(
-    AnalyzeLook_PC(
-      state = state,
-      p_raw = p_raw,
-      look = look,
-      selection = selection,
-      new_weights = new_weights,
-      new_G = new_G,
-      new_correlation = NULL,
-      plotGraphs = plotGraphs
+    do.call(
+      AnalyzeLook_PC,
+      list(
+        state = state,
+        p_raw = p_raw,
+        Correlation = dCorrelation,
+        look = look,
+        selection = selection,
+        new_weights = new_weights,
+        new_G = new_G,
+        plotGraphs = plotGraphs
+      )
     )
   )
 }
