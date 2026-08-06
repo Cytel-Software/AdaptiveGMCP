@@ -213,7 +213,10 @@ applyCorrelationUpdate <- function(mcpObj, Correlation, target_hypotheses = NULL
     }
 
     rownames(full_correlation) <- colnames(full_correlation) <- initial_hypotheses
-    full_correlation[target_hypotheses, target_hypotheses] <- target_correlation
+    
+    # Use numeric indexing for reliable subset assignment
+    target_indices <- match(target_hypotheses, initial_hypotheses)
+    full_correlation[target_indices, target_indices] <- target_correlation
     validate_corr_matrix(full_correlation)
   } else {
     stop(

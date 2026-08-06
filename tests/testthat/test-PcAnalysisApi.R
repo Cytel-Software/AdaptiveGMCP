@@ -2314,6 +2314,9 @@ testthat::test_that("AnalyzeLook_PC: look-level sized correlation update maps to
   )
 
   testthat::expect_equal(dim(state$mcpObj$Correlation), c(4, 4))
+  
+  # Set dimnames to match what extraction returns
+  dimnames(corr_l2_subset) <- list(c("H1", "H2", "H4"), c("H1", "H2", "H4"))
   testthat::expect_equal(
     state$mcpObj$Correlation[c("H1", "H2", "H4"), c("H1", "H2", "H4")],
     corr_l2_subset
