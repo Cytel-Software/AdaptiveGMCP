@@ -46,7 +46,7 @@ testthat::test_that( "AnalyzeLook_PE_PC derives a generic look-level correlation
     plotGraphs = FALSE
   )
 
-  expectedCorrelation <- BuildPECorrelationMatrix(
+  expectedCorrelation <- AdaptGMCP:::BuildPECorrelationMatrix(
     fullpop_sample_sizes = fullpopSampleSizes,
     subpop_sample_sizes = subpopSampleSizes,
     n_hypotheses = length( peState$mcpObj$IntialHypothesis ),
