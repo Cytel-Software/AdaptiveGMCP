@@ -15,10 +15,6 @@ SetupAnalysis_PE_PC(
   deltaPT1 = 0,
   gammaA = 2,
   userAlphaSpending = NULL,
-  full_d,
-  full_0,
-  sub_d,
-  sub_0,
   MultipleWinners = TRUE,
   Selection = TRUE,
   UpdateStrategy = TRUE,
@@ -26,9 +22,9 @@ SetupAnalysis_PE_PC(
 )
 }
 \arguments{
-\item{WI}{Vector of node weights for the initial graph. Must have length 2.}
+\item{WI}{Vector of node weights for the initial graph.}
 
-\item{G}{Transition matrix for the graph. Must be a 2 x 2 matrix.}
+\item{G}{Transition matrix for the graph.}
 
 \item{test.type}{Character specifying test type.
 Supported values: "Bonf", "Sidak", "Simes", "Dunnett", "Partly-Parametric".}
@@ -47,14 +43,6 @@ Supported values: "Bonf", "Sidak", "Simes", "Dunnett", "Partly-Parametric".}
 
 \item{userAlphaSpending}{Alpha spending values for typeOfDesign = "asUser".}
 
-\item{full_d}{Full-population treatment-arm sample size.}
-
-\item{full_0}{Full-population control-arm sample size.}
-
-\item{sub_d}{Subgroup treatment-arm sample size.}
-
-\item{sub_0}{Subgroup control-arm sample size.}
-
 \item{MultipleWinners}{Logical; TRUE means reject as many hypotheses as
 possible, FALSE means reject at most one hypothesis.}
 
@@ -70,15 +58,17 @@ modified at interim looks.}
 An object of class "PCAnalysisState".
 }
 \description{
-Creates a non-interactive population-enrichment analysis state object. This
-interface computes the full/subgroup correlation internally using Martin's
-nested-population formula and delegates the core analysis setup to
-[SetupAnalysis_PC()].
+Creates a non-interactive population-enrichment analysis state object.
+The look-specific correlation matrix is computed in [AnalyzeLook_PE_PC()] so
+setup remains design-only.
 }
 \details{
-This first implementation slice supports only the simple case:
-
-- one treatment arm
-- one endpoint
-- two populations (full and subgroup)
+PE wrapper contract:
+- [SetupAnalysis_PE_PC()] does not compute or store a correlation matrix.
+- [AnalyzeLook_PE_PC()] requires look-specific population sample sizes and
+  computes the correlation matrix for that look.
+- Sample-size vectors follow order \code{(n0, n1, n2, ...)} where \code{n0}
+  is the control arm.
+- Hypothesis ordering is endpoint-major, treatment-minor, with a full-
+  population block followed by a subgroup block.
 }

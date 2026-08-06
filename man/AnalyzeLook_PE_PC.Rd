@@ -7,6 +7,8 @@
 AnalyzeLook_PE_PC(
   state,
   p_raw,
+  fullpop_sample_sizes,
+  subpop_sample_sizes,
   look = NULL,
   selection = NULL,
   new_weights = NULL,
@@ -18,6 +20,12 @@ AnalyzeLook_PE_PC(
 \item{state}{A "PCAnalysisState" object created by [SetupAnalysis_PE_PC()].}
 
 \item{p_raw}{Named numeric vector of raw p-values for active hypotheses.}
+
+\item{fullpop_sample_sizes}{Numeric vector of full-population sample sizes
+ordered as control first, then treatment arms.}
+
+\item{subpop_sample_sizes}{Numeric vector of subgroup sample sizes ordered as
+control first, then treatment arms.}
 
 \item{look}{Optional positive integer naming the current look number.}
 
@@ -36,5 +44,12 @@ Updated "PCAnalysisState" object.
 }
 \description{
 Advances an existing [SetupAnalysis_PE_PC()] state object by exactly one
-look. This wrapper delegates the per-look analysis to [AnalyzeLook_PC()].
+look. The look-specific population correlation matrix is derived from the
+supplied full- and sub-population sample sizes and then passed to
+[AnalyzeLook_PC()].
+}
+\details{
+The two sample-size vectors must follow \code{(n0, n1, n2, ...)} where
+\code{n0} is the control arm and subsequent entries correspond to treatment
+arms in the same order used to define hypotheses.
 }

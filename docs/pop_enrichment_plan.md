@@ -84,7 +84,7 @@ Update status as work progresses.
 | D1 | Document simple-case enrichment logic | TBD | Done | #97 | Final D1 sign-off draft completed with explicit acceptance thresholds and decision log |
 | V1 | EAST reference example creation | User/TBD | Not Started | #95 | Source of numerical truth cases |
 | V2 | EAST fixture integration and tolerance rules | TBD | Not Started | #96 | Reproducible comparison fixtures |
-| T1 | Non-interactive endpoint-agnostic analysis (TDD) | TBD | Not Started | #98 | First implementation slice |
+| T1 | Non-interactive endpoint-agnostic analysis (TDD) | TBD | In Progress | #98 | Core PE wrapper and look-level correlation update flow implemented; final sign-off pending |
 | T2 | Retire binomial-specific non-interactive track | TBD | Done | #99 | Closed as not planned; scope absorbed by T1 |
 | U1 | Interactive implementation track | TBD | Not Started | #111 | Interactive work managed under dedicated epic |
 | P1 | README + package documentation refresh | TBD | Not Started | #102 | Include examples and release notes |
@@ -99,3 +99,4 @@ Update status as work progresses.
 - 2026-07-25: Finalized D1 sign-off content for #97 by adding explicit acceptance thresholds and decision logs in docs/pop_enrichment_simple_case_pc_design.md; updated D1 status to Done.
 - 2026-08-04: Updated scope to endpoint-agnostic non-interactive analysis, retired #99 as not planned, and aligned tracker entries to #98 and #111.
 - 2026-08-05: Reconciled epic #87 child-issue coverage in this plan; updated I2 linked-issue range to reflect current child issue set.
+- 2026-08-06: Updated T1 (#98) status to In Progress after implementing PE wrapper/correlation update changes and targeted tests.
