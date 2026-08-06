@@ -8,7 +8,8 @@ This is a living plan document. Update this file as work progresses.
   - Population enrichment analysis using the p-value combination method.
   - Simplest case first: 1 treatment, 1 endpoint, 2 populations.
   - Non-interactive analysis first, then interactive interface.
-  - Normal endpoint first, then binomial endpoint.
+  - Endpoint-agnostic analysis with user-provided raw p-values.
+  - Look-wise correlation updates derived from per-look sample-size inputs.
 - Out of scope now:
   - Simulation changes for population enrichment.
   - CER method (analysis/simulation) changes.
@@ -34,10 +35,8 @@ This is a living plan document. Update this file as work progresses.
   - Design and logic documentation.
   - Living plan maintenance (this file).
   - EAST example preparation and numerical validation fixture creation.
-  - Non-interactive normal endpoint implementation.
-  - Non-interactive binomial endpoint implementation.
-  - Interactive normal endpoint implementation.
-  - Interactive binomial endpoint implementation.
+  - Non-interactive endpoint-agnostic implementation.
+  - Interactive implementation tasks (tracked under the interactive epic).
   - Regression/TDD test tasks.
   - README and package-documentation updates.
 
@@ -58,10 +57,8 @@ This is a living plan document. Update this file as work progresses.
   3. Refactor safely.
   4. Re-run regression tests.
 - Implementation order:
-  - Non-interactive normal.
-  - Non-interactive binomial.
-  - Interactive normal.
-  - Interactive binomial.
+  - Non-interactive endpoint-agnostic analysis.
+  - Interactive implementation tasks under the interactive epic.
 
 6. Numerical validation using EAST
 - Build high-quality reference examples in EAST.
@@ -82,15 +79,14 @@ Update status as work progresses.
 | G1 | Update issue management instructions | TBD | Done | #92 | Closed after adding epic label, issue Type, and issue-state rules |
 | G2 | Create living plan document under docs | TBD | Done | #93 | Closed after creating this living plan file |
 | I1 | Create enrichment epic (PC analysis) | TBD | Done | #87 | Epic created with epic label |
-| I2 | Create sub-issues and set Type | TBD | Done | #93-#102 | Sub-issues created with explicit Type values |
+| I2 | Create sub-issues and set Type | TBD | Done | #88-#108 | Sub-issues created with explicit Type values |
 | R1 | Regression gate review (#30, #66) | TBD | Done | #94 | Completed: baseline green; #31 parallel; merge-gate coverage #67/#70/#69 now implemented and closed |
 | D1 | Document simple-case enrichment logic | TBD | Done | #97 | Final D1 sign-off draft completed with explicit acceptance thresholds and decision log |
 | V1 | EAST reference example creation | User/TBD | Not Started | #95 | Source of numerical truth cases |
 | V2 | EAST fixture integration and tolerance rules | TBD | Not Started | #96 | Reproducible comparison fixtures |
-| T1 | Non-interactive normal endpoint (TDD) | TBD | Not Started | #98 | First implementation slice |
-| T2 | Non-interactive binomial endpoint (TDD) | TBD | Not Started | #99 | After T1 is complete |
-| U1 | Interactive normal endpoint (TDD) | TBD | Not Started | #100 | After T1 and baseline stability |
-| U2 | Interactive binomial endpoint (TDD) | TBD | Not Started | #101 | After T2 and U1 |
+| T1 | Non-interactive endpoint-agnostic analysis (TDD) | TBD | In Progress | #98 | Core PE wrapper and look-level correlation update flow implemented; final sign-off pending |
+| T2 | Retire binomial-specific non-interactive track | TBD | Done | #99 | Closed as not planned; scope absorbed by T1 |
+| U1 | Interactive implementation track | TBD | Not Started | #111 | Interactive work managed under dedicated epic |
 | P1 | README + package documentation refresh | TBD | Not Started | #102 | Include examples and release notes |
 
 ## Change Log
@@ -101,3 +97,6 @@ Update status as work progresses.
 - 2026-07-25: Verified progress for #67/#69/#70, posted completion evidence comments, and closed all three issues.
 - 2026-07-25: Started D1 (#97); added draft design spec at docs/pop_enrichment_simple_case_pc_design.md and set D1 status to In Progress.
 - 2026-07-25: Finalized D1 sign-off content for #97 by adding explicit acceptance thresholds and decision logs in docs/pop_enrichment_simple_case_pc_design.md; updated D1 status to Done.
+- 2026-08-04: Updated scope to endpoint-agnostic non-interactive analysis, retired #99 as not planned, and aligned tracker entries to #98 and #111.
+- 2026-08-05: Reconciled epic #87 child-issue coverage in this plan; updated I2 linked-issue range to reflect current child issue set.
+- 2026-08-06: Updated T1 (#98) status to In Progress after implementing PE wrapper/correlation update changes and targeted tests.

@@ -278,15 +278,10 @@ AnalyzeLook_PC <- function(
     stop("Correlation must be provided at look 1 for Dunnett or Partly-Parametric tests")
   }
 
-  if (!is.null(Correlation) &&
-      mcpObj$test.type %in% c("Dunnett", "Partly-Parametric")) {
-    mcpObj <- applyCorrelationUpdate(mcpObj, Correlation)
-  }
-
   # Apply optional changes before analyzing look > 1
   if (next_look > 1) {
     if (!is.null(selection)) {
-      if (!isTRUE(state$design_params$Selection)) { 
+      if (!isTRUE(state$design_params$Selection)) {
         stop("selection cannot be applied: Selection was disabled in SetupAnalysis_PC()")
       }
       mcpObj <- applySelection(mcpObj, selection, look = next_look)
@@ -330,6 +325,16 @@ AnalyzeLook_PC <- function(
   mcpObj$CurrentLook <- next_look
 
   p_raw <- validate_p_raw(p_raw, mcpObj$IndexSet)
+
+  if (!is.null(Correlation) &&
+      mcpObj$test.type %in% c("Dunnett", "Partly-Parametric")) {
+    mcpObj <- applyCorrelationUpdate(
+      mcpObj,
+      Correlation,
+      target_hypotheses = names(p_raw)
+    )
+  }
+
   mcpObj$p_raw <- addNAPvalue(p_raw, mcpObj$IntialHypothesis)
 
   mcpObj$CutOff <- state$thresholds[next_look]

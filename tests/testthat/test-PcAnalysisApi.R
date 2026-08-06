@@ -2256,6 +2256,74 @@ testthat::test_that("AnalyzeLook_PC: correlation update validity at look > 1", {
   testthat::expect_identical(state2$design_params$test.type, "Partly-Parametric")
 })
 
+testthat::test_that("AnalyzeLook_PC: look-level sized correlation update maps to initial hypothesis universe", {
+  wi <- c(0.5, 0.5, 0, 0)
+  g <- matrix(
+    c(0, 1, 0, 0,
+      1, 0, 0, 0,
+      0, 0, 0, 1,
+      0, 0, 1, 0),
+    byrow = TRUE, nrow = 4
+  )
+
+  corr_l1 <- matrix(
+    c(1, 0.5, 0.2, 0.2,
+      0.5, 1, 0.2, 0.2,
+      0.2, 0.2, 1, 0.5,
+      0.2, 0.2, 0.5, 1),
+    byrow = TRUE, nrow = 4
+  )
+
+  state <- SetupAnalysis_PC(
+    WI = wi, G = g, test.type = "Dunnett",
+    alpha = 0.025, info_frac = c(0.5, 1.0),
+    Selection = TRUE, UpdateStrategy = TRUE,
+    plotGraphs = FALSE
+  )
+
+  state <- AnalyzeLook_PC(
+    state,
+    p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
+    Correlation = corr_l1,
+    plotGraphs = FALSE
+  )
+
+  new_weights <- c(H1 = 0.5, H2 = 0.5, H4 = 0)
+  new_G <- matrix(
+    c(0, 1, 0,
+      1, 0, 0,
+      1, 0, 0),
+    byrow = TRUE, nrow = 3
+  )
+
+  corr_l2_subset <- matrix(
+    c(1, 0.3, 0.25,
+      0.3, 1, 0.35,
+      0.25, 0.35, 1),
+    byrow = TRUE, nrow = 3
+  )
+
+  state <- AnalyzeLook_PC(
+    state,
+    p_raw = c(H1 = 0.10, H2 = 0.15, H4 = 0.20),
+    selection = c("H1", "H2", "H4"),
+    new_weights = new_weights,
+    new_G = new_G,
+    Correlation = corr_l2_subset,
+    plotGraphs = FALSE
+  )
+
+  testthat::expect_equal(dim(state$mcpObj$Correlation), c(4, 4))
+  
+  # Set dimnames to match what extraction returns
+  dimnames(corr_l2_subset) <- list(c("H1", "H2", "H4"), c("H1", "H2", "H4"))
+  testthat::expect_equal(
+    state$mcpObj$Correlation[c("H1", "H2", "H4"), c("H1", "H2", "H4")],
+    corr_l2_subset
+  )
+  testthat::expect_equal(state$completed_looks, 2L)
+})
+
 testthat::test_that("AnalyzeLook_PC: Dunnett stays Dunnett when updated correlation is fully specified", {
   wi <- c(0.5, 0.5, 0, 0)
   g <- matrix(

@@ -159,29 +159,75 @@ applyStrategyUpdate <- function(mcpObj, new_weights, new_G) {
   return(modified$mcpObj)
 }
 
-applyCorrelationUpdate <- function(mcpObj, Correlation) {
+applyCorrelationUpdate <- function(mcpObj, Correlation, target_hypotheses = NULL) {
   if (is.null(Correlation)) return(mcpObj)
   if (!is.matrix(Correlation)) stop("Correlation must be a matrix")
   if (!is.numeric(Correlation)) stop("Correlation must be a numeric matrix")
-  d <- length(mcpObj$IntialHypothesis)
-  if (!all(dim(Correlation) == c(d, d))) {
-    stop("Correlation must have dimensions ", d, " x ", d)
+
+  initial_hypotheses <- mcpObj$IntialHypothesis
+  d_initial <- length(initial_hypotheses)
+
+  if (is.null(target_hypotheses)) {
+    target_hypotheses <- initial_hypotheses
   }
 
-  if (any(!is.na(Correlation) & (Correlation < -1 | Correlation > 1))) {
-    stop("Correlation entries must be in [-1, 1] (or NA)")
+  target_hypotheses <- unique(target_hypotheses)
+  if (!all(target_hypotheses %in% initial_hypotheses)) {
+    stop(
+      "target_hypotheses must be a subset of initial hypotheses. Initial hypotheses: ",
+      toString(initial_hypotheses)
+    )
   }
 
-  if (any(is.na(diag(Correlation)) | diag(Correlation) != 1)) stop("Correlation diagonal must be 1")
+  d_target <- length(target_hypotheses)
+  corr_dim <- dim(Correlation)
 
-  if (!isTRUE(all.equal(Correlation, t(Correlation), tolerance = 1e-12, check.attributes = FALSE))) {
-    stop("Correlation must be symmetric")
+  validate_corr_matrix <- function(corr_matrix) {
+    if (any(!is.na(corr_matrix) & (corr_matrix < -1 | corr_matrix > 1))) {
+      stop("Correlation entries must be in [-1, 1] (or NA)")
+    }
+
+    if (any(is.na(diag(corr_matrix)) | diag(corr_matrix) != 1)) {
+      stop("Correlation diagonal must be 1")
+    }
+
+    if (!isTRUE(all.equal(corr_matrix, t(corr_matrix), tolerance = 1e-12, check.attributes = FALSE))) {
+      stop("Correlation must be symmetric")
+    }
   }
 
-  rownames(Correlation) <- colnames(Correlation) <- mcpObj$IntialHypothesis
+  if (all(corr_dim == c(d_initial, d_initial))) {
+    full_correlation <- Correlation
+    rownames(full_correlation) <- colnames(full_correlation) <- initial_hypotheses
+    validate_corr_matrix(full_correlation)
+  } else if (all(corr_dim == c(d_target, d_target))) {
+    target_correlation <- Correlation
+    rownames(target_correlation) <- colnames(target_correlation) <- target_hypotheses
+    validate_corr_matrix(target_correlation)
+
+    full_correlation <- mcpObj$Correlation
+    if (!is.matrix(full_correlation) || !is.numeric(full_correlation) ||
+        !all(dim(full_correlation) == c(d_initial, d_initial))) {
+      full_correlation <- matrix(NA_real_, nrow = d_initial, ncol = d_initial)
+      diag(full_correlation) <- 1
+    }
+
+    rownames(full_correlation) <- colnames(full_correlation) <- initial_hypotheses
+    
+    # Use numeric indexing for reliable subset assignment
+    target_indices <- match(target_hypotheses, initial_hypotheses)
+    full_correlation[target_indices, target_indices] <- target_correlation
+    validate_corr_matrix(full_correlation)
+  } else {
+    stop(
+      "Correlation must have dimensions ", d_initial, " x ", d_initial,
+      " or ", d_target, " x ", d_target
+    )
+  }
+
   normalized <- normalize_dunnett_correlation(
     test.type = mcpObj$test.type,
-    correlation = Correlation,
+    correlation = full_correlation,
     arg_name = "Correlation"
   )
   mcpObj$test.type <- normalized$test.type

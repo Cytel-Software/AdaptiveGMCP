@@ -22,9 +22,9 @@ AnalyzeLook_PC(
 currently active hypotheses (state$mcpObj$IndexSet).}
 
 \item{Correlation}{Optional D x D correlation matrix. This input is mandatory
-at look 1 when `test.type` is `"Dunnett"` or `"Partly-Parametric"`.
+at look 1 when \code{test.type} is \code{"Dunnett"} or \code{"Partly-Parametric"}.
 For subsequent looks, if supplied for those test types it updates the
-correlation used in analysis; if `NULL`, the most recently stored
+correlation used in analysis; if \code{NULL}, the most recently stored
 correlation is used.}
 
 \item{look}{Optional positive integer explicitly naming the current look number.
