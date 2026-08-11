@@ -216,7 +216,8 @@ SetupAnalysis_PC <- function(
 #' @param state A "PCAnalysisState" object.
 #' @param p_raw Named numeric vector of raw p-values for the current look, for the
 #'   currently active hypotheses (state$mcpObj$IndexSet).
-#' @param Correlation Optional D x D correlation matrix. This input is mandatory
+#' @param Correlation Optional D_active x D_active correlation matrix for the
+#'   currently active hypotheses (\code{length(state$mcpObj$IndexSet)}). Mandatory
 #'   at look 1 when \code{test.type} is \code{"Dunnett"} or \code{"Partly-Parametric"}.
 #'   For subsequent looks, if supplied for those test types it updates the
 #'   correlation used in analysis; if \code{NULL}, the most recently stored
@@ -325,6 +326,16 @@ AnalyzeLook_PC <- function(
   mcpObj$CurrentLook <- next_look
 
   p_raw <- validate_p_raw(p_raw, mcpObj$IndexSet)
+
+  if (!is.null(Correlation) && is.matrix(Correlation)) {
+    n_active <- length(mcpObj$IndexSet)
+    if (!all(dim(Correlation) == c(n_active, n_active))) {
+      stop(
+        "Correlation must be a ", n_active, " x ", n_active,
+        " matrix matching the currently active hypotheses."
+      )
+    }
+  }
 
   if (!is.null(Correlation) &&
       mcpObj$test.type %in% c("Dunnett", "Partly-Parametric")) {

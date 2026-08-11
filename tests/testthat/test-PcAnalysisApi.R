@@ -250,8 +250,8 @@ testthat::test_that("Test 3: PC analysis API scaffolds (full transition at look 
     1, 0, 0
   ), byrow = TRUE, nrow = 3)
 
-  # 3) correlation update (example: tweak H1-H2 and H1-H3)
-  Correlation <- corr
+  # 3) correlation update for the active hypotheses H1, H2, H3 only
+  Correlation <- corr[1:3, 1:3]
   Correlation[1, 2] <- Correlation[2, 1] <- 0.3
   Correlation[1, 3] <- Correlation[3, 1] <- 0.4
 
@@ -2200,7 +2200,7 @@ testthat::test_that("AnalyzeLook_PC: correlation update validity at look > 1", {
       Correlation = matrix(c(1, 0.5, 0.5, 1), nrow = 2),
       plotGraphs = FALSE
     ),
-    regexp = "Correlation must have dimensions"
+    regexp = "Correlation must be a"
   )
 
   # Non-symmetric Correlation must error

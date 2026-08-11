@@ -294,10 +294,12 @@ SetupAnalysis_PE_PC <- function(
 #'
 #' @param state A "PCAnalysisState" object created by [SetupAnalysis_PE_PC()].
 #' @param p_raw Named numeric vector of raw p-values for active hypotheses.
-#' @param fullpop_sample_sizes Numeric vector of full-population sample sizes
-#' ordered as control first, then treatment arms.
-#' @param subpop_sample_sizes Numeric vector of subgroup sample sizes ordered as
-#' control first, then treatment arms.
+#' @param fullpop_sample_sizes Numeric vector of cumulative full-population sample
+#' sizes ordered as control first, then treatment arms. Must be non-decreasing
+#' across looks and the same length at every look.
+#' @param subpop_sample_sizes Numeric vector of cumulative subgroup sample sizes
+#' ordered as control first, then treatment arms. Must be non-decreasing across
+#' looks and the same length at every look.
 #' @param look Optional positive integer naming the current look number.
 #' @param selection Optional character vector of hypotheses to retain for this
 #' look (only meaningful when look > 1).
@@ -319,63 +321,54 @@ AnalyzeLook_PE_PC <- function(
     new_G = NULL,
     plotGraphs = TRUE )
 {
-  if( !is.null( new_weights ) )
+  if( state$completed_looks > 0L )
   {
-    n_hypotheses <- length( new_weights )
-  } else if( state$completed_looks == 0L )
-  {
-    n_hypotheses <- length( state$mcpObj$IntialWeights )
-  } else
-  {
-    n_hypotheses <- length( state$mcpObj$IndexSet )
+    vPrevFull <- state$pe_sample_history[[ state$completed_looks ]]$fullpop
+    vPrevSub  <- state$pe_sample_history[[ state$completed_looks ]]$subpop
+
+    if( length( fullpop_sample_sizes ) != length( vPrevFull ) ||
+        length( subpop_sample_sizes ) != length( vPrevSub ) )
+    {
+      stop(
+        "fullpop_sample_sizes and subpop_sample_sizes must have the same length as at look 1."
+      )
+    }
+
+    if( any( fullpop_sample_sizes < vPrevFull ) || any( subpop_sample_sizes < vPrevSub ) )
+    {
+      stop( "Cumulative sample sizes must be non-decreasing across looks." )
+    }
   }
 
-  hypothesis_names <- names( new_weights )
-  if( is.null( hypothesis_names ) || !all( nzchar( hypothesis_names, keepNA = TRUE ) ) )
-  {
-    hypothesis_names <- names( p_raw )
-  }
-
-  if( is.null( hypothesis_names ) || !all( nzchar( hypothesis_names, keepNA = TRUE ) ) )
-  {
-    hypothesis_names <- state$mcpObj$IndexSet
-  }
-
-  if( length( hypothesis_names ) != n_hypotheses && length( state$mcpObj$IndexSet ) == n_hypotheses )
-  {
-    hypothesis_names <- state$mcpObj$IndexSet
-  }
-
-  if( length( hypothesis_names ) != n_hypotheses && length( names( p_raw ) ) == n_hypotheses )
-  {
-    hypothesis_names <- names( p_raw )
-  }
-
-  if( length( hypothesis_names ) != n_hypotheses )
-  {
-    hypothesis_names <- paste0( "H", seq_len( n_hypotheses ) )
-  }
-
-  dCorrelation <- BuildPECorrelationMatrix(
+  n_initial <- length( state$mcpObj$IntialHypothesis )
+  dFullCorrelation <- BuildPECorrelationMatrix(
     fullpop_sample_sizes = fullpop_sample_sizes,
-    subpop_sample_sizes = subpop_sample_sizes,
-    n_hypotheses = n_hypotheses,
-    hypothesis_names = hypothesis_names
+    subpop_sample_sizes  = subpop_sample_sizes,
+    n_hypotheses         = n_initial,
+    hypothesis_names     = state$mcpObj$IntialHypothesis
   )
 
-  return(
-    do.call(
-      AnalyzeLook_PC,
-      list(
-        state = state,
-        p_raw = p_raw,
-        Correlation = dCorrelation,
-        look = look,
-        selection = selection,
-        new_weights = new_weights,
-        new_G = new_G,
-        plotGraphs = plotGraphs
-      )
+  vActiveNames <- state$mcpObj$IndexSet
+  dCorrelation <- dFullCorrelation[ vActiveNames, vActiveNames, drop = FALSE ]
+
+  state <- do.call(
+    AnalyzeLook_PC,
+    list(
+      state = state,
+      p_raw = p_raw,
+      Correlation = dCorrelation,
+      look = look,
+      selection = selection,
+      new_weights = new_weights,
+      new_G = new_G,
+      plotGraphs = plotGraphs
     )
   )
+
+  state$pe_sample_history[[ state$completed_looks ]] <- list(
+    fullpop = fullpop_sample_sizes,
+    subpop  = subpop_sample_sizes
+  )
+
+  return( state )
 }
