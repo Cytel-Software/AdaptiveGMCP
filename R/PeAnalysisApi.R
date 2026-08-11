@@ -348,7 +348,24 @@ AnalyzeLook_PE_PC <- function(
     hypothesis_names     = state$mcpObj$IntialHypothesis
   )
 
-  vActiveNames <- state$mcpObj$IndexSet
+  # Use the post-selection active set when selection is specified at look > 1,
+  # because AnalyzeLook_PC applies selection before validating the correlation matrix.
+  vActiveNames <- if( !is.null( selection ) && state$completed_looks > 0L )
+  {
+    if( !all( selection %in% state$mcpObj$IndexSet ) )
+    {
+      stop(
+        "selection must be a subset of current IndexSet. Current IndexSet: ",
+        toString( state$mcpObj$IndexSet )
+      )
+    }
+
+    intersect( state$mcpObj$IndexSet, unique( selection ) )
+  } else
+  {
+    state$mcpObj$IndexSet
+  }
+
   dCorrelation <- dFullCorrelation[ vActiveNames, vActiveNames, drop = FALSE ]
 
   nPreviousLooks <- state$completed_looks

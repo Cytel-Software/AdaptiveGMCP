@@ -1,104 +1,106 @@
 # Examples for analysis in the population enrichment case
 library(AdaptGMCP)
 
-# # EXAMPLE 1 #############################################
-# # Simplest population enrichment problem with 1 treatment and 1 control arm
-# # 1 endpoint, and 1 full population and 1 subpopulation
-# # Fixed sample design
-# # Total sample size = 200, balanced allocation between treatment and control arms
-# # Subpopulation is 50% of full population
+#########################################################
 
-# # Setting input parameters for the function
-# # Weights
-# wi <- rep(0.5, 2) # Initial weights for the 2 hypotheses
+# EXAMPLE 1 #############################################
+# Simplest population enrichment problem with 1 treatment and 1 control arm
+# 1 endpoint, and 1 full population and 1 subpopulation
+# Fixed sample design
+# Total sample size = 200, balanced allocation between treatment and control arms
+# Subpopulation is 50% of full population
 
-# # Transition matrix
-# g <- matrix(c(0, 1, 1, 0), byrow = T, nrow = 2)
+# Setting input parameters for the function
+# Weights
+wi <- rep(0.5, 2) # Initial weights for the 2 hypotheses
 
-# # Test type
-# test <- "Dunnett"
+# Transition matrix
+g <- matrix(c(0, 1, 1, 0), byrow = T, nrow = 2)
 
-# # Type I error
-# alp <- 0.025
+# Test type
+test <- "Dunnett"
 
-# # Info fraction
-# t <- 1
+# Type I error
+alp <- 0.025
 
-# # Setting up the design first
-# design <- SetupAnalysis_PE_PC(
-#   WI = wi,
-#   G = g,
-#   test.type = test,
-#   alpha = alp,
-#   info_frac = t)
+# Info fraction
+t <- 1
 
-# print(design)
+# Setting up the design first
+design <- SetupAnalysis_PE_PC(
+  WI = wi,
+  G = g,
+  test.type = test,
+  alpha = alp,
+  info_frac = t)
 
-# # Performing analysis
-# look1_out <- AnalyzeLook_PE_PC(
-#   design,
-#   p_raw = c(H1 = 0.1, H2 = 0.0025),
-#   fullpop_sample_sizes = c(100, 100), # Sample sizes are specified first for control and then for treatment arm
-#   subpop_sample_sizes = c(50, 50)) # Sample sizes are specified first for control and then for treatment arm
+print(design)
 
-# print(look1_out$mcpObj$Correlation)
-# print(look1_out)
-# #########################################################
+# Performing analysis
+look1_out <- AnalyzeLook_PE_PC(
+  design,
+  p_raw = c(H1 = 0.1, H2 = 0.0025),
+  fullpop_sample_sizes = c(100, 100), # Sample sizes are specified first for control and then for treatment arm
+  subpop_sample_sizes = c(50, 50)) # Sample sizes are specified first for control and then for treatment arm
 
-# # EXAMPLE 2 #############################################
-# # Same as Example 1, but with 1 interim look
+print(look1_out$mcpObj$Correlation)
+print(look1_out)
+#########################################################
 
-# # Setting input parameters for the function
-# # Weights
-# wi <- rep(0.5, 2) # Initial weights for the 2 hypotheses
+# EXAMPLE 2 #############################################
+# Same as Example 1, but with 1 interim look
 
-# # Transition matrix
-# g <- matrix(c(0, 1, 1, 0), byrow = T, nrow = 2)
+# Setting input parameters for the function
+# Weights
+wi <- rep(0.5, 2) # Initial weights for the 2 hypotheses
 
-# # Test type
-# test <- "Dunnett"
+# Transition matrix
+g <- matrix(c(0, 1, 1, 0), byrow = T, nrow = 2)
 
-# # Type I error
-# alp <- 0.025
+# Test type
+test <- "Dunnett"
 
-# # Info fraction
-# t <- c(0.5, 1)
+# Type I error
+alp <- 0.025
 
-# # Design type
-# des <- "asOF"
+# Info fraction
+t <- c(0.5, 1)
 
-# # Setting up the design first
-# design <- SetupAnalysis_PE_PC(
-#   WI = wi,
-#   G = g,
-#   test.type = test,
-#   alpha = alp,
-#   info_frac = t,
-#   typeOfDesign = des
-#   )
+# Design type
+des <- "asOF"
 
-# print(design)
+# Setting up the design first
+design <- SetupAnalysis_PE_PC(
+  WI = wi,
+  G = g,
+  test.type = test,
+  alpha = alp,
+  info_frac = t,
+  typeOfDesign = des
+  )
 
-# # Performing analysis for look 1
-# look1_out <- AnalyzeLook_PE_PC(
-#   design,
-#   p_raw = c(H1 = 0.1, H2 = 0.075),
-#   fullpop_sample_sizes = c(48, 53), # Sample sizes are specified first for control and then for treatment arm
-#   subpop_sample_sizes = c(26, 24)) # Sample sizes are specified first for control and then for treatment arm
+print(design)
 
-# print(look1_out$mcpObj$Correlation)
-# print(look1_out)
+# Performing analysis for look 1
+look1_out <- AnalyzeLook_PE_PC(
+  design,
+  p_raw = c(H1 = 0.1, H2 = 0.075),
+  fullpop_sample_sizes = c(48, 53), # Sample sizes are specified first for control and then for treatment arm
+  subpop_sample_sizes = c(26, 24)) # Sample sizes are specified first for control and then for treatment arm
 
-# # Performing analysis for look 2
-# look2_out <- AnalyzeLook_PE_PC(
-#   look1_out,
-#   p_raw = c(H1 = 0.08, H2 = 0.003),
-#   fullpop_sample_sizes = c(100, 100), # Sample sizes are specified first for control and then for treatment arm
-#   subpop_sample_sizes = c(53, 49)) # Sample sizes are specified first for control and then for treatment arm
+print(look1_out$mcpObj$Correlation)
+print(look1_out)
 
-# print(look2_out$mcpObj$Correlation)
-# print(look2_out)
-# #########################################################
+# Performing analysis for look 2
+look2_out <- AnalyzeLook_PE_PC(
+  look1_out,
+  p_raw = c(H1 = 0.08, H2 = 0.003),
+  fullpop_sample_sizes = c(100, 100), # Sample sizes are specified first for control and then for treatment arm
+  subpop_sample_sizes = c(53, 49)) # Sample sizes are specified first for control and then for treatment arm
+
+print(look2_out$mcpObj$Correlation)
+print(look2_out)
+#########################################################
 
 # EXAMPLE 3 #############################################
 # Severe oral mucocites example
@@ -134,41 +136,40 @@ t <- c(0.5, 1)
 # Design type
 des <- "asOF"
 
-# # Setting up the design first
-# design <- SetupAnalysis_PE_PC(
-#   WI = wi,
-#   G = g,
-#   test.type = test,
-#   alpha = alp,
-#   info_frac = t,
-#   typeOfDesign = des)
+# Setting up the design first
+design <- SetupAnalysis_PE_PC(
+  WI = wi,
+  G = g,
+  test.type = test,
+  alpha = alp,
+  info_frac = t,
+  typeOfDesign = des)
 
-# print(design)
+print(design)
 
-# # Performing analysis at look 1
-# look1_out <- AnalyzeLook_PE_PC(
-#   design,
-#   p_raw = c(H1 = 0.00045, H2 = 0.0952, H3 = 0.0225, H4 = 0.1104),
-#   fullpop_sample_sizes = c(50, 50, 50), # Sample sizes: first for control and then for treatment arms
-#   subpop_sample_sizes = c(25, 25, 25)) # Sample sizes: first for control and then for treatment arms
+# Performing analysis at look 1
+look1_out <- AnalyzeLook_PE_PC(
+  design,
+  p_raw = c(H1 = 0.00045, H2 = 0.0952, H3 = 0.0225, H4 = 0.1104),
+  fullpop_sample_sizes = c(50, 50, 50), # Sample sizes: first for control and then for treatment arms
+  subpop_sample_sizes = c(25, 25, 25)) # Sample sizes: first for control and then for treatment arms
 
-# print(look1_out$mcpObj$Correlation)
-# print(look1_out)
+print(look1_out$mcpObj$Correlation)
+print(look1_out)
 
-# # No hypotheses are rejected at look 1
+# No hypotheses are rejected at look 1
 
-# # Performing analysis at look 2
-# look2_out <- AnalyzeLook_PE_PC(
-#   look1_out,
-#   p_raw = c(H1 = 0.00045, H2 = 0.1121, H3 = 0.0112, H4 = 0.1153),
-#   fullpop_sample_sizes = c(100, 100, 100), # Sample sizes: first for control and then for treatment arms
-#   subpop_sample_sizes = c(50, 50, 50)) # Sample sizes: first for control and then for treatment arms
+# Performing analysis at look 2
+look2_out <- AnalyzeLook_PE_PC(
+  look1_out,
+  p_raw = c(H1 = 0.00045, H2 = 0.1121, H3 = 0.0112, H4 = 0.1153),
+  fullpop_sample_sizes = c(100, 100, 100), # Sample sizes: first for control and then for treatment arms
+  subpop_sample_sizes = c(50, 50, 50)) # Sample sizes: first for control and then for treatment arms
 
-# print(look2_out$mcpObj$Correlation)
-# print(look2_out)
+print(look2_out$mcpObj$Correlation)
+print(look2_out)
 
 # >>> Trying with higher look 1 info fract
-
 # Setting up the design first
 design <- SetupAnalysis_PE_PC(
   WI = wi,
@@ -204,22 +205,12 @@ print(look2_out)
 
 #########################################################
 
-#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 # EXAMPLE 4 #############################################
 # Problem: Full population and a subpopulation (50% of full population)
 # High dose and low dose of the drug being tested
 # 2 stage trial with interim look at 50% information fraction
 # H1: full pop, high dose; H2: subpop, high dose;
 # H3: full pop, low dose; H4: subpop, low dose
-# Correlations:
-#       (1) For the same dose, test stats for full population and subpopulation
-#           are correlated due to the shared patients and the correlation coefficient
-#           is the same as the subpop prop. (H1 vs H2 and H3 vs H4)
-#       (2) For the same population, test stats for high dose and low dose are correlated
-#           due to the shared control arm and the correlation coefficient depends on
-#           the allocation ratio between the control and the dose arms.
-#           (H1 vs H3 and H2 vs H4)
-#       (3) Correlation unknown between the remaining test stats (i.e. H1 vs H4 and H2 vs H3)
 
 # Setting input parameters for the function
 
@@ -234,7 +225,7 @@ g <- matrix(c(0, 0.5, 0.5, 0, # H1->H2, H1->H3
             byrow = T, nrow = 4)
 
 # Test type
-test <- "Dunnett" # "Bonf" # "Partly-Parametric" #
+test <- "Bonf"
 
 # Type I error
 alp <- 0.025
@@ -245,46 +236,30 @@ t <- c(0.5, 1)
 # Design type
 des <- "asOF"
 
-# Correlation matrix between test stats
-corr <- matrix(c(1, 0.5, 0.5, NA,
-                 0.5, 1, NA, 0.5,
-                 0.5, NA, 1, 0.5,
-                 NA, 0.5, 0.5, 1), byrow = T, nrow = 4)
-x <- AdaptGMCP:::conn.comp(corr)
-print(x)
-
-y <- AdaptGMCP:::clique.partition(corr)
-print(y)
-
-# Calling the analysis function for p-value combination method
-# Use these p-values: p(H1) = 0.00025, p(H2) = 0.0952, p(H3) = 0.0245, p(H4) = 0.1104
-# out <- adaptGMCP_PC(WI=wi, G=g, test.type = test, alpha = alp, info_frac = t,
-#                     typeOfDesign = des, Correlation = corr,
-#                     Selection = T, UpdateStrategy = T, plotGraphs = T)
-
-design <- SetupAnalysis_PC(
+# Setting up the design first
+design <- SetupAnalysis_PE_PC(
   WI = wi,
   G = g,
   test.type = test,
   alpha = alp,
   info_frac = t,
-  typeOfDesign = des,
-  Correlation = corr,
-  plotGraphs = TRUE,
-  MultipleWinners = TRUE
-)
+  typeOfDesign = des)
 
-# Look 1
-look1_out <- AnalyzeLook_PC(
+print(design)
+
+# Performing analysis at look 1
+look1_out <- AnalyzeLook_PE_PC(
   design,
   p_raw = c(H1 = 0.00025, H2 = 0.0952, H3 = 0.0245, H4 = 0.1104),
-  plotGraphs = TRUE
-)
+  fullpop_sample_sizes = c(50, 50, 50), # Sample sizes: first for control and then for treatment arms
+  subpop_sample_sizes = c(25, 25, 25)) # Sample sizes: first for control and then for treatment arms
 
-look1_out
+print(look1_out$mcpObj$Correlation)
+print(look1_out)
+
 #########################################################
 
-# EXAMPLE 3 #################################################
+# EXAMPLE 5 #################################################
 wi <- c(1 / 2, 1 / 2, 0, 0)
 g <- matrix(c(
   0, 1 / 2, 1 / 2, 0,
@@ -295,27 +270,55 @@ g <- matrix(c(
 
 t <- c(0.5, 0.7, 1)
 alp <- 0.025
-
-corr <- matrix(c(
-  1, 0.5, 0.5, NA,
-  0.5, 1, NA, 0.5,
-  0.5, NA, 1, 0.5,
-  NA, 0.5, 0.5, 1
-), byrow = TRUE, nrow = 4)
 
 tt <- "Partly-Parametric"
 des <- "asOF"
 
-out <- adaptGMCP_PC(WI=wi, G=g, test.type = tt, alpha = alp, info_frac = t,
-                    typeOfDesign = des, Correlation = corr,
-                    Selection = T, UpdateStrategy = T, plotGraphs = T)
+# Setting up the design first
+design <- SetupAnalysis_PE_PC(
+  WI = wi,
+  G = g,
+  test.type = tt,
+  alpha = alp,
+  info_frac = t,
+  typeOfDesign = des)
 
-# p_raw = c(H1 = 0.03, H2 = 0.20, H3 = 0.10, H4 = 0.25)
+print(design)
+
+# Performing analysis at look 1
+look1_out <- AnalyzeLook_PE_PC(
+  design,
+  p_raw = c(H1 = 0.03, H2 = 0.20, H3 = 0.10, H4 = 0.25),
+  fullpop_sample_sizes = c(50, 75, 60), # Sample sizes: first for control and then for treatment arms
+  subpop_sample_sizes = c(25, 40, 35)) # Sample sizes: first for control and then for treatment arms
+
+print(look1_out$mcpObj$Correlation)
+print(look1_out)
+
+# Performing analysis at look 2
+look2_out <- AnalyzeLook_PE_PC(
+  look1_out,
+  p_raw = c(H1 = 0.003, H2 = 0.10, H3 = 0.08, H4 = 0.15),
+  fullpop_sample_sizes = c(70, 105, 84), # Sample sizes: first for control and then for treatment arms
+  subpop_sample_sizes = c(35, 56, 49)) # Sample sizes: first for control and then for treatment arms
+
+print(look2_out$mcpObj$Correlation)
+print(look2_out)
+
+# Performing analysis at look 3
+look3_out <- AnalyzeLook_PE_PC(
+  look2_out,
+  p_raw = c(H2 = 0.10, H3 = 0.08),
+  fullpop_sample_sizes = c(100, 140, 123), # Sample sizes: first for control and then for treatment arms
+  subpop_sample_sizes = c(48, 80, 70), # Sample sizes: first for control and then for treatment arms
+  selection = c('H2', 'H3')) # H1 rejected at look 2 and H4 dropped at this look
+
+print(look3_out$mcpObj$Correlation)
+print(look3_out)
 
 #########################################################
 
-
-# EXAMPLE 2 #############################################
+# EXAMPLE 6 #############################################
 wi <- c(1 / 2, 1 / 2, 0, 0)
 g <- matrix(c(
   0, 1 / 2, 1 / 2, 0,
@@ -326,17 +329,6 @@ g <- matrix(c(
 
 t <- c(0.5, 0.7, 1)
 alp <- 0.025
-
-# Example correlation matrix (NA means unknown correlation)
-corr <- matrix(c(
-  1, 0.5, 0.5, NA,
-  0.5, 1, NA, 0.5,
-  0.5, NA, 1, 0.5,
-  NA, 0.5, 0.5, 1
-), byrow = TRUE, nrow = 4)
-
-AdaptGMCP:::conn.comp(corr)
-AdaptGMCP:::clique.partition(corr)
 
 # Test type
 test <- "Partly-Parametric"
@@ -344,23 +336,45 @@ test <- "Partly-Parametric"
 # Design type
 des <- "asOF"
 
-# Calling the analysis function for p-value combination method
-out <- adaptGMCP_PC(WI=wi, G=g, test.type = test, alpha = alp, info_frac = t,
-                    typeOfDesign = des, Correlation = corr,
-                    Selection = T, UpdateStrategy = T, plotGraphs = T)
+# Setting up the design first
+design <- SetupAnalysis_PE_PC(
+  WI = wi, G = g, test.type = test, alpha = alp, info_frac = t, typeOfDesign = des)
 
-# Use these p-values:
-# Look 1 p_vals = c(H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30)
-# Look 2:
-#   selection = c("H1", "H2", "H4")
-#   p-vals = c(H1 = 0.02, H2 = 0.10, H4 = 0.40)
-# Look 3:
-#   no selection changes
-#   p-vals = c(H1 = 0.01, H2 = 0.05, H4 = 0.10)
+print(design)
+
+# Performing analysis at look 1
+look1_out <- AnalyzeLook_PE_PC(
+  design,
+  p_raw = c(H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30),
+  fullpop_sample_sizes = c(50, 50, 50), # Sample sizes: first for control and then for treatment arms
+  subpop_sample_sizes = c(25, 25, 25)) # Sample sizes: first for control and then for treatment arms
+
+print(look1_out$mcpObj$Correlation)
+print(look1_out)
+
+# Performing analysis at look 2
+look2_out <- AnalyzeLook_PE_PC(
+  look1_out,
+  p_raw = c(H1 = 0.02, H2 = 0.10, H4 = 0.40),
+  selection = c("H1", "H2", "H4"),
+  fullpop_sample_sizes = c(70, 105, 84), # Sample sizes: first for control and then for treatment arms
+  subpop_sample_sizes = c(35, 56, 49)) # Sample sizes: first for control and then for treatment arms
+
+print(look2_out$mcpObj$Correlation)
+print(look2_out)
+
+# Performing analysis at look 3
+look3_out <- AnalyzeLook_PE_PC(
+  look2_out,
+  p_raw = c(H2 = 0.05, H4 = 0.10), # H1 rejected and H3 dropped at look 2
+  fullpop_sample_sizes = c(100, 140, 123), # Sample sizes: first for control and then for treatment arms
+  subpop_sample_sizes = c(48, 80, 70)) # Sample sizes: first for control and then for treatment arms
+
+print(look3_out$mcpObj$Correlation)
+print(look3_out)
 #########################################################
 
-
-# EXAMPLE 1 #############################################
+# EXAMPLE 7 #############################################
 # Phase-3 clinical trial in severe oral mucositis
 # 2 doses (low, high) compared to placebo, 2 normal endpoints (primary and secondary) evaluated
 # In addition to the full population, a subgroup of patients with HPV+ status is also evaluated.
@@ -395,28 +409,6 @@ G <- matrix(
   )
 )
 
-corr <- matrix(
-  c(
-    # H1          H2          H3          H4          H5          H6          H7          H8
-    1,          0.5,        NA,         NA,         0.6324555,  0.3162278,  NA,         NA,         # H1
-    0.5,        1,          NA,         NA,         0.3162278,  0.6324555,  NA,         NA,         # H2
-    NA,         NA,         1,          0.5,        NA,         NA,         0.6324555,  0.3162278,  # H3
-    NA,         NA,         0.5,        1,          NA,         NA,         0.3162278,  0.6324555,  # H4
-    0.6324555,  0.3162278,  NA,         NA,         1,          0.5,        NA,         NA,         # H5
-    0.3162278,  0.6324555,  NA,         NA,         0.5,        1,          NA,         NA,         # H6
-    NA,         NA,         0.6324555,  0.3162278,  NA,         NA,         1,          0.5,        # H7
-    NA,         NA,         0.3162278,  0.6324555,  NA,         NA,         0.5,        1           # H8
-  ),
-  nrow = 8, byrow = TRUE,
-  dimnames = list(
-    paste0("H", 1:8),
-    paste0("H", 1:8)
-  )
-)
-
-AdaptGMCP:::conn.comp(corr)
-AdaptGMCP:::clique.partition(corr)
-
 # Test type
 test <- "Partly-Parametric"
 
@@ -429,10 +421,19 @@ t <- 1 # c(0.5, 1)
 # Design type
 des <- "asOF"
 
-# Calling the analysis function for p-value combination method
-# Use these p-values: p =(0.21, 0.04, 0.01, 0.0155, 0.02, 0.01, 0.009, 0.003)
-out <- adaptGMCP_PC(WI=wi, G=G, test.type = test, alpha = alp, info_frac = t,
-                    typeOfDesign = des, Correlation = corr,
-                    Selection = T, UpdateStrategy = T, plotGraphs = T)
-#########################################################
+# Setting up the design first
+design <- SetupAnalysis_PE_PC(WI = wi, G = G, test.type = test, alpha = alp, 
+                              info_frac = t, typeOfDesign = des)
 
+print(design)
+
+# Performing analysis at look 1
+look1_out <- AnalyzeLook_PE_PC(
+  design,
+  p_raw = c(0.21, 0.04, 0.01, 0.0155, 0.02, 0.01, 0.009, 0.003),
+  fullpop_sample_sizes = c(100, 100, 100), # Sample sizes: first for control and then for treatment arms
+  subpop_sample_sizes = c(50, 50, 50)) # Sample sizes: first for control and then for treatment arms
+
+print(look1_out$mcpObj$Correlation)
+print(look1_out)
+#########################################################
