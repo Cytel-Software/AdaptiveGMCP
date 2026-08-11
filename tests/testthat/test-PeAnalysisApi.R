@@ -114,3 +114,53 @@ testthat::test_that( "AnalyzeLook_PE_PC validates look-level sample sizes", {
     "Subgroup sample sizes must not exceed full-population sample sizes"
   )
 } )
+
+testthat::test_that( "AnalyzeLook_PE_PC does not update PE sample history on PC early return", {
+  wi <- rep( 1 / 4, 4 )
+  g <- matrix( 0, nrow = 4, ncol = 4 )
+  infoFrac <- c( 0.5, 1 )
+
+  vFullpopLook1 <- c( 100, 60 )
+  vSubpopLook1 <- c( 80, 45 )
+  vFullpopAttemptedLook2 <- c( 120, 70 )
+  vSubpopAttemptedLook2 <- c( 90, 50 )
+
+  peState <- SetupAnalysis_PE_PC(
+    WI = wi,
+    G = g,
+    test.type = "Partly-Parametric",
+    alpha = 0.025,
+    info_frac = infoFrac,
+    typeOfDesign = "asOF",
+    plotGraphs = FALSE
+  )
+
+  peState <- AnalyzeLook_PE_PC(
+    state = peState,
+    p_raw = c( H1 = 0.01, H2 = 0.02, H3 = 0.03, H4 = 0.04 ),
+    fullpop_sample_sizes = vFullpopLook1,
+    subpop_sample_sizes = vSubpopLook1,
+    plotGraphs = FALSE
+  )
+
+  peState$mcpObj$IndexSet <- character( 0 )
+  peState$trial_completed <- FALSE
+  peState$completion_reason <- NULL
+
+  peState <- AnalyzeLook_PE_PC(
+    state = peState,
+    p_raw = numeric( 0 ),
+    fullpop_sample_sizes = vFullpopAttemptedLook2,
+    subpop_sample_sizes = vSubpopAttemptedLook2,
+    plotGraphs = FALSE
+  )
+
+  vRecordedLooks <- which( !vapply( peState$pe_sample_history, is.null, logical( 1 ) ) )
+
+  testthat::expect_equal( peState$completed_looks, 1L )
+  testthat::expect_true( peState$trial_completed )
+  testthat::expect_identical( peState$completion_reason, "all_hypotheses_dropped" )
+  testthat::expect_equal( vRecordedLooks, 1L )
+  testthat::expect_equal( peState$pe_sample_history[[ 1 ]]$fullpop, vFullpopLook1 )
+  testthat::expect_equal( peState$pe_sample_history[[ 1 ]]$subpop, vSubpopLook1 )
+} )

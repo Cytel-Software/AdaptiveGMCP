@@ -13,6 +13,9 @@ See [docs/architecture.md](../docs/architecture.md) for the full architecture ov
 ## Build & Dev Workflow
 See [instructions/build.instructions.md](instructions/build.instructions.md) for the full build, test, lint, and renv workflow.
 
+## Test Runner Guidance
+Before running targeted package tests, follow [instructions/test_runner.instructions.md](instructions/test_runner.instructions.md) to avoid false failures caused by running test files outside the normal package-loading context.
+
 ## Documentation Sync Gate
 Before marking any Copilot-implemented change complete, follow [instructions/documentation_sync.instructions.md](instructions/documentation_sync.instructions.md) to check and update man pages and project documentation, including the relevant living plan document if one exists.
 
