@@ -352,14 +352,15 @@ AnalyzeLook_PE_PC <- function(
   # because AnalyzeLook_PC applies selection before validating the correlation matrix.
   vActiveNames <- if( !is.null( selection ) && state$completed_looks > 0L )
   {
-    if( !all( selection %in% state$mcpObj$IntialHypothesis ) )
+    if( !all( selection %in% state$mcpObj$IndexSet ) )
     {
       stop(
-        "selection must be a subset of initial hypotheses. Initial hypotheses: ",
-        toString( state$mcpObj$IntialHypothesis )
+        "selection must be a subset of current IndexSet. Current IndexSet: ",
+        toString( state$mcpObj$IndexSet )
       )
     }
-    selection
+
+    intersect( state$mcpObj$IndexSet, unique( selection ) )
   } else
   {
     state$mcpObj$IndexSet
