@@ -351,6 +351,8 @@ AnalyzeLook_PE_PC <- function(
   vActiveNames <- state$mcpObj$IndexSet
   dCorrelation <- dFullCorrelation[ vActiveNames, vActiveNames, drop = FALSE ]
 
+  nPreviousLooks <- state$completed_looks
+
   state <- do.call(
     AnalyzeLook_PC,
     list(
@@ -365,10 +367,15 @@ AnalyzeLook_PE_PC <- function(
     )
   )
 
-  state$pe_sample_history[[ state$completed_looks ]] <- list(
-    fullpop = fullpop_sample_sizes,
-    subpop  = subpop_sample_sizes
-  )
+  if(state$completed_looks == nPreviousLooks + 1L)
+  {
+    # Sample size history should be updated only if the analysis 
+    # was successfully completed for this look.
+    state$pe_sample_history[[ state$completed_looks ]] <- list(
+      fullpop = fullpop_sample_sizes,
+      subpop  = subpop_sample_sizes
+    )
+  }
 
   return( state )
 }

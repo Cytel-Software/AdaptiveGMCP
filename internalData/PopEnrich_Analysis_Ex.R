@@ -46,7 +46,7 @@ library(AdaptGMCP)
 # #########################################################
 
 # # EXAMPLE 2 #############################################
-# # Sample as Example 1, but with 1 interim look
+# # Same as Example 1, but with 1 interim look
 
 # # Setting input parameters for the function
 # # Weights
