@@ -1,0 +1,1222 @@
+AdaptGMCP Meeting-20260811_193228-Meeting Recording
+August 11, 2026, 2:02PM
+
+V.P. started transcription
+
+A.D.   0:03
+Is the so you can imagine that this is for setting up the design, let's say the design or the plan, and then you call the analysis function for every look. And when you call it the first time, it takes the output written by the first function as the first argument.
+Then the raw P values vector and then these are the additional parameters here, an array of sample sizes for the full population and an array similar array for the sub population. And then the remaining parameters are again as before. And what this function internally does is that it uses these sample sizes.
+To calculate the full correlation matrix using Martin's formulas and then it again calls the original analysis function, this function to perform the analysis, yeah.
+
+C.M.   0:58
+So, that means for full population sample size of all the treatment arms.
+
+A.D.   1:08
+Correct control and treatment apps.
+
+C.M.   1:08
+And sub population sample size of all the treatment arms, that's it. So you have to actually put sample sizes, not proportions.
+
+A.D.   1:13
+Correct, exactly, yeah.
+Yeah, we had discussed this, that in simulation we will accept the total sample size and proportions, and in analysis, we will accept the actual sample sizes because, yeah, right. So accordingly, I have done that and I can also show you some sample code that I have written.
+
+C.M.   1:27
+Actual sample size, okay.
+Yeah.
+
+A.D.   1:38
+Are you able to see this other window, the code?
+Okay, so the example one is the simplest case where you have just one treatment being compared against one control arm. There is a single endpoint and of course one full population and one sub population. And here I am just doing it for a fixed sample design with a total sample size of.
+
+C.M.   1:57
+Yeah.
+Yeah.
+
+A.D.   2:04
+200. So you have just 2 hypothesis being tested. So the weights are equal for both of those initial weights and the graph is also very simple, just 2 nodes. And let us say the next test regular alpha fixed sample so information fraction is one. So now you call the first function.
+To set up the design, so you pass all of this, you know the way its graph, the test type etcetera to it. That function then returns the design object and I mean I can actually start running this so that you actually see some output as well on the screen. Just give me a moment to break point here.
+I know.
+It will start soon.
+OK, so the package is loaded and I will just source this file so that the break point is hit. OK, so now we will just run this step by step. So all these variables are set and now the first function is called and it creates a design object.
+So you have this graph.
+Just 2 nodes as expected and then when you print the design details you get the design outputs. In this case it is simple anyway, it is a fixed sample design. So the P value scale boundary is exactly 0.025. No analysis has been performed yet. So now you do the single analysis.
+So you pass the design object to it and let us say the raw P values for the 2 hypothesis are like this 0.1 for H1, 0.0025 for H2 and the full population sample are this are 100 each, 100 for control arm, 100 for the single treatment arm and the sub population is let us say 50% of full population.
+So 5050 sample sizes for this of population.
+
+C.M.   4:02
+And the P values, P values are for, so H1 is H1 is full population, H2 is subpopulation.
+
+A.D.   4:10
+Exactly.
+
+C.M.   4:12
+And you got those 2P values, right?
+
+A.D.   4:15
+Correct. Yeah.
+So now we are, sorry, yes, right. So internally the analysis happens exactly the same way, it does that the correlation matrix is calculated using Martin's formulas.
+
+C.M.   4:17
+And so you can do a close test.
+The correlation matrix you're using that formula.
+
+A.D.   4:34
+Yes. So in this case I will print that correlation matrix. So it is simple in this case. So it is this which is square root of 0.5 in this case.
+
+C.M.   4:44
+Yeah.
+
+A.D.   4:48
+That is why you get this correlation matrix for this 2 by 2 problem.
+
+C.M.   4:51
+Correct.
+
+A.D.   4:53
+Yeah, and then at the first look with this P values looks like H2 got rejected, H1 could not be rejected. So we will also get that output here, yeah.
+
+C.M.   5:06
+Where is the where are you showing the pictures?
+
+A.D.   5:12
+Because I am not using R Studio, the pictures are going into my browser. That's why, yeah, in R Studio, they appear on the side inside R Studio. Yeah, exactly. But I am using Visual Studio code, so it shows the pictures outside. yeah.
+
+C.M.   5:22
+In our studio, they would appear, okay.
+So, A.D., A.D., now this is going to be the new way of inputting things, right? We will use this function every time.
+
+A.D.   5:35
+Correct.
+Yes, exactly. So that the inputs are also saved.
+
+C.M.   5:40
+We are no longer going to use the old old out input method which you are using for another for the treatment multiple arm case, right?
+
+A.D.   5:48
+Yeah.
+Right. I mean, it continues to exist. I have not modified it for population enrichment yet, but if you want, I can also do that. The interact with you that's not required, yeah.
+
+C.M.   5:58
+No, I think it's better to have one system only and not have 2. This is a better system, I think, because this is something that can be reproduced.
+
+A.D.   6:03
+Okay.
+Okay.
+Yes, exactly. Yeah. And the input gets saved with the code, so you can also create R markdown files and everything with it.
+
+C.M.   6:12
+I think we should have you also you have implemented the same way right for the.
+For the multi arm fans.
+
+A.D.   6:23
+Yes.
+Yes, I have done the same. I have not yet implemented that for the CR method right now. I'm just doing this for P value combination, but I'll do that as well, yeah.
+
+C.M.   6:33
+EC.
+
+A.D.   6:36
+Yeah.
+So yeah, so this is the first example and you get these adjusted P values and H1 could not be rejected, but H2 didn't get rejected.
+So this for the simplest and then I have more examples here gradually becoming more complex, including the 8 hypothesis example at the end of this file.
+
+C.M.   6:49
+Sorry.
+wow.
+
+A.D.   7:00
+Yeah.
+So yeah, the question is how do we test this like?
+
+C.M.   7:08
+We've tested against against the Martins code.
+
+A.D.   7:14
+Okay, yeah, so I think his student is also good.
+
+C.M.   7:17
+We can test it because Martin also has a code which does the population enrichment, so we can test it.
+
+A.D.   7:26
+OK, yeah, that will be great. OK. Can we get that quote then? Because then I can. Yeah. OK, great.
+
+C.M.   7:31
+Yeah, of course we can get that code. I'm going to have a conference call with them tomorrow, so I'll get it.
+
+A.D.   7:36
+Okay.
+Great, great. Yeah, then I'll test against his score and so I mean the second example is basically the same same design but just with an interim look. Yeah, so let me just clean this one so that it does not clutter.
+
+C.M.   7:52
+Let's do that one.
+
+A.D.   7:58
+The screen and I will close this graphs as well. So same thing, but now you have a first look at 50% information, then the design is created same design again as before.
+And now the so again.
+
+C.M.   8:23
+Are you allowing adapting also?
+
+A.D.   8:27
+Yes, that selection, correct, correct. So again, it is not in this example, but in examples with more hypothesis, I have implemented that as well in the test. So we'll be able to see that.
+
+C.M.   8:27
+Selection selection and.
+So in this one is only early early stopping or so let's see what happens if you do P values we get how do you repeat the thing if you if you want to kind of play with it and try different P values.
+
+A.D.   8:47
+Correct.
+You can just in fact repeat this code. So suppose for look one you want to try out with different P values, you just copy and paste that same code here and now you add this P values so you can put something else here you know all that is possible and it will just execute that code.
+
+C.M.   9:11
+Yeah.
+Yeah.
+
+P.S.   9:20
+Hello.
+
+A.D.   9:20
+So you can do it this way as well.
+So let let's try that first. We will try with the original input and here again at stage one, nothing got rejected. So we will see the correlation coefficient is correlation matrix is the same as before. Well, it's slightly different now because I purposely change the sample size a bit.
+
+C.M.   10:07
+Yeah.
+
+A.D.   10:10
+So yeah, so here, when I was doing this, I had this question that the boundary was calculated using the original information fraction, what you specified as design, but then correlation metrics, etcetera, we are calculating using the actual sample sizes. So do we need to recompute the boundary as well?
+In analysis.
+
+C.M.   10:30
+No, I guess, I guess in a real, in a real trial, if you, if you spend, if you don't spend the right alpha.
+Then you recompute the boundary based on the alpha that you actually spent.
+I mean.
+
+A.D.   10:51
+M.
+Yeah.
+
+C.M.   10:55
+Right. In a simple, in a simple 2 arm trial, you say, well, I'm going to take an interim look after 50%, but somehow you missed it, missed the chance and you took the interim look after 60%. I mean, you could, you could if you.
+
+A.D.   10:57
+Mhm.
+Correct.
+
+C.M.   11:15
+You can do it both ways. I mean, if you it depends on what you have pre specified in the protocol. Usually, you will pre specify in the protocol that if I don't take the interim look at the time that I said I would, I will recompute the alpha from the one that I actually used.
+
+A.D.   11:22
+Okay.
+Okay.
+
+C.M.   11:36
+So, that's probably the right thing to do.
+
+A.D.   11:40
+Okay, do we want to make that an option or do it always like use the?
+
+C.M.   11:48
+I mean.
+This is going to eventually be used for both analysis and design, right? In East, in East, don't make it an in East. What do we do in the East interim analysis part? We just type in the actual sample sizes and then do the right thing.
+
+A.D.   11:58
+Yes.
+Yeah, we don't need an option.
+Correct, yeah, correct.
+
+C.M.   12:10
+No, right? Is that true?
+
+P.S.   12:14
+Yeah, I think we yeah.
+
+V.P.   12:14
+Yeah, we recompute the boundaries based on where you are taking the look.
+
+A.D.   12:16
+Can you confirm the orders?
+
+C.M.   12:20
+I think that's how we should do it because that's how we do it in East and even if this goes into East Horizon, then that's how it should be.
+
+A.D.   12:20
+Yeah.
+Any.
+Okay, yeah, and then in that case, I mean this is a simple problem, just 2 hypothesis, but when you have multiple treatment arms, so how do you calculate that information fraction?
+Open.
+
+C.M.   12:42
+No, I mean, this is just for the.
+It doesn't matter if there are multiple arms, right? It's the, it's the boundary for the early stopping.
+
+A.D.   13:02
+Yeah, but in a 2 sample problem, we just take the actual sample size at that look and divide that by the plant total sample size at design to get the information fraction here. What do I divide? You know, like that is what I am not clear like in a multi arm.
+
+C.M.   13:19
+Yeah, I think that in multi arm they just take the information fraction from the control arm. Isn't that correct, Praveen?
+
+P.S.   13:20
+I thought that in.
+Yeah, that's what I was going to say, that I think in MMS, we use the control that ratio.
+
+A.D.   13:35
+Control arm, okay, so control arm sample size divided by.
+
+P.S.   13:37
+Because everything is, yeah, because everything is standardized. I think if you see all those information factional lambdas and all those things, those are standardized using the controller ratio with the controller.
+
+A.D.   13:41
+Thank you.
+Okay, but then in that.
+
+P.S.   13:52
+Did they correct me?
+That's what I remember for C.M. and Pranav's paper.
+
+A.D.   13:57
+With the other, that's it, isn't it? In ma'am.
+Okay, the paper mentions that, okay, then I can look at the paper also, okay, and but then in that case, we need to know the planned total.
+
+P.S.   14:06
+Hello.
+I don't think paper says what to do in the IM, but I am saying that information fraction and everything was defined in terms of the controller.
+
+A.D.   14:22
+Control arm, okay, yeah, okay, all right. And then, but then we need to know the total sample size also right design which today I'm not asking for, but I guess we'll have to accept it then.
+
+C.M.   14:30
+Sure.
+
+P.S.   14:39
+Total sample size you are getting this N1, N2 from where you are computing this.
+
+A.D.   14:45
+So, but that is only the current look sample size. We need to divide this 48 by the plant control total sample size, right? That is not there, so that also.
+
+P.S.   14:53
+Okay, yeah.
+
+C.M.   14:54
+Yeah, that's right.
+
+P.S.   14:56
+That's right, yeah, because this is the analysis of a just I mean designed trial, so you must be having the overall sample size, final sample size.
+
+A.D.   15:03
+MM.
+So I guess, so I should take overall sample size and planned allocations and everything, all of that input I should take, yeah, okay, got it.
+
+P.S.   15:11
+yeah.
+
+A.D.   15:18
+Okay, so I'll make that modification then and then recompute the boundary.
+
+V.P.   15:23
+But this means that now you have to as the analysis progresses, you have to keep track of those things, right? Because just like in I am right, remember if we deviate from the look position at first look, then at the second look you need to remember what happened at the first look because it is all related.
+
+P.S.   15:43
+Yeah.
+
+A.D.   15:45
+Yeah, right, correct.
+
+P.S.   15:45
+Yeah, I think already.
+
+V.P.   15:45
+So no, I am just telling A.D. that like the design goes out of the kind of thing, right? I mean, they you understand A.D., what I am saying, right?
+
+P.S.   15:48
+Yeah.
+
+C.M.   15:49
+This is.
+
+A.D.   15:53
+Mhm.
+Yeah, exactly what we do in IM. Yeah, like that.
+
+C.M.   15:56
+Excuse stage.
+
+V.P.   15:56
+Code wise, I mean, you need to make sure that.
+
+P.S.   16:00
+Yeah, there is a sort of like a, there is a, I mean, original design parameters we have to take, we have to keep it for the future looks. And I think that we are already storing all the information that we are getting input at the current look.
+
+V.P.   16:00
+Yeah.
+
+A.D.   16:17
+Yeah.
+
+P.S.   16:17
+That's what we're doing, I mean.
+
+C.M.   16:17
+So, in P in PC method, we are doing multiple looks, no? Is that right? Is that why?
+
+V.P.   16:25
+No, we are doing only 2i mean one interim.
+
+A.D.   16:26
+we'll.
+
+C.M.   16:28
+2 looks. If you're only doing one interim, then there's nothing to keep track of, right?
+
+P.S.   16:34
+YouTube.
+
+A.D.   16:34
+No, in analysis we are allowing multiple looks. It is in Cr method in simulations that I think we allow only one interim look, but in analysis we allow multiple looks. But there I we are not recomputing the boundaries right now.
+
+P.S.   16:43
+Yeah.
+
+C.M.   16:50
+Analysis, only PC analysis. We are doing multiple looks.
+
+A.D.   16:56
+PC analysis, correct.
+
+C.M.   16:58
+Not CE analysis, right?
+
+A.D.   17:02
+Let's see, we're not doing multiple looks.
+
+P.S.   17:03
+Yeah, CS, we are not doing. I mean, CS is only for yeah.
+
+C.M.   17:08
+So far, we have been sort of focused on 2 stage. I mean, I'm not saying it should remain like that, but it's been focused on 2 stage designs.
+Mainly, we are not tested. I don't think we have tested anything beyond 2 stage designs in even in PC.
+
+A.D.   17:29
+There are some examples in the package which I think I had written earlier where where you have like 3 looks, but that's for PC.
+
+C.M.   17:38
+Okay, well, that's good. Then eventually we will want to do that, but I think we will not do it until we have finished with so 2 stages properly, including survivor.
+
+A.D.   17:39
+Yeah.
+
+P.S.   17:48
+We also we are computing the CE, I mean assuming that there's only 2 loops, there's only you're computing the CE.
+
+A.D.   17:48
+Okay.
+
+C.M.   17:59
+Yeah, because we, yeah.
+
+A.D.   17:59
+But.
+But even for 2 looks, your interim look may not be as planned, right? So you still need to recompute. Yeah.
+
+P.S.   18:05
+Yeah, that that's the thing. That's what I was going to say. Even for the tools also, if I'm going to if we have to decompute the samples, I mean the information fraction, etcetera, we have to know the final sample size.
+
+A.D.   18:15
+Yeah.
+Yeah.
+
+P.S.   18:19
+Original sample size.
+
+A.D.   18:27
+Will need it back then.
+
+P.S.   18:29
+Yeah.
+
+A.D.   18:31
+Okay.
+Okay, so I'll update the function accordingly and yeah, and what we was saying earlier that then we have to keep track of that and right, so.
+
+P.S.   18:45
+Yeah.
+I mean, you're storing, I think last time you made the changes to store all the previous looks information, right?
+
+A.D.   18:55
+yes.
+
+P.S.   18:56
+Whatever is input. So now extra is that in the first time when you take the input first analysis, we have to take the overall sample size.
+
+A.D.   19:06
+Correct, yeah.
+Yeah.
+Okay.
+Alright, okay, that's good.
+so I I'll just delete this code that I added just to illustrate that you can copy and edit. But yeah, so.
+Yeah, so in this case also, like, we had that.
+In this case, no hypothesis was rejected at the first look and then at the second look again, you know you perform the analysis this time you pass the look one output as the first argument instead of the original design about Pradi was saying just.
+
+P.S.   19:51
+Yeah.
+
+A.D.   20:02
+Recently, so now look 2 and now the sample size has increased because there is a final risk. So you have the full sample size sample. So these sample sizes are cumulative up to that look.
+And then H2 got rejected again.
+So there is the updated correlation matrix at look to and this is the output along with the adjusted P values, but now we also have the combined P values.
+
+C.M.   20:39
+So show me the inputs again, A.D.. So our input portion is always in this same region. So you always have look one and look 2.
+
+A.D.   20:40
+Alright.
+Yeah.
+Yeah, because these are to look design, yes.
+
+C.M.   21:00
+Lookworld.out.
+
+A.D.   21:04
+Yeah, so the analysis function always returns an object that contains the input and output combined for that look, and then when you call the same function for the next look, you pass the previous looks output as the first argument. and.
+Then the input for this look.
+
+C.M.   21:26
+So you just like do just like look out, that's all.
+
+A.D.   21:30
+Correct, yeah, right.
+
+C.M.   21:31
+Because it's saved as a as that function.
+
+A.D.   21:34
+Right, this is a right, this is an object and in fact I can just show you what it contains. So if you do dollar you will see that it has all these members. So it has all kinds of information internally there is look history what has happened so far. There are design parameters.
+Then if the trial got completed, then why was it completed? How many looks have been completed so far? Then there is this internal object that stores some additional information. What kind of so all kinds of things are stored inside.
+
+P.S.   22:09
+What is there in the design parameters, Soni?
+
+C.M.   22:09
+Thank you.
+
+A.D.   22:12
+Design parameters will have the original thing, so I can just print it about you.
+
+C.M.   22:15
+What you're showing me now is the contents of look one out.
+
+P.S.   22:19
+Yeah.
+
+A.D.   22:20
+Correct contents so.
+
+C.M.   22:21
+And then we add the next one, the new P ROS, and then so now that you've run it, it's saved, everything is saved so that someone can run exactly the same thing because those P values have been saved, right?
+
+A.D.   22:25
+Right.
+Yeah.
+Exactly.
+Correct, correct.
+
+C.M.   22:43
+That's great. That's great. We will share this with Martin because I don't think they have, he wanted us, he wanted this a long time ago.
+
+A.D.   22:43
+Yeah.
+Okay, yeah.
+
+P.S.   22:58
+So you the design parameters of whatever is coming with that, you are going to tell that now sample size.
+
+A.D.   23:05
+Yeah, exactly. So this will have the sample size of since as design total sample size as the input. Yeah, and then I'll use the control and sample size from there to calculate the information reduction.
+
+P.S.   23:06
+Region sample size.
+Yeah.
+Yeah.
+
+C.M.   23:17
+And then you print, you print, look to out that whole thing, that whole MCP or correlation. You're just printing the correlation part of MCP object and MCP object has lots of stuff in it.
+
+A.D.   23:27
+Yeah, so.
+Correct, because of.
+
+C.M.   23:36
+No.
+
+A.D.   23:37
+Yeah, it has it has all kinds of things so that also I can show you here if we see.
+Okay, that for some reason VS code is not showing right now, but I can see list of 30. So it has 30 things internally, all kinds of things are there.
+
+C.M.   23:51
+Okay, it's a list.
+Okay, looks good. So this one was with a so let's run, let's run it again. Let's see what happens if you make the P raw 0.1 and 0., where is it?
+
+A.D.   24:03
+Yeah.
+Okay, so yeah, so let me stop and run then again if you want to come to this example, so that yeah.
+
+C.M.   24:25
+Okay, so now example 2, right?
+
+A.D.   24:26
+Okay.
+Yeah, example 2. I'll comment out example one so that we can directly go to some.
+
+C.M.   24:32
+I see this whole thing is now a bunch of examples. That's great.
+
+A.D.   24:36
+Yeah, I just have one file right now, so I'll put a breakpoint at example 2 and we can run that now.
+
+C.M.   24:47
+And so if you want to write example 2 with.
+
+A.D.   24:50
+Yeah.
+
+C.M.   24:54
+Where is the option for P values?
+
+A.D.   24:58
+Yeah, here. So this is look one and this is look 2.
+
+C.M.   25:02
+so now leave that H1 at 0.1 and midway is 2.0075 Let's see if it rejects.
+
+A.D.   25:10
+Okay, alright, and let me load up the file, okay.
+Okay, so there is the design and now 475.
+OK, so it did not reject in this case we can see.
+
+C.M.   25:33
+Still did not reject.
+
+A.D.   25:35
+Yeah, we can see the.
+
+C.M.   25:36
+So does it print out the intersection hypo? Does it print out the adjusted P values or what does it do?
+
+A.D.   25:41
+Yes.
+Please, yes, here you can see that, yeah.
+
+C.M.   25:46
+Yeah, insert adjust adjusted P values.
+
+A.D.   25:51
+Yes, this column you see, yeah.
+
+C.M.   25:52
+Yeah, so for 01013 is not good enough, right, for land limits.
+
+A.D.   25:59
+Right, because I guess our design boundary was 0015015 and this 013, yeah.
+
+C.M.   26:02
+The language would be 00015, so you got me, yeah.
+Okay, if you made it even one one more decimal, maybe it'll do it right.
+
+A.D.   26:18
+Yeah, we can try that. so.
+
+C.M.   26:22
+0075 C.
+
+A.D.   26:24
+Yeah.
+
+C.M.   26:25
+No 0013, so 0075 also won't be good enough, right?
+
+A.D.   26:33
+Yeah, and moreover.
+Yeah, okay. If you want to reject H2, I guess then 00075.
+
+C.M.   26:41
+You want me to reject, you want me to reject the adjusted P value is still. Well, let's see, let's see what happens. Make one, we put one more.
+
+A.D.   26:48
+Mhm.
+One more, one more. Okay, let me see if I can just copy this and edit.
+
+C.M.   26:55
+One zero.
+
+A.D.   27:03
+Okay, I guess yeah, I I'll do that. Let's just ignore this part and then I'll do it here so that we are able to check that.
+Okay, and you want to type 000075, right? Yeah, so let's ignore the look 2, but okay, we jumped it didn't take that I have to restart. Okay, yeah, I'll do that here, look one.
+
+C.M.   27:30
+Look one.
+
+A.D.   27:38
+0070075 and let me clear this and run again.
+Now look one.
+Yeah, now H2 got rejected.
+
+C.M.   28:06
+Now, let's see the let's see the output.
+
+A.D.   28:10
+Yeah, correlation as before, but here.
+
+C.M.   28:13
+Let's see the plastic P value.
+
+A.D.   28:16
+Yeah.
+
+C.M.   28:18
+This made it.
+
+A.D.   28:19
+Yeah.
+
+C.M.   28:22
+Okay.
+So, I mean, I'm not clear about exactly what how you when you're redoing things, what are you doing? I mean, this whole function is just a whole bunch of examples one after another, right?
+
+A.D.   28:36
+Sure.
+Correct, exactly.
+
+C.M.   28:41
+And that's how that's how it will be made available to people.
+
+A.D.   28:41
+Yeah.
+I mean, as examples, we can do that. It can be included in the package, but when people write code, basically they will have to write similar code for their own example.
+
+C.M.   28:54
+Yeah.
+Okay, so they will take the inputs, they will take the, they will take the, what will they write?
+
+A.D.   29:15
+So they have to essentially they have to write code to call these 2 functions in sequence, first this function and then this function. And this function requires all these as input, you know, what are your weights, what is your transition matrix, etcetera, you know. So they have to assemble all these variables.
+
+C.M.   29:27
+That's love, yeah.
+yeah.
+
+A.D.   29:35
+Which is what I have done here. I mean, you can do it like this or you can just directly type the values here. I could have directly type this here instead of creating a separate variable for it. But yeah.
+
+C.M.   29:42
+Yeah.
+So this is fine. It's giving a nice template that you can enter.
+
+A.D.   29:52
+Yeah, I mean, this is more readable otherwise, the syntax starts looking very complicated. So yeah.
+
+C.M.   29:58
+Okay, what you want to do a more complicated example?
+I see.
+
+A.D.   30:27
+so this one, this one has 4 nodes, example 3. So let's look at this one for a hypothesis I will.
+
+C.M.   30:33
+Let's have a look from the beginning.
+
+A.D.   30:36
+Yeah, I will comment out this one now and we will keep only example 3 so that we that can directly come to it. So here there is a simplified version of your 8 hypothesis problem because I've just used single endpoint here but.
+
+C.M.   30:52
+High dose full, low dose full, high dose subgroup, low dose subgroup. So, 44 hypothesis is the usual usual 4 hypothesis in this case, except it is for populations and here correlations. We will have correlations, right?
+
+A.D.   30:55
+Yeah.
+For hypothesis.
+Correct.
+We will have and those, but again, those will be calculated inside the function.
+
+C.M.   31:14
+So everything will be parametric in this case.
+
+A.D.   31:18
+Yes, yeah, I mean, in this case, everything is parametric because yeah, you have all correlations known.
+Correct. So yeah, let's see this one.
+
+C.M.   31:28
+It hasn't been, is that like hard work required or I mean, or is it like you can still choose? You can choose still test type ponferroni if you want, right?
+
+A.D.   31:35
+No, I mean.
+Yeah, you can choose that, yes, and we can try that as well. So let me just write that also as a separate this thing after this one, so that we can see what happens. Yeah, in fact, this one is there. Let's make this bomb firuni.
+OK, and we will see then what happens with that. so.
+Yeah, let's start with the from the beginning.
+
+C.M.   32:20
+And I went in that in the original version that we had, we had prompts for how to type down it and bond for only and all that. Here, where will we look for how to put in the right inputs? Where will that be available?
+
+A.D.   32:30
+Yeah.
+Correct.
+So yeah, so the package has help file like this one for example, or where is this one here? So the help file gives you all that information like here it says test, test type supported values are all these for example, it says.
+
+C.M.   32:53
+How to do it? Yeah.
+Right.
+
+A.D.   33:00
+The other thing that all the these programs do like this Visual Studio Code or R Studio as well, that when you hover your mouse over the function name, then you get also this large tooltip which also provides you the same information.
+
+C.M.   33:13
+Yeah.
+Yeah, good. I'll play with it. Yeah, just see it for the first time.
+
+A.D.   33:21
+Yeah.
+Yeah.
+Okay, let me load it. Okay, so now the 4 hypothesis example. This is the transition matrix in the next test.
+
+C.M.   33:38
+In this matrix, In this matrix you have.
+Yeah, where it's like you're testing the full population first and the sub population second.
+
+A.D.   33:46
+Yeah.
+so I'll bring it up. I took it from your old slides, slide, so I'll just show you where that was. that okay, nice.
+This was C.M. and C.M. stock.
+
+C.M.   34:15
+that in my session at JSM, this fellow Dong Shi made a presentation in which she was giving the optimal, he was optimising how.
+
+A.D.   34:15
+And tell me what person?
+Yeah.
+
+C.M.   34:34
+How you distribute the alphas and then given an optimal allocation of the alphas, how you do the optimise the transition matrix?
+
+A.D.   34:51
+Okay.
+
+C.M.   34:51
+And the only input, the only input that he accepted was power, the marginal, marginal power for each hypothesis.
+You so.
+If you input the marginal power for each hypothesis, it does some optimization and gives you the whole transition matrix and the distribution, the allocation of weights.
+According to some criteria that they had.
+
+A.D.   35:25
+Present.
+yeah.
+
+P.S.   35:33
+C.M..
+
+C.M.   35:35
+Yeah.
+
+P.S.   35:36
+You have to get the alpha, you have to give alpha, right?
+
+C.M.   35:41
+You give he allocates the alphas based on he did a comparison what happens if you do equal allocation versus what happens if you do optimal allocation. So if you want more power for H1 and then for H2, you won't put equal alphas.
+
+P.S.   35:47
+No.
+no, that is different, not equal equal alpha. I'm talking about the overall alpha that is also that 0.05 or 0.025, those things.
+
+C.M.   36:06
+Yeah, what I'll for you have to do.
+
+P.S.   36:09
+Empower.
+
+C.M.   36:11
+And how much power you want? How much? No, how much is the marginal power of each?
+To give that.
+
+P.S.   36:20
+Marianpal. So then he was computing the optimum ratio, the allocation ratio. From there, he was computing the information fraction, something like that. OK.
+
+C.M.   36:24
+Very does optimal everything here.
+And the last fellow also did something like that, more complicated, even taking inputs of finance and all kinds of things from the company.
+
+A.D.   36:44
+Okay.
+
+C.M.   36:46
+I'll try and get this slides and you may find them interesting.
+
+A.D.   36:51
+Yeah.
+
+P.S.   36:54
+Finance and all this, is it the is it one of the latest published?
+
+A.D.   36:55
+Okay.
+
+C.M.   36:59
+He has not published it yet, but I'm sure he will. He's a good, very good researcher, this Dong Qi.
+
+P.S.   37:01
+Yeah.
+Tell you.
+Okay.
+
+A.D.   37:12
+Okay, yeah, so C.M., so this is the example that I have quoted in example 3, so this from your slides. So yeah, and so that is the transition matrix here and the initial allocation is equal alpha to all 4 hypothesis.
+
+C.M.   37:18
+Yeah.
+
+A.D.   37:32
+So that is this and the I mean these correlations are exactly what Martin's formulas also give. So that those are coded inside our code anyway. And then yeah, okay, so I'm setting the design first.
+So basically, if we put it in the right order, then sorry, H2 here, H3 here, yeah. So this is that same graph that we have in your slides.
+Yeah, so.
+
+C.M.   38:10
+Put an equal weight on all 4 hypothesis in the beginning.
+
+A.D.   38:14
+Correct, yes.
+Yeah.
+
+C.M.   38:19
+OK.
+
+A.D.   38:20
+And then okay, so that's the design. And then of course I cooked up the P values, so I just use this numbers and again equal allocation.
+To all arms.
+So when you do that, nothing gets rejected in this case. But anyway, the graph changes a little bit and this is the correlation matrix. So all correlations are known here as we had said earlier. So it's a fully specified correlation matrix.
+
+C.M.   38:57
+Yeah.
+
+A.D.   39:02
+And nothing could be rejected, but this is your full.
+
+C.M.   39:07
+Close test.
+
+A.D.   39:08
+Table, yeah, all of those.
+And this can be values.
+This is at look one and since and then you proceed to look 2. So these are 2 look example. So again you pass the look one output as the first argument. Then you specify the ROPI values based on the cumulative data up to look 2. So those are these values and again now the.
+cumulative sample sizes at the second look. So when you do that.
+couple of hypothesis got rejected.
+This is the updated correlation metrics here.
+At look to and technically look to output.
+So again, now you have the...
+Updated adjusted P values and these the combined adjusted P values in your combination information.
+
+C.M.   40:26
+Adjusted t values will be larger now, right?
+
+A.D.   40:30
+Yeah, let's check that.
+
+C.M.   40:30
+But now everything is one for only means you're not taking account of the correlation at all.
+
+A.D.   40:37
+Correct, correct.
+
+C.M.   40:38
+Let's see, let's see, let's see how the key values look.
+
+A.D.   40:41
+But in fact, something got rejected at look one with Bonfiruli. So this does look a little strange, right? Like Duned could not reject H1 at look one here if you see like.
+
+C.M.   40:56
+Wow, how's that?
+
+A.D.   41:00
+Yeah, so.
+
+C.M.   41:02
+That can't be.
+
+A.D.   41:04
+This was the look one with the next test and this is look one with Bonfuroni.
+
+C.M.   41:14
+Same P values.
+
+A.D.   41:16
+I let's see, I think I did copy that. So 0.0045.1121 no, look what did I do here? Look one out. Sorry, yeah, 009520025.
+L1104, yeah, so same P values.
+
+C.M.   41:37
+Are you taking the same?
+
+A.D.   41:41
+MP values, but...
+
+C.M.   41:44
+04509520225 Yeah, these are correct. These are the ones we have been using all along.
+
+A.D.   41:52
+Stop.
+So bonds are only rejected, but done it did not.
+
+C.M.   41:58
+Confirm did one. Corporate rejected the what?
+
+A.D.   42:05
+Sorry, just a minute, let me see. Oh no, I have no, I had another change. I should not have done that. Here the information fraction was 0.5 when we did done it, but here I had changed it to 0.7. So let me make it exactly the same. Lets verify first that.
+We have exactly the same input. Okay, so 0.5 information fraction.
+so I'll make that 0.5 test is one for me weights and graph are the same as before yeah and yeah and then the P values let me just copy this so that I don't.
+It's something else by mistake and sample size is at look one hour 50 and 25. Okay, so that is the same.
+Yeah, so now we can check what happens.
+This is the first graph.
+This is with yeah, so this would done it, nothing was rejected. We have the adjusted P values then the look to.
+Where 2 appearances got rejected with.net.
+Okay, and now on to any.
+
+C.M.   44:03
+For look for look 2, you're also putting incremental P values only, right? Because this is PC method.
+
+A.D.   44:13
+This will be incremental, right? I have.
+
+C.M.   44:15
+PC method before you increment your T values for each stage and come and then you combine them with a P value combination.
+
+A.D.   44:18
+Mhm.
+Yeah, correct, correct. Yes, right, yeah. So these are incremental, yes, and that's how they're used internally. And that's why in the output also you will get those 2 columns and the combined adjusted value. But let's see with Bonfire now.
+Again, at look one, yeah, nothing got rejected and we can see if the P values adjusted P values here. So with Bonferoni, first of all, you are yeah, correlation matrix was really nothing I mean because it is Bonferroni.
+So you just have Na's, a bunch of Na's, and the tag one went to tag one.
+And if you see, for example, this adjusted P value for the for this intersection hypothesis 0.0018 with Bonferroni and with Donet we can see not this one look one yeah 0016 yeah.
+
+C.M.   45:26
+One 6.
+
+A.D.   45:31
+Yeah, so this we've done it.
+So.
+
+C.M.   45:38
+And thank you. And then at stage 2, then probably we may not get the same result, right? We may have less rejection.
+
+A.D.   45:46
+Yeah and again earlier I was trying with 0.7 so first one hypothesis had got rejected but now nothing has got rejected. So again I need to modify this. I need to have P value for H1 as well. Suppose I just keep it the same.
+As before.
+Yeah, and now we run this. I have to debug again, I guess, but this won't work because I edited and saved the file.
+Let me run this again.
+It's loaded.
+Please okay, first done it example.
+Okay.
+Look one output this is the done it P value 0.0016 then look to.
+Do I have this has got rejected?
+And here now we can see.
+
+C.M.   47:21
+The warferoni look to. Did anything get rejected?
+
+A.D.   47:26
+Yeah, we'll check now. Now Bonferoni.
+At look one again, the thing gets rejected as expected.
+We also see the look look one of P value for the intersection hypothesis is higher 0.0018 but now look 2 yeah here also 2 hypothesis got rejected and we can see the P values and compare those with so.
+
+C.M.   47:49
+Yeah.
+
+A.D.   47:58
+Okay, so with Ponferroni like we can see the this intersection hypothesis then both were 0.0018 and the combined value was this 4 zeros 192 whereas in the earlier example with Dunnet.
+Sorry, this is Bonfir me.
+Yeah, this is done it, right? Yeah. So here these are smaller and yeah.
+
+C.M.   48:27
+Yeah.
+Much smaller, yeah, that's good.
+It looks like it is working. I would like to play with it for this week. and.
+
+A.D.   48:40
+Yeah.
+Yeah, I'll give you the updated package and I can help you install if required, and then if you can, yeah.
+
+C.M.   48:49
+And for next week, for next week.
+What?
+
+A.D.   48:55
+And I'll implement that change that we discussed today, like recomputing the boundaries based on the actual information fraction. So I will implement that. And if you can also get Martin's code, then I can also test it against that, yeah.
+
+C.M.   49:04
+Yeah.
+Yeah.
+I'll do that here, so, and then yeah.
+
+A.D.   49:14
+And then I guess I can.
+
+C.M.   49:15
+It looks looks good to me. It looks very good. And the thing is next, what to do next, whether to do the CE method or yeah, I think go to CE method.
+
+A.D.   49:25
+So should we do that or do the simulations? for?
+
+C.M.   49:30
+Or simulation, you can whichever you think you would like to, whichever you prefer.
+
+A.D.   49:32
+Yeah.
+Yeah, then I think let's complete the simulations also because then we will have population enrichment done for both using the P value combination. Yeah, okay.
+
+C.M.   49:43
+Okay.
+Yeah.
+
+A.D.   49:51
+Okay, so I'll do that and then we can tackle the CR method.
+
+C.M.   49:56
+so if you give me this code, I guess just show me where it is and I send it on to Martin and so his student can also look at it.
+
+A.D.   49:58
+Yeah.
+Okay, so do you want me to first implement this boundary re computation and then share with Martin?
+
+C.M.   50:11
+Yeah.
+Yes, you mean using the recomputed boundaries, yes, let's do that. Let's do that.
+
+A.D.   50:21
+Correct. Yeah, so I'll do that then and then share that with you. Yeah.
+
+P.S.   50:28
+So C.M., this P value combination method.
+I mean, mainly for this, what is that called? This population enrichment will be always for 2 loops, right? Or we are going to make it from multiple loops in case of pivotal combination method.
+
+C.M.   50:47
+I don't know, I mean, I don't know what people want. I mean, in the presentations in my session were all 2 stage.
+
+A.D.   50:55
+Thank you.
+
+P.S.   50:56
+Yeah, you said that you said that earlier the this analysis was done for the multiple stages in case of PC and that is for the MAMS, not for multiple endpoint, not for the not for the proportion enrichment. Population enrichment to will be always.
+
+C.M.   50:57
+And.
+
+A.D.   51:05
+In.
+
+P.S.   51:14
+To look, it doesn't matter whether it is C or PC.
+
+C.M.   51:15
+2 loops.
+I think it gets quite complicated to have more than 2 looks and enrichment one.
+
+A.D.   51:23
+Yeah.
+
+P.S.   51:25
+If you people don't do that, I mean, usually people don't do that. Some may do using the stratified this thing. I mean, shutdown some of the, don't allocate anything else, some data.
+
+C.M.   51:25
+2 stage device.
+
+P.S.   51:37
+But most of the time it is to look. I mean you do the population enrichment, then go ahead. The second after you have finished the population enrichment, it can be multiple look.
+
+A.D.   51:37
+Yeah.
+
+C.M.   51:43
+Hello.
+I think that.
+Yeah, let's go with to it's already complicated, and then when we get to survival, it's going to be even worse. so.
+
+A.D.   51:56
+Hello.
+
+P.S.   51:57
+Yeah.
+Yeah, that's what I was trying to say, that no point in spending time here for the multiple look PC.
+
+A.D.   52:02
+So both her.
+Okay, fine. And then simulations also will be only for 2 looks, right?
+
+P.S.   52:10
+When you are doing the pops and everything.
+Yeah.
+
+C.M.   52:13
+Yeah, let's just stick with tool for now.
+
+A.D.   52:15
+Okay, all right, so I'll also do that. I'll restrict it to 2 looks. So yeah, so I'll make all the changes and then share the updated package so that you can share with Martin and similarly, you know, I can also test it against his code.
+
+C.M.   52:23
+Yeah.
+Yes.
+
+A.D.   52:34
+And then I will go after simulations.
+
+C.M.   52:37
+Where are we now? In terms of our planning, we had said that we would, well, we have delayed because...
+
+A.D.   52:48
+Yeah, there is that couple of months of delay.
+
+C.M.   52:49
+I think we will be starting survival probably in the fall, right? Like September or something.
+
+A.D.   52:54
+Yeah, yes, I we should be able to. That's certainly yeah.
+
+C.M.   52:59
+Yeah, so that's okay. I don't think that's a problem. I mean, they diverted us because you they required you for some other project.
+
+A.D.   53:08
+Yeah.
+Right.
+
+C.M.   53:13
+Okay then, I think we're done for today.
+
+A.D.   53:14
+Yeah.
+Yeah, yes.
+
+C.M.   53:19
+Thanks. Thanks a lot, A.D.. Thank you, P.S. and V.P..
+
+A.D.   53:25
+Yeah, thank you. Thank you, C.M.. Thanks really with the other. Have a good day.
+
+V.P.   53:26
+Yeah, thanks.
+
+P.S.   53:27
+Thanks guys. Can I talk call you?
+
+C.M.   53:29
+Do you want to do it next week also 10:00 o'clock? Is that better for you?
+
+V.P.   53:32
+Yeah, you can call me.
+
+P.S.   53:34
+Thank you. What is the C.M.?
+
+C.M.   53:37
+So, A.D., A.D., do you want more again 10:00 o'clock next week or what?
+
+A.D.   53:43
+Yes, because I will have that meeting every week. Yeah. So for now it is okay. Once winter begins, we will see if we want to shift things around. But for now, it is okay. Yeah. All right. Thank you. Yeah. Have a good day, everyone. Bye. Bye.
+
+C.M.   53:45
+10:00 o'clock is fine with me. 10:00 o'clock is fine. Okay, yeah.
+Okay.
+OK, bye then.
+
+P.S.   53:59
+Hi guys, I'll call you after this meeting.
