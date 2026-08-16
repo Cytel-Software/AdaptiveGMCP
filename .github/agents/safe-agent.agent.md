@@ -1,6 +1,7 @@
 ---
 name: "Safe Agent"
 description: "Use when making code changes safely with developer approval at every step. Enforces SCAFF-structured planning, risk assessment, and explicit approval gates before any action. Use for all development tasks where safety, traceability, and developer control are required."
+model: Auto (copilot)
 tools: [read, edit, search, execute, todo]
 ---
 

@@ -235,6 +235,8 @@ BuildPECorrelationMatrix <- function(
 #' @param deltaPT1 Parameter for typeOfDesign = "PT".
 #' @param gammaA Parameter for typeOfDesign = "asHSD" or "asKD".
 #' @param userAlphaSpending Alpha spending values for typeOfDesign = "asUser".
+#' @param info_frac_tolerance Numeric scalar in (0, 1); absolute tolerance for
+#' matching current information fraction to planned fractions in the PC engine.
 #' @param MultipleWinners Logical; TRUE means reject as many hypotheses as
 #' possible, FALSE means reject at most one hypothesis.
 #' @param Selection Logical; TRUE if selection of hypotheses is allowed at
@@ -256,6 +258,7 @@ SetupAnalysis_PE_PC <- function(
     deltaPT1 = 0,
     gammaA = 2,
     userAlphaSpending = NULL,
+    info_frac_tolerance = 0.05,
     MultipleWinners = TRUE,
     Selection = TRUE,
     UpdateStrategy = TRUE,
@@ -272,6 +275,7 @@ SetupAnalysis_PE_PC <- function(
     deltaPT1 = deltaPT1,
     gammaA = gammaA,
     userAlphaSpending = userAlphaSpending,
+    info_frac_tolerance = info_frac_tolerance,
     MultipleWinners = MultipleWinners,
     Selection = Selection,
     UpdateStrategy = UpdateStrategy,
@@ -301,6 +305,8 @@ SetupAnalysis_PE_PC <- function(
 #' ordered as control first, then treatment arms. Must be non-decreasing across
 #' looks and the same length at every look.
 #' @param look Optional positive integer naming the current look number.
+#' @param info_frac_cur Optional numeric scalar; current-look cumulative
+#' information fraction. If NULL, the planned fraction for this look is used.
 #' @param selection Optional character vector of hypotheses to retain for this
 #' look (only meaningful when look > 1).
 #' @param new_weights Optional numeric vector of new weights for continuing
@@ -316,6 +322,7 @@ AnalyzeLook_PE_PC <- function(
     fullpop_sample_sizes,
     subpop_sample_sizes,
     look = NULL,
+    info_frac_cur = NULL,
     selection = NULL,
     new_weights = NULL,
     new_G = NULL,
@@ -370,11 +377,18 @@ AnalyzeLook_PE_PC <- function(
 
   nPreviousLooks <- state$completed_looks
 
+  if (is.null(info_frac_cur)) {
+    nNextLook <- state$completed_looks + 1L
+    nPlannedLooks <- length(state$design_params$info_frac)
+    info_frac_cur <- state$design_params$info_frac[min(nNextLook, nPlannedLooks)]
+  }
+
   state <- do.call(
     AnalyzeLook_PC,
     list(
       state = state,
       p_raw = p_raw,
+      info_frac_cur = info_frac_cur,
       Correlation = dCorrelation,
       look = look,
       selection = selection,

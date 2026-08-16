@@ -64,15 +64,19 @@ state <- SetupAnalysis_PC(
   alpha        = alpha,
   info_frac    = info_frac,
   typeOfDesign = typeOfDesign,
-  Correlation  = Correlation,
   plotGraphs   = plotGraphs
 )
+
+print("Initial design:")
+print(state)
 
 #--------------Look 1 Analysis-----------------------
 state <- AnalyzeLook_PC(
   state,
-  look  = 1,
-  p_raw = c(H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30),
+  look         = 1,
+  info_frac_cur = 0.5,
+  p_raw        = c(H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30),
+  Correlation  = Correlation,
   plotGraphs = plotGraphs
 )
 print(state)
@@ -81,9 +85,10 @@ print(state)
 # H3 is dropped; remaining hypotheses are H1, H2, H4
 state <- AnalyzeLook_PC(
   state,
-  look      = 2,
-  p_raw     = c(H1 = 0.02, H2 = 0.10, H4 = 0.40),
-  selection = c("H1", "H2", "H4"),
+  look         = 2,
+  info_frac_cur = 0.7,
+  p_raw        = c(H1 = 0.02, H2 = 0.10, H4 = 0.40),
+  selection    = c("H1", "H2", "H4"),
   plotGraphs = plotGraphs
 )
 print(state)
@@ -91,8 +96,9 @@ print(state)
 #--------------Look 3 Analysis (final look)----------
 state <- AnalyzeLook_PC(
   state,
-  look  = 3,
-  p_raw = c(H2 = 0.005, H4 = 0.10),
+  look         = 3,
+  info_frac_cur = 1.0,
+  p_raw        = c(H2 = 0.005, H4 = 0.10),
   plotGraphs = plotGraphs
 )
 print(state)

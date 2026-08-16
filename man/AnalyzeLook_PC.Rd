@@ -7,6 +7,7 @@
 AnalyzeLook_PC(
   state,
   p_raw,
+  info_frac_cur,
   Correlation = NULL,
   look = NULL,
   selection = NULL,
@@ -21,7 +22,11 @@ AnalyzeLook_PC(
 \item{p_raw}{Named numeric vector of raw p-values for the current look, for the
 currently active hypotheses (state$mcpObj$IndexSet).}
 
-\item{Correlation}{Optional D x D correlation matrix. This input is mandatory
+\item{info_frac_cur}{Numeric scalar; cumulative information fraction observed
+at the current look.}
+
+\item{Correlation}{Optional D_active x D_active correlation matrix for the
+currently active hypotheses (\code{length(state$mcpObj$IndexSet)}). Mandatory
 at look 1 when \code{test.type} is \code{"Dunnett"} or \code{"Partly-Parametric"}.
 For subsequent looks, if supplied for those test types it updates the
 correlation used in analysis; if \code{NULL}, the most recently stored
