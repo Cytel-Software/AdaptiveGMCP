@@ -78,6 +78,7 @@ testthat::test_that( "AnalyzeLook_PE_PC derives a generic look-level correlation
   manualState <- AnalyzeLook_PC(
     state = manualState,
     p_raw = c( H1 = 0.01, H2 = 0.04, H3 = 0.02, H4 = 0.03, H5 = 0.05, H6 = 0.06, H7 = 0.07, H8 = 0.08 ),
+    info_frac_cur = infoFrac[1],
     Correlation = expectedCorrelation,
     plotGraphs = FALSE
   )

@@ -10,6 +10,7 @@ AnalyzeLook_PE_PC(
   fullpop_sample_sizes,
   subpop_sample_sizes,
   look = NULL,
+  info_frac_cur = NULL,
   selection = NULL,
   new_weights = NULL,
   new_G = NULL,
@@ -21,13 +22,18 @@ AnalyzeLook_PE_PC(
 
 \item{p_raw}{Named numeric vector of raw p-values for active hypotheses.}
 
-\item{fullpop_sample_sizes}{Numeric vector of full-population sample sizes
-ordered as control first, then treatment arms.}
+\item{fullpop_sample_sizes}{Numeric vector of cumulative full-population sample
+sizes ordered as control first, then treatment arms. Must be non-decreasing
+across looks and the same length at every look.}
 
-\item{subpop_sample_sizes}{Numeric vector of subgroup sample sizes ordered as
-control first, then treatment arms.}
+\item{subpop_sample_sizes}{Numeric vector of cumulative subgroup sample sizes
+ordered as control first, then treatment arms. Must be non-decreasing across
+looks and the same length at every look.}
 
 \item{look}{Optional positive integer naming the current look number.}
+
+\item{info_frac_cur}{Optional numeric scalar; current-look cumulative
+information fraction. If NULL, the planned fraction for this look is used.}
 
 \item{selection}{Optional character vector of hypotheses to retain for this
 look (only meaningful when look > 1).}

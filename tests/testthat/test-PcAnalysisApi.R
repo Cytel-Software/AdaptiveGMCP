@@ -16,6 +16,20 @@ CompareImportantMcpMembers <- function( actMcp, expMcp, dTolerance = 1e-6 )
   return( bMatches )
 }
 
+AnalyzeLook_PC_TestWrapper <- function( state, ... )
+{
+  lArgs <- list( ... )
+  if( inherits( state, "PCAnalysisState" ) && is.null( lArgs$info_frac_cur ) )
+  {
+    nNextLook <- state$completed_looks + 1L
+    nPlannedLooks <- length( state$design_params$info_frac )
+    lArgs$info_frac_cur <- state$design_params$info_frac[ min( nNextLook, nPlannedLooks ) ]
+  }
+
+  lArgs$state <- state
+  return( do.call( AnalyzeLook_PC, lArgs ) )
+}
+
 ############
 # Test1 # COMPLETED
 testthat::test_that("Test 1: PC analysis API scaffolds", {
@@ -54,7 +68,7 @@ testthat::test_that("Test 1: PC analysis API scaffolds", {
   testthat::expect_equal(state$completed_looks, 0L)
 
   # Look 1
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30),
     Correlation = corr,
@@ -72,7 +86,7 @@ testthat::test_that("Test 1: PC analysis API scaffolds", {
   testthat::expect_equal(state$mcpObj$rej_flag_Curr, exp_out)
 
   # Look 2 with selection
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.02, H2 = 0.10, H4 = 0.40),
     selection = c("H1", "H2", "H4"),
@@ -90,7 +104,7 @@ testthat::test_that("Test 1: PC analysis API scaffolds", {
   testthat::expect_equal(state$mcpObj$IndexSet, exp_out)
 
   # Look 3
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H2 = 0.05, H4 = 0.10),
     plotGraphs = FALSE
@@ -149,7 +163,7 @@ testthat::test_that("Test 2: PC analysis API scaffolds (strategy modification)",
   )
 
   # Look 1
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.03, H2 = 0.20, H3 = 0.10, H4 = 0.25),
     Correlation = corr,
@@ -168,7 +182,7 @@ testthat::test_that("Test 2: PC analysis API scaffolds (strategy modification)",
     1, 0, 0, 0
   ), byrow = TRUE, nrow = 4)
 
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.02, H2 = 0.12, H3 = 0.08, H4 = 0.20),
     new_weights = new_weights,
@@ -228,7 +242,7 @@ testthat::test_that("Test 3: PC analysis API scaffolds (full transition at look 
   testthat::expect_equal(state$mcpObj$bdryTab, exp_out)
 
   # Look 1
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.04, H2 = 0.18, H3 = 0.12, H4 = 0.22),
     Correlation = corr,
@@ -255,7 +269,7 @@ testthat::test_that("Test 3: PC analysis API scaffolds (full transition at look 
   Correlation[1, 2] <- Correlation[2, 1] <- 0.3
   Correlation[1, 3] <- Correlation[3, 1] <- 0.4
 
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.03, H2 = 0.10, H3 = 0.08),
     selection = selection,
@@ -296,36 +310,36 @@ testthat::test_that("AnalyzeLook_PC: look argument validation and error handling
 
   # look mismatch: state expects look 1, user passes look = 2
   testthat::expect_error(
-    AnalyzeLook_PC(state0, p_raw = c(H1 = 0.10, H2 = 0.20), look = 2L, plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper(state0, p_raw = c(H1 = 0.10, H2 = 0.20), look = 2L, plotGraphs = FALSE),
     regexp = "does not match the expected next look"
   )
 
   # look is non-numeric
   testthat::expect_error(
-    AnalyzeLook_PC(state0, p_raw = c(H1 = 0.10, H2 = 0.20), look = "a", plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper(state0, p_raw = c(H1 = 0.10, H2 = 0.20), look = "a", plotGraphs = FALSE),
     regexp = "single positive integer"
   )
 
   # look is non-integer numeric (1.5)
   testthat::expect_error(
-    AnalyzeLook_PC(state0, p_raw = c(H1 = 0.10, H2 = 0.20), look = 1.5, plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper(state0, p_raw = c(H1 = 0.10, H2 = 0.20), look = 1.5, plotGraphs = FALSE),
     regexp = "single positive integer"
   )
 
   # look = 0 (not positive)
   testthat::expect_error(
-    AnalyzeLook_PC(state0, p_raw = c(H1 = 0.10, H2 = 0.20), look = 0L, plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper(state0, p_raw = c(H1 = 0.10, H2 = 0.20), look = 0L, plotGraphs = FALSE),
     regexp = "single positive integer"
   )
 
   # --- Correct usage ---
 
   # look = NULL (default): proceeds normally and completed_looks advances
-  state1_null <- AnalyzeLook_PC(state0, p_raw = c(H1 = 0.10, H2 = 0.20), look = NULL, plotGraphs = FALSE)
+  state1_null <- AnalyzeLook_PC_TestWrapper(state0, p_raw = c(H1 = 0.10, H2 = 0.20), look = NULL, plotGraphs = FALSE)
   testthat::expect_equal(state1_null$completed_looks, 1L)
 
   # look = 1L (correct explicit value): same result as omitting look
-  state1_expl <- AnalyzeLook_PC(state0, p_raw = c(H1 = 0.10, H2 = 0.20), look = 1L, plotGraphs = FALSE)
+  state1_expl <- AnalyzeLook_PC_TestWrapper(state0, p_raw = c(H1 = 0.10, H2 = 0.20), look = 1L, plotGraphs = FALSE)
   testthat::expect_equal(state1_expl$completed_looks, 1L)
 
   testthat::expect_equal(state1_null, state1_expl)
@@ -333,12 +347,12 @@ testthat::test_that("AnalyzeLook_PC: look argument validation and error handling
   # --- After final look: specific "final look" error ---
 
   # Run look 2 to complete the trial
-  state2 <- AnalyzeLook_PC(state1_null, p_raw = c(H1 = 0.10, H2 = 0.20), look = 2L, plotGraphs = FALSE)
+  state2 <- AnalyzeLook_PC_TestWrapper(state1_null, p_raw = c(H1 = 0.10, H2 = 0.20), look = 2L, plotGraphs = FALSE)
   testthat::expect_true(state2$trial_completed)
 
   # Calling again after final look must name the final look in the error message
   testthat::expect_error(
-    AnalyzeLook_PC(state2, p_raw = c(H1 = 0.10, H2 = 0.20), plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper(state2, p_raw = c(H1 = 0.10, H2 = 0.20), plotGraphs = FALSE),
     regexp = "was the final look"
   )
 
@@ -349,7 +363,7 @@ testthat::test_that("AnalyzeLook_PC: look argument validation and error handling
   state_early_stopped$trial_completed <- TRUE   # completed_looks (1) < LastLook (2)
 
   testthat::expect_error(
-    AnalyzeLook_PC(state_early_stopped, p_raw = c(H1 = 0.10, H2 = 0.20), plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper(state_early_stopped, p_raw = c(H1 = 0.10, H2 = 0.20), plotGraphs = FALSE),
     regexp = "Trial already concluded"
   )
 })
@@ -377,7 +391,7 @@ testthat::test_that("AnalyzeLook_PC: structural invariants hold across looks", {
   testthat::expect_equal(state$mcpObj$IndexSet, c("H1", "H2"))
 
   # Look 1: completed_looks advances, AdjPValues is populated, trial not yet complete
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.10, H2 = 0.20),
     plotGraphs = FALSE
@@ -389,7 +403,7 @@ testthat::test_that("AnalyzeLook_PC: structural invariants hold across looks", {
   testthat::expect_true(length(state$mcpObj$IndexSet) > 0)
 
   # Look 2 (final look): trial_completed flips to TRUE, completed_looks = 2
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.10, H2 = 0.20),
     plotGraphs = FALSE
@@ -399,7 +413,7 @@ testthat::test_that("AnalyzeLook_PC: structural invariants hold across looks", {
 
   # Calling again after trial is complete must error
   testthat::expect_error(
-    AnalyzeLook_PC(state, p_raw = c(H1 = 0.10, H2 = 0.20), plotGraphs = FALSE)
+    AnalyzeLook_PC_TestWrapper(state, p_raw = c(H1 = 0.10, H2 = 0.20), plotGraphs = FALSE)
   )
 })
 
@@ -436,7 +450,7 @@ testthat::test_that("Test 6a: Bonferroni, fixed-sample, 3-hypo simple allocation
 
   # Look 1 (final)
   # Raw p-values from file: p1=0.02, p2=0.055, p3=0.012
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.02, H2 = 0.055, H3 = 0.012),
     plotGraphs = FALSE
@@ -491,7 +505,7 @@ testthat::test_that("Test 6b: Bonferroni, fixed-sample, 4-hypo hierarchical gate
 
   # Look 1 (final)
   # Raw p-values from file: p1=0.04, p2=0.01, p3=0.03, p4=0.04
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.04, H2 = 0.01, H3 = 0.03, H4 = 0.04),
     plotGraphs = FALSE
@@ -543,7 +557,7 @@ testthat::test_that("Test 6c: Bonferroni, fixed-sample, 4-hypo serial gatekeepin
 
   # Look 1 (final)
   # Raw p-values from file: p1=0.076, p2=0.035, p3=0.563, p4=0.407
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.076, H2 = 0.035, H3 = 0.563, H4 = 0.407),
     plotGraphs = FALSE
@@ -605,7 +619,7 @@ testthat::test_that("Test 7: Dunnett, group-sequential, 2-look, no selection/upd
 
   # Look 1
   # Raw p-values from file: p1=0.00045, p2=0.0952, p3=0.0225, p4=0.1104
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.00045, H2 = 0.0952, H3 = 0.0225, H4 = 0.1104),
     Correlation = corr,
@@ -622,7 +636,7 @@ testthat::test_that("Test 7: Dunnett, group-sequential, 2-look, no selection/upd
 
   # Look 2 (final)
   # Raw p-values from file: p2=0.1121, p3=0.0112, p4=0.1153
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H2 = 0.1121, H3 = 0.0112, H4 = 0.1153),
     plotGraphs = FALSE
@@ -677,7 +691,7 @@ testthat::test_that("Test 8: Dunnett, group-sequential, 2-look, weight modificat
   )
 
   # Look 1 (same as Test 7)
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.00045, H2 = 0.0952, H3 = 0.0225, H4 = 0.1104),
     Correlation = corr,
@@ -703,7 +717,7 @@ testthat::test_that("Test 8: Dunnett, group-sequential, 2-look, weight modificat
     nrow = 3
   )
 
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H2 = 0.0299, H3 = 0.0225, H4 = 0.0586),
     new_weights = new_weights,
@@ -755,7 +769,7 @@ testthat::test_that("Test 9: Simes test, fixed-sample, 4-hypo", {
 
   # Look 1 (final)
   # Raw p-values from file: p1=0.01, p2=0.005, p3=0.015, p4=0.022
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.01, H2 = 0.005, H3 = 0.015, H4 = 0.022),
     plotGraphs = FALSE
@@ -817,7 +831,7 @@ testthat::test_that("Test 10: Dunnett, fixed-sample, 4-hypo, full correlation", 
 
   # Look 1 (final)
   # Raw p-values from file: p1=0.01, p2=0.02, p3=0.005, p4=0.5
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.01, H2 = 0.02, H3 = 0.005, H4 = 0.5),
     Correlation = corr,
@@ -881,7 +895,7 @@ testthat::test_that("Test 11: Dunnett, fixed-sample, 4-hypo, equal weights", {
 
   # Look 1 (final)
   # Raw p-values from file: p1=0.638, p2=0.01, p3=0.007, p4=3.959E-4
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.638, H2 = 0.01, H3 = 0.007, H4 = 3.959e-4),
     Correlation = corr,
@@ -935,7 +949,7 @@ testthat::test_that("PC equivalence M07: asP design", {
     plotGraphs = FALSE
   )
 
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
     Correlation = corr,
@@ -945,7 +959,7 @@ testthat::test_that("PC equivalence M07: asP design", {
   exp_mcp <- readRDS(testthat::test_path("M07.l1.mcpObj.rds"))
   testthat::expect_true( CompareImportantMcpMembers( state$mcpObj, exp_mcp ) )
 
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.08, H2 = 0.09, H3 = 0.12, H4 = 0.15),
     plotGraphs = FALSE
@@ -996,7 +1010,7 @@ testthat::test_that("PC equivalence M11: asHSD design", {
     plotGraphs = FALSE
   )
 
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.25, H2 = 0.30, H3 = 0.35, H4 = 0.40),
     Correlation = corr,
@@ -1006,7 +1020,7 @@ testthat::test_that("PC equivalence M11: asHSD design", {
   exp_mcp <- readRDS(testthat::test_path("M11.l1.mcpObj.rds"))
   testthat::expect_true( CompareImportantMcpMembers( state$mcpObj, exp_mcp ) )
 
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.07, H2 = 0.09, H3 = 0.10, H4 = 0.12),
     plotGraphs = FALSE
@@ -1057,7 +1071,7 @@ testthat::test_that("PC equivalence M12: asKD design", {
     plotGraphs = FALSE
   )
 
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.28, H2 = 0.31, H3 = 0.33, H4 = 0.37),
     Correlation = corr,
@@ -1067,7 +1081,7 @@ testthat::test_that("PC equivalence M12: asKD design", {
   exp_mcp <- readRDS(testthat::test_path("M12.l1.mcpObj.rds"))
   testthat::expect_true( CompareImportantMcpMembers( state$mcpObj, exp_mcp ) )
 
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.06, H2 = 0.09, H3 = 0.11, H4 = 0.13),
     plotGraphs = FALSE
@@ -1128,7 +1142,7 @@ testthat::test_that("PC equivalence M19: correlation-only adaptation", {
     plotGraphs = FALSE
   )
 
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.26, H2 = 0.29, H3 = 0.34, H4 = 0.38),
     Correlation = corr,
@@ -1138,7 +1152,7 @@ testthat::test_that("PC equivalence M19: correlation-only adaptation", {
   exp_mcp <- readRDS(testthat::test_path("M19.l1.mcpObj.rds"))
   testthat::expect_true( CompareImportantMcpMembers( state$mcpObj, exp_mcp ) )
 
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.07, H2 = 0.08, H3 = 0.11, H4 = 0.14),
     Correlation = new_corr,
@@ -1189,7 +1203,7 @@ testthat::test_that("PC equivalence M22: early-stop efficacy path", {
     plotGraphs = FALSE
   )
 
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 1e-4, H2 = 0.40, H3 = 0.45, H4 = 0.50),
     Correlation = corr,
@@ -1242,7 +1256,7 @@ testthat::test_that("PC equivalence M24: MultipleWinners FALSE", {
     plotGraphs = FALSE
   )
 
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.38, H4 = 0.42),
     Correlation = corr,
@@ -1252,7 +1266,7 @@ testthat::test_that("PC equivalence M24: MultipleWinners FALSE", {
   exp_mcp <- readRDS(testthat::test_path("M24.l1.mcpObj.rds"))
   testthat::expect_true( CompareImportantMcpMembers( state$mcpObj, exp_mcp ) )
 
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.02, H2 = 0.06, H3 = 0.10, H4 = 0.20),
     plotGraphs = FALSE
@@ -1303,7 +1317,7 @@ testthat::test_that("PC equivalence M09: WT design", {
     plotGraphs = FALSE
   )
 
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.28, H2 = 0.32, H3 = 0.36, H4 = 0.40),
     Correlation = corr,
@@ -1313,7 +1327,7 @@ testthat::test_that("PC equivalence M09: WT design", {
   exp_mcp <- readRDS(testthat::test_path("M09.l1.mcpObj.rds"))
   testthat::expect_true( CompareImportantMcpMembers( state$mcpObj, exp_mcp ) )
 
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.07, H2 = 0.10, H3 = 0.13, H4 = 0.16),
     plotGraphs = FALSE
@@ -1364,7 +1378,7 @@ testthat::test_that("PC equivalence M13: asUser design", {
     plotGraphs = FALSE
   )
 
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.29, H2 = 0.33, H3 = 0.37, H4 = 0.41),
     Correlation = corr,
@@ -1374,7 +1388,7 @@ testthat::test_that("PC equivalence M13: asUser design", {
   exp_mcp <- readRDS(testthat::test_path("M13.l1.mcpObj.rds"))
   testthat::expect_true( CompareImportantMcpMembers( state$mcpObj, exp_mcp ) )
 
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.07, H2 = 0.09, H3 = 0.12, H4 = 0.15),
     plotGraphs = FALSE
@@ -1424,7 +1438,7 @@ testthat::test_that("PC equivalence M17: selection-only adaptation", {
     plotGraphs = FALSE
   )
 
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.21, H2 = 0.24, H3 = 0.30, H4 = 0.35),
     Correlation = corr,
@@ -1434,7 +1448,7 @@ testthat::test_that("PC equivalence M17: selection-only adaptation", {
   exp_mcp <- readRDS(testthat::test_path("M17.l1.mcpObj.rds"))
   testthat::expect_true( CompareImportantMcpMembers( state$mcpObj, exp_mcp ) )
 
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.05, H2 = 0.07, H4 = 0.11),
     selection = c("H1", "H2", "H4"),
@@ -1485,7 +1499,7 @@ testthat::test_that("PC equivalence M08: noEarlyEfficacy design", {
     plotGraphs = FALSE
   )
 
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.31, H2 = 0.34, H3 = 0.38, H4 = 0.43),
     Correlation = corr,
@@ -1495,7 +1509,7 @@ testthat::test_that("PC equivalence M08: noEarlyEfficacy design", {
   exp_mcp <- readRDS(testthat::test_path("M08.l1.mcpObj.rds"))
   testthat::expect_true( CompareImportantMcpMembers( state$mcpObj, exp_mcp ) )
 
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.08, H2 = 0.10, H3 = 0.12, H4 = 0.16),
     plotGraphs = FALSE
@@ -1534,7 +1548,7 @@ testthat::test_that("PC equivalence M02: Sidak baseline", {
     plotGraphs = FALSE
   )
 
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.01, H2 = 0.02, H3 = 0.03, H4 = 0.04),
     plotGraphs = FALSE
@@ -1774,17 +1788,17 @@ testthat::test_that("SetupAnalysis_PC: asUser typeOfDesign requires userAlphaSpe
 })
 
 ############################################################################
-# Issue #70 Phase 2: AnalyzeLook_PC() input-validation tests
+# Issue #70 Phase 2: AnalyzeLook_PC_TestWrapper() input-validation tests
 ############################################################################
 
 testthat::test_that("AnalyzeLook_PC: non-PCAnalysisState input is rejected", {
   testthat::expect_error(
-    AnalyzeLook_PC(list(), p_raw = c(H1 = 0.1), plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper(list(), p_raw = c(H1 = 0.1), plotGraphs = FALSE),
     regexp = "PCAnalysisState"
   )
 
   testthat::expect_error(
-    AnalyzeLook_PC("not_a_state", p_raw = c(H1 = 0.1), plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper("not_a_state", p_raw = c(H1 = 0.1), plotGraphs = FALSE),
     regexp = "PCAnalysisState"
   )
 })
@@ -1801,43 +1815,43 @@ testthat::test_that("AnalyzeLook_PC: p_raw contract validation", {
 
   # Non-numeric p_raw
   testthat::expect_error(
-    AnalyzeLook_PC(state0, p_raw = c(H1 = "a", H2 = "b"), plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper(state0, p_raw = c(H1 = "a", H2 = "b"), plotGraphs = FALSE),
     regexp = "p_raw must be numeric"
   )
 
   # p_raw contains NA
   testthat::expect_error(
-    AnalyzeLook_PC(state0, p_raw = c(H1 = 0.1, H2 = NA), plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper(state0, p_raw = c(H1 = 0.1, H2 = NA), plotGraphs = FALSE),
     regexp = "p_raw cannot contain NA"
   )
 
   # p_raw value below 0
   testthat::expect_error(
-    AnalyzeLook_PC(state0, p_raw = c(H1 = -0.1, H2 = 0.2), plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper(state0, p_raw = c(H1 = -0.1, H2 = 0.2), plotGraphs = FALSE),
     regexp = "p_raw values must be in"
   )
 
   # p_raw value above 1
   testthat::expect_error(
-    AnalyzeLook_PC(state0, p_raw = c(H1 = 1.1, H2 = 0.2), plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper(state0, p_raw = c(H1 = 1.1, H2 = 0.2), plotGraphs = FALSE),
     regexp = "p_raw values must be in"
   )
 
   # Unnamed p_raw with wrong length
   testthat::expect_error(
-    AnalyzeLook_PC(state0, p_raw = c(0.1, 0.2, 0.3), plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper(state0, p_raw = c(0.1, 0.2, 0.3), plotGraphs = FALSE),
     regexp = "Unnamed p_raw must have length"
   )
 
   # Named p_raw with names not matching current IndexSet
   testthat::expect_error(
-    AnalyzeLook_PC(state0, p_raw = c(X1 = 0.1, X2 = 0.2), plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper(state0, p_raw = c(X1 = 0.1, X2 = 0.2), plotGraphs = FALSE),
     regexp = "p_raw names must match"
   )
 
   # Unnamed p_raw with correct length succeeds
   testthat::expect_no_error(
-    AnalyzeLook_PC(state0, p_raw = c(0.1, 0.2), plotGraphs = FALSE)
+    AnalyzeLook_PC_TestWrapper(state0, p_raw = c(0.1, 0.2), plotGraphs = FALSE)
   )
 })
 
@@ -1859,7 +1873,7 @@ testthat::test_that("AnalyzeLook_PC: look 1 adaptation prohibition and correlati
   )
 
   testthat::expect_error(
-    AnalyzeLook_PC(
+    AnalyzeLook_PC_TestWrapper(
       state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
       plotGraphs = FALSE
     ),
@@ -1868,7 +1882,7 @@ testthat::test_that("AnalyzeLook_PC: look 1 adaptation prohibition and correlati
 
   # selection at look 1 must error
   testthat::expect_error(
-    AnalyzeLook_PC(
+    AnalyzeLook_PC_TestWrapper(
       state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
       Correlation = corr,
       selection = c("H1", "H2"), plotGraphs = FALSE
@@ -1878,7 +1892,7 @@ testthat::test_that("AnalyzeLook_PC: look 1 adaptation prohibition and correlati
 
   # new_weights/new_G at look 1 must error
   testthat::expect_error(
-    AnalyzeLook_PC(
+    AnalyzeLook_PC_TestWrapper(
       state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
       Correlation = corr,
       new_weights = c(H1 = 0.5, H2 = 0.5, H3 = 0, H4 = 0),
@@ -1889,7 +1903,7 @@ testthat::test_that("AnalyzeLook_PC: look 1 adaptation prohibition and correlati
 
   # Correlation at look 1 is valid
   testthat::expect_no_error(
-    AnalyzeLook_PC(
+    AnalyzeLook_PC_TestWrapper(
       state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
       Correlation = corr, plotGraphs = FALSE
     )
@@ -1918,7 +1932,7 @@ testthat::test_that("AnalyzeLook_PC: feature-flag gates at look > 1", {
     Selection = FALSE, UpdateStrategy = FALSE,
     plotGraphs = FALSE
   )
-  stateNoAdapt <- AnalyzeLook_PC(
+  stateNoAdapt <- AnalyzeLook_PC_TestWrapper(
     stateNoAdapt,
     p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
     Correlation = corr,
@@ -1927,7 +1941,7 @@ testthat::test_that("AnalyzeLook_PC: feature-flag gates at look > 1", {
 
   # Selection = FALSE: providing selection must error
   testthat::expect_error(
-    AnalyzeLook_PC(
+    AnalyzeLook_PC_TestWrapper(
       stateNoAdapt,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
       selection = c("H1", "H2"), plotGraphs = FALSE
@@ -1937,7 +1951,7 @@ testthat::test_that("AnalyzeLook_PC: feature-flag gates at look > 1", {
 
   # UpdateStrategy = FALSE: providing new_weights/new_G must error
   testthat::expect_error(
-    AnalyzeLook_PC(
+    AnalyzeLook_PC_TestWrapper(
       stateNoAdapt,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
       new_weights = c(H1 = 0.5, H2 = 0.5, H3 = 0, H4 = 0),
@@ -1964,7 +1978,7 @@ testthat::test_that("AnalyzeLook_PC: selection validity at look > 1", {
     Selection = TRUE, UpdateStrategy = FALSE,
     plotGraphs = FALSE
   )
-  state1 <- AnalyzeLook_PC(
+  state1 <- AnalyzeLook_PC_TestWrapper(
     state1,
     p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
     Correlation = corr,
@@ -1973,7 +1987,7 @@ testthat::test_that("AnalyzeLook_PC: selection validity at look > 1", {
 
   # Non-character selection
   testthat::expect_error(
-    AnalyzeLook_PC(
+    AnalyzeLook_PC_TestWrapper(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
       selection = c(1L, 2L), plotGraphs = FALSE
@@ -1983,7 +1997,7 @@ testthat::test_that("AnalyzeLook_PC: selection validity at look > 1", {
 
   # selection not a subset of active IndexSet
   testthat::expect_error(
-    AnalyzeLook_PC(
+    AnalyzeLook_PC_TestWrapper(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
       selection = c("H1", "H5"), plotGraphs = FALSE
@@ -1993,7 +2007,7 @@ testthat::test_that("AnalyzeLook_PC: selection validity at look > 1", {
 
   # Empty selection vector
   testthat::expect_error(
-    AnalyzeLook_PC(
+    AnalyzeLook_PC_TestWrapper(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
       selection = character(0), plotGraphs = FALSE
@@ -2003,7 +2017,7 @@ testthat::test_that("AnalyzeLook_PC: selection validity at look > 1", {
 
   # Valid selection proceeds without error
   testthat::expect_no_error(
-    AnalyzeLook_PC(
+    AnalyzeLook_PC_TestWrapper(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15),
       selection = c("H1", "H2"), plotGraphs = FALSE
@@ -2028,7 +2042,7 @@ testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
     Selection = FALSE, UpdateStrategy = TRUE,
     plotGraphs = FALSE
   )
-  state1 <- AnalyzeLook_PC(
+  state1 <- AnalyzeLook_PC_TestWrapper(
     state1,
     p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
     Correlation = corr,
@@ -2043,7 +2057,7 @@ testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
 
   # Only new_weights without new_G must error
   testthat::expect_error(
-    AnalyzeLook_PC(
+    AnalyzeLook_PC_TestWrapper(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
       new_weights = vValidNewW, plotGraphs = FALSE
@@ -2053,7 +2067,7 @@ testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
 
   # Only new_G without new_weights must error
   testthat::expect_error(
-    AnalyzeLook_PC(
+    AnalyzeLook_PC_TestWrapper(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
       new_G = gValidNew, plotGraphs = FALSE
@@ -2063,7 +2077,7 @@ testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
 
   # Non-numeric new_weights must error
   testthat::expect_error(
-    AnalyzeLook_PC(
+    AnalyzeLook_PC_TestWrapper(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
       new_weights = c(H1 = "a", H2 = "b", H3 = "c", H4 = "d"),
@@ -2074,7 +2088,7 @@ testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
 
   # Unnamed new_weights with wrong length must error
   testthat::expect_error(
-    AnalyzeLook_PC(
+    AnalyzeLook_PC_TestWrapper(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
       new_weights = c(0.5, 0.5),
@@ -2085,7 +2099,7 @@ testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
 
   # new_weights with names not matching IndexSet must error
   testthat::expect_error(
-    AnalyzeLook_PC(
+    AnalyzeLook_PC_TestWrapper(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
       new_weights = c(X1 = 0.5, X2 = 0.5, X3 = 0, X4 = 0),
@@ -2096,7 +2110,7 @@ testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
 
   # new_weights summing to > 1 must error
   testthat::expect_error(
-    AnalyzeLook_PC(
+    AnalyzeLook_PC_TestWrapper(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
       new_weights = c(H1 = 0.7, H2 = 0.7, H3 = 0, H4 = 0),
@@ -2107,7 +2121,7 @@ testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
 
   # new_G not a matrix must error
   testthat::expect_error(
-    AnalyzeLook_PC(
+    AnalyzeLook_PC_TestWrapper(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
       new_weights = vValidNewW,
@@ -2119,7 +2133,7 @@ testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
 
   # new_G with wrong dimensions must error
   testthat::expect_error(
-    AnalyzeLook_PC(
+    AnalyzeLook_PC_TestWrapper(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
       new_weights = vValidNewW,
@@ -2133,7 +2147,7 @@ testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
   gNeg <- gValidNew
   gNeg[1, 2] <- -0.1
   testthat::expect_error(
-    AnalyzeLook_PC(
+    AnalyzeLook_PC_TestWrapper(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
       new_weights = vValidNewW,
@@ -2148,7 +2162,7 @@ testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
     byrow = TRUE, nrow = 4
   )
   testthat::expect_error(
-    AnalyzeLook_PC(
+    AnalyzeLook_PC_TestWrapper(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
       new_weights = vValidNewW,
@@ -2175,7 +2189,7 @@ testthat::test_that("AnalyzeLook_PC: correlation update validity at look > 1", {
     Selection = FALSE, UpdateStrategy = FALSE,
     plotGraphs = FALSE
   )
-  state1 <- AnalyzeLook_PC(
+  state1 <- AnalyzeLook_PC_TestWrapper(
     state1,
     p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
     Correlation = corr,
@@ -2184,7 +2198,7 @@ testthat::test_that("AnalyzeLook_PC: correlation update validity at look > 1", {
 
   # Correlation not a matrix must error
   testthat::expect_error(
-    AnalyzeLook_PC(
+    AnalyzeLook_PC_TestWrapper(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
       Correlation = c(1, 0.5, 0.5, 1), plotGraphs = FALSE
@@ -2194,7 +2208,7 @@ testthat::test_that("AnalyzeLook_PC: correlation update validity at look > 1", {
 
   # Wrong dimensions (2 x 2 instead of 4 x 4) must error
   testthat::expect_error(
-    AnalyzeLook_PC(
+    AnalyzeLook_PC_TestWrapper(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
       Correlation = matrix(c(1, 0.5, 0.5, 1), nrow = 2),
@@ -2207,7 +2221,7 @@ testthat::test_that("AnalyzeLook_PC: correlation update validity at look > 1", {
   corrAsym <- corr
   corrAsym[1, 2] <- 0.3  # differs from corrAsym[2, 1] = 0.5
   testthat::expect_error(
-    AnalyzeLook_PC(
+    AnalyzeLook_PC_TestWrapper(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
       Correlation = corrAsym, plotGraphs = FALSE
@@ -2219,7 +2233,7 @@ testthat::test_that("AnalyzeLook_PC: correlation update validity at look > 1", {
   corrBadDiag <- corr
   corrBadDiag[1, 1] <- 0.9
   testthat::expect_error(
-    AnalyzeLook_PC(
+    AnalyzeLook_PC_TestWrapper(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
       Correlation = corrBadDiag, plotGraphs = FALSE
@@ -2231,7 +2245,7 @@ testthat::test_that("AnalyzeLook_PC: correlation update validity at look > 1", {
   corrOutOfRange <- corr
   corrOutOfRange[1, 2] <- corrOutOfRange[2, 1] <- 1.5
   testthat::expect_error(
-    AnalyzeLook_PC(
+    AnalyzeLook_PC_TestWrapper(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
       Correlation = corrOutOfRange, plotGraphs = FALSE
@@ -2245,7 +2259,7 @@ testthat::test_that("AnalyzeLook_PC: correlation update validity at look > 1", {
     nrow = 4
   )
   testthat::expect_warning(
-    state2 <- AnalyzeLook_PC(
+    state2 <- AnalyzeLook_PC_TestWrapper(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
       Correlation = corrValid, plotGraphs = FALSE
@@ -2281,7 +2295,7 @@ testthat::test_that("AnalyzeLook_PC: look-level sized correlation update maps to
     plotGraphs = FALSE
   )
 
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
     Correlation = corr_l1,
@@ -2303,7 +2317,7 @@ testthat::test_that("AnalyzeLook_PC: look-level sized correlation update maps to
     byrow = TRUE, nrow = 3
   )
 
-  state <- AnalyzeLook_PC(
+  state <- AnalyzeLook_PC_TestWrapper(
     state,
     p_raw = c(H1 = 0.10, H2 = 0.15, H4 = 0.20),
     selection = c("H1", "H2", "H4"),
@@ -2341,7 +2355,7 @@ testthat::test_that("AnalyzeLook_PC: Dunnett stays Dunnett when updated correlat
     Selection = FALSE, UpdateStrategy = FALSE,
     plotGraphs = FALSE
   )
-  state1 <- AnalyzeLook_PC(
+  state1 <- AnalyzeLook_PC_TestWrapper(
     state1,
     p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
     Correlation = corr,
@@ -2353,7 +2367,7 @@ testthat::test_that("AnalyzeLook_PC: Dunnett stays Dunnett when updated correlat
     nrow = 4
   )
   state2 <- testthat::expect_no_warning(
-    AnalyzeLook_PC(
+    AnalyzeLook_PC_TestWrapper(
       state1,
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
       Correlation = corrValid, plotGraphs = FALSE
@@ -2362,4 +2376,5 @@ testthat::test_that("AnalyzeLook_PC: Dunnett stays Dunnett when updated correlat
   testthat::expect_identical(state2$mcpObj$test.type, "Dunnett")
   testthat::expect_identical(state2$design_params$test.type, "Dunnett")
 })
+
 

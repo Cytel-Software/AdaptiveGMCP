@@ -59,25 +59,30 @@ This is acceptable in practice because typical look counts are small (often 2-3)
 - Stored in state design params
 
 3. Finality determination is IF-driven, not look-count-driven
-- is_final_look is true when current_if >= (1.0 - tolerance)
+- is_final_look is true when info_frac_cur >= (1.0 - tolerance)
 - This decouples completion semantics from planned look count and supports flexible execution patterns.
 
 4. Interim IF rule is strict
-- Interim if and only if current_if < (1.0 - tolerance)
-- Interim IF must satisfy 0 < current_if < (1.0 - tolerance)
-- If current_if is equal to or above (1.0 - tolerance), treat as final look
+- Interim if and only if info_frac_cur < (1.0 - tolerance)
+- Interim IF must satisfy 0 < info_frac_cur < (1.0 - tolerance)
+- If info_frac_cur is equal to or above (1.0 - tolerance), treat as final look
 
 5. Final IF upper bound
-- Final look must satisfy current_if <= (1.0 + tolerance)
+- Final look must satisfy info_frac_cur <= (1.0 + tolerance)
 - This permits practical over-recruitment near final look
 
 6. Monotonic IF requirement for all looks
-- current_if must be strictly increasing across analyzed looks
-- For look > 1, current_if must be strictly greater than previous IF
+- info_frac_cur must be strictly increasing across analyzed looks
+- For look > 1, info_frac_cur must be strictly greater than previous IF
+
+7. Final-look IF above 1.0 is handled by standard rpact spending
+- If current look is final and info_frac_cur > 1.0, keep using actual info_frac_cur for history and inverse-normal weights.
+- For rpact compatibility, cap only the rpact information rate input at 1.0 for that final look.
+- Use the resulting rpact boundaries directly (no separate remaining-alpha override call).
 
 ## IF mapping and matching logic
 Match actual IF to planned IF using absolute tolerance:
-- If |actual_if - planned_if[i]| <= tolerance, candidate match exists
+- If |actual_info_frac - planned_info_frac[i]| <= tolerance, candidate match exists
 - If multiple candidates exist, choose closest planned IF (minimum absolute distance)
 - If no match exists, treat as unplanned timing event and continue with adaptive recomputation
 
@@ -95,10 +100,56 @@ At each AnalyzeLook_PC call:
 2. Reconstruct full IF trajectory for rpact call
 - first segment: actual IF values for completed/current looks
 - remaining segment: planned IF values for not-yet-observed looks
-- keep total length equal to planned kMax design length
+- do not force total length to the original planned kMax; use a dynamic reconstructed length
+- set rpact kMax to length(reconstructed_if)
+
+Pseudo-code for dynamic reconstruction:
+
+```r
+observed_info_frac <- c(previous_info_frac, info_frac_cur)
+is_final_look <- info_frac_cur >= (1.0 - tolerance)
+
+if (is_final_look) {
+  # Final look: design ends at current observed trajectory.
+  reconstructed_info_frac <- observed_info_frac
+} else {
+  # Not final: first match info_frac_cur to planned_info_frac using tolerance.
+  matched_idx <- which(abs(planned_info_frac - info_frac_cur) <= tolerance)
+
+  if (length(matched_idx) > 0L) {
+    # Tie-break by closest planned IF.
+    mapped_idx <- matched_idx[which.min(abs(planned_info_frac[matched_idx] - info_frac_cur))]
+    if (mapped_idx < length(planned_info_frac)) {
+      planned_future_info_frac <- planned_info_frac[seq.int(mapped_idx + 1L, length(planned_info_frac))]
+    } else {
+      planned_future_info_frac <- numeric(0)
+    }
+  } else {
+    # No tolerant match: keep genuinely future planned looks.
+    planned_future_info_frac <- planned_info_frac[planned_info_frac > info_frac_cur]
+  }
+
+  if (length(planned_future_info_frac) > 0L) {
+    reconstructed_info_frac <- c(observed_info_frac, planned_future_info_frac)
+  } else {
+    stop(
+      "No future planned IF remains in a non-final look. ",
+      "Check IF finality logic or planned IF vector."
+    )
+  }
+}
+
+k_reconstructed <- length(reconstructed_info_frac)
+rpact_info_frac <- reconstructed_info_frac
+if (is_final_look && info_frac_cur > 1.0) {
+  rpact_info_frac[length(rpact_info_frac)] <- 1.0
+}
+```
 
 3. Recompute design
-- call rpact getDesignGroupSequential with reconstructed IF and same design options as setup
+- call rpact getDesignGroupSequential with reconstructed IF, kMax = length(reconstructed_info_frac),
+  and the same design options as setup
+- if current look is final and info_frac_cur > 1.0, cap only the rpact IF input for that final look at 1.0
 
 4. Refresh look-dependent analysis components
 - stage-wise p-value boundary for current look
@@ -112,18 +163,18 @@ At each AnalyzeLook_PC call:
 Use the following conceptual flow:
 
 - Set tolerance from state design params.
-- Compute is_final_look as current_if >= (1.0 - tolerance).
+- Compute is_final_look as info_frac_cur >= (1.0 - tolerance).
 
 If not final:
-- Require 0 < current_if < (1.0 - tolerance)
+- Require 0 < info_frac_cur < (1.0 - tolerance)
 - Error otherwise
 
 If final:
-- Require current_if <= (1.0 + tolerance)
+- Require info_frac_cur <= (1.0 + tolerance)
 - Error otherwise
 
 Always:
-- If look > 1, require current_if > previous_if
+- If look > 1, require info_frac_cur > previous_info_frac
 - Error otherwise
 
 Note:
@@ -133,19 +184,20 @@ Note:
 
 SetupAnalysis_PC in `PcAnalysisApi.R`:
 - Add parameter info_frac_tolerance with default 0.05
-- Add argument validation for tolerance (numeric scalar, non-missing, positive, practical bound)
+- Add argument validation for tolerance (numeric scalar, non-missing, strictly > 0 and < 1)
 - Add roxygen entry documenting semantics
 - Persist tolerance in design_params
 
 AnalyzeLook_PC in `PcAnalysisApi.R`:
-- Add mandatory parameter info_frac_current
+- Add mandatory parameter info_frac_cur
 - Add roxygen entry documenting required per-look IF input
-- Validate info_frac_current type and length
+- Validate info_frac_cur type and length
 - Apply strict interim/final validation logic
 - Apply monotonicity validation against prior IF
 - Maintain actual IF history in state look_history
 - Reconstruct IF vector for current call
 - Recompute rpact design per look using reconstructed IF
+- If final look has info_frac_cur > 1.0, cap only rpact IF input at that final look to 1.0
 - Update current boundary and inverse-normal weights in mcpObj
 - Ensure state updates persist recomputed quantities and IF history
 
@@ -159,10 +211,11 @@ State/history expectations:
 ## Edge cases to cover in tests
 
 IF classification:
-- current_if exactly equal to (1.0 - tolerance) must be final
-- current_if just below (1.0 - tolerance) must be interim
-- current_if above (1.0 + tolerance) must fail final upper-bound validation
-- current_if <= 0 must fail interim validation
+- info_frac_cur exactly equal to (1.0 - tolerance) must be final
+- info_frac_cur just below (1.0 - tolerance) must be interim
+- info_frac_cur above (1.0 + tolerance) must fail final upper-bound validation
+- info_frac_cur <= 0 must fail interim validation
+- when final info_frac_cur > 1.0, boundary must match rpact output evaluated at capped final IF input (1.0)
 
 Monotonicity:
 - equal IF across consecutive looks must fail

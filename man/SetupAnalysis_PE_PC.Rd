@@ -15,6 +15,7 @@ SetupAnalysis_PE_PC(
   deltaPT1 = 0,
   gammaA = 2,
   userAlphaSpending = NULL,
+  info_frac_tolerance = 0.05,
   MultipleWinners = TRUE,
   Selection = TRUE,
   UpdateStrategy = TRUE,
@@ -42,6 +43,9 @@ Supported values: "Bonf", "Sidak", "Simes", "Dunnett", "Partly-Parametric".}
 \item{gammaA}{Parameter for typeOfDesign = "asHSD" or "asKD".}
 
 \item{userAlphaSpending}{Alpha spending values for typeOfDesign = "asUser".}
+
+\item{info_frac_tolerance}{Numeric scalar in (0, 1); absolute tolerance for
+matching current information fraction to planned fractions in the PC engine.}
 
 \item{MultipleWinners}{Logical; TRUE means reject as many hypotheses as
 possible, FALSE means reject at most one hypothesis.}
