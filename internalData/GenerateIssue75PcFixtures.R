@@ -119,6 +119,59 @@ SaveScenarioFixtures <- function( lScenario, strOutDir )
 #------------------------------------------------------ -
 # Main
 #------------------------------------------------------ -
+GenerateFixturesForMyTests <- function()
+{
+  strOutDir <- file.path( "tests", "testthat" )
+  if( !dir.exists( strOutDir ) ) dir.create( strOutDir, recursive = TRUE )
+
+  G <- matrix(c(0,0.5,0.5,0,
+                0.5,0,0,0.5,
+                0,1,0,0,
+                1,0,0,0),
+              nrow = 4, byrow = TRUE)
+
+  corr <- matrix(c(1,0.5,NA,NA,
+                          0.5,1,NA,NA,
+                          NA,NA,1,0.5,
+                          NA,NA,0.5,1),
+                          byrow=TRUE, nrow= 4)
+
+  # Setting default values for these parameters as expected by adaptGMCP_PC()
+  # If a test scenario requires a different value, then set the parameter to that value
+  # in the scenario instead of using this default value.
+  defDeltaWT <- 0
+  defDeltaPT1 <- 0
+  defGammaA <- 2
+  defUserAlphaSpending <- rpact::getDesignGroupSequential(
+    sided = 1, alpha = 0.025, informationRates = c(1 / 2, 1),
+    typeOfDesign = "asOF")$alphaSpent
+
+  lScenario <- list(
+      rowId = "PC-test-01",
+      WI = c(1/2,1/2,0,0),
+      G = G,
+      testType = "Partly-Parametric",
+      alpha = 0.025,
+      infoFrac = c(0.5,0.7,1),
+      typeOfDesign = "asOF",
+      deltaWT = defDeltaWT,
+      deltaPT1 = defDeltaPT1,
+      gammaA = defGammaA,
+      userAlphaSpending = defUserAlphaSpending,
+      correlation = corr,
+      multipleWinners = TRUE,
+      lookInputs = list(
+        list( p_raw = c(H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30) ),
+        list( p_raw = c(H1 = 0.02, H2 = 0.10, H4 = 0.40), selection = c("H1", "H2", "H4") ), # H3 dropped at look 2
+        list( p_raw = c(H2 = 0.005, H4 = 0.10) ) # H1 rejected at look 2
+      )
+  )
+
+  SaveScenarioFixtures( lScenario, strOutDir )
+
+  return( invisible( TRUE ) )
+}
+
 GenerateIssue75Fixtures <- function()
 {
   strOutDir <- file.path( "tests", "testthat" )
@@ -383,4 +436,14 @@ GenerateIssue75Fixtures <- function()
   return( invisible( TRUE ) )
 }
 
-GenerateIssue75Fixtures()
+# GenerateIssue75Fixtures()
+GenerateFixturesForMyTests()
+
+l1 <- readRDS("tests/testthat/PC-test-01.l1.mcpObj.rds")
+print(l1)
+
+l2 <- readRDS("tests/testthat/PC-test-01.l2.mcpObj.rds")
+print(l2)
+
+l3 <- readRDS("tests/testthat/PC-test-01.l3.mcpObj.rds")
+print(l3)

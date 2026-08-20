@@ -8,8 +8,9 @@ on:
         type: boolean
         default: true
   workflow_dispatch:
-  schedule:
-    - cron: "0 5 * * *"
+  # Disabled the daily 5 am run for now to avoid unnecessary minutes consumption on GitHub Actions
+  # schedule:
+  #   - cron: "0 5 * * *"
 
 permissions:
   contents: read
