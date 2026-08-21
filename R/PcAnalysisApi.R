@@ -105,7 +105,7 @@
 #' @param test.type Character specifying test type.
 #' Supported values: "Bonf", "Sidak", "Simes", "Dunnett", "Partly-Parametric".
 #' @param alpha One-sided type-1 error.
-#' @param info_frac Vector of cumulative information fractions.
+#' @param planned_info_frac Vector of cumulative information fractions planned at design time.
 #' @param typeOfDesign Group sequential design type (rpact).
 #' Supported values: "OF" (O'Brien & Fleming), "P" (Pocock), "WT" (Wang & Tsiatis Delta class), 
 #'      "PT" (Pampallona & Tsiatis), "HP" (Haybittle & Peto), 
@@ -140,7 +140,7 @@ SetupAnalysis_PC <- function(
                                      # since they can be derived from the correlation matrix provided by the user.
                                      # Only Bonf, Sidak, and Simes are strictly necessary to be specified.
     alpha = 0.025,
-    info_frac = c(0.5, 1.0),
+    planned_info_frac = c(0.5, 1.0),
     typeOfDesign = "asOF",
     deltaWT = 0,
     deltaPT1 = 0,
@@ -156,10 +156,10 @@ SetupAnalysis_PC <- function(
   d <- length(WI)
   if (!is.matrix(G) || !all(dim(G) == c(d, d))) stop("G (transition matrix) must be a ", d, " x ", d, " matrix")
 
-  k <- length(info_frac)
-  if (k < 1) stop("info_frac must have length >= 1")
-  if (any(info_frac <= 0) || any(info_frac > 1)) stop("info_frac must be in (0, 1]")
-  if (any(diff(info_frac) <= 0)) stop("info_frac must be strictly increasing")
+  k <- length(planned_info_frac)
+  if (k < 1) stop("planned_info_frac must have length >= 1")
+  if (any(planned_info_frac <= 0) || any(planned_info_frac > 1)) stop("planned_info_frac must be in (0, 1]")
+  if (any(diff(planned_info_frac) <= 0)) stop("planned_info_frac must be strictly increasing")
   if (!is.numeric(info_frac_tolerance) || length(info_frac_tolerance) != 1L || is.na(info_frac_tolerance)) {
     stop("info_frac_tolerance must be a single numeric value")
   }
@@ -200,7 +200,7 @@ SetupAnalysis_PC <- function(
 
   des <- .pc_get_design_group_sequential(
     design_params = tmp_design_params,
-    information_rates = info_frac,
+    information_rates = planned_info_frac,
     k_max = k
   )
 
@@ -208,7 +208,7 @@ SetupAnalysis_PC <- function(
   incr_alpha <- c(des$alphaSpent[1], diff(des$alphaSpent))
   bdryTab <- data.frame(
     "Look" = seq_len(k),
-    "Information_Fraction" = info_frac,
+    "Information_Fraction" = planned_info_frac,
     "Incr_alpha_spent" = incr_alpha,
     "ZScale_Eff_Bbry" = des$criticalValues,
     "PValue_Eff_Bbry" = thresholds,
@@ -220,7 +220,7 @@ SetupAnalysis_PC <- function(
   WH <- allGraphs$IntersectionWeights
 
   # Inverse normal weights
-  inv_norm <- .pc_compute_invnorm_weights(info_frac)
+  inv_norm <- .pc_compute_invnorm_weights(planned_info_frac)
   InvNormWeights <- inv_norm$InvNormWeights
   W_Norm <- inv_norm$W_Norm
 
@@ -266,7 +266,7 @@ SetupAnalysis_PC <- function(
     G = G,
     test.type = test.type,
     alpha = alpha,
-    info_frac = info_frac,
+    info_frac = planned_info_frac,
     typeOfDesign = typeOfDesign,
     deltaWT = deltaWT,
     deltaPT1 = deltaPT1,

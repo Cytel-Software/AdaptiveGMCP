@@ -10,7 +10,6 @@ AnalyzeLook_PE_PC(
   fullpop_sample_sizes,
   subpop_sample_sizes,
   look = NULL,
-  info_frac_cur = NULL,
   selection = NULL,
   new_weights = NULL,
   new_G = NULL,
@@ -32,9 +31,6 @@ looks and the same length at every look.}
 
 \item{look}{Optional positive integer naming the current look number.}
 
-\item{info_frac_cur}{Optional numeric scalar; current-look cumulative
-information fraction. If NULL, the planned fraction for this look is used.}
-
 \item{selection}{Optional character vector of hypotheses to retain for this
 look (only meaningful when look > 1).}
 
@@ -55,6 +51,10 @@ supplied full- and sub-population sample sizes and then passed to
 [AnalyzeLook_PC()].
 }
 \details{
+The current-look information fraction is computed internally as
+\code{fullpop_sample_sizes[1] / planned_fullpop_sample_sizes[1]} using the
+control-arm cumulative sample size only.
+
 The two sample-size vectors must follow \code{(n0, n1, n2, ...)} where
 \code{n0} is the control arm and subsequent entries correspond to treatment
 arms in the same order used to define hypotheses.

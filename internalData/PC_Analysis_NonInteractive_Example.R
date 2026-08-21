@@ -62,7 +62,7 @@ state <- SetupAnalysis_PC(
   G            = G,
   test.type    = test.type,
   alpha        = alpha,
-  info_frac    = info_frac,
+  planned_info_frac    = info_frac,
   typeOfDesign = typeOfDesign,
   plotGraphs   = plotGraphs
 )

@@ -41,6 +41,57 @@ ValidatePESampleSizes <- function(fullpop_sample_sizes, subpop_sample_sizes)
   return( invisible( TRUE ) )
 }
 
+ValidatePEActualWithinPlanned <- function(
+    fullpop_sample_sizes,
+    subpop_sample_sizes,
+    planned_fullpop_sample_sizes,
+    planned_subpop_sample_sizes)
+{
+  if( length( fullpop_sample_sizes ) != length( planned_fullpop_sample_sizes ) ||
+      length( subpop_sample_sizes ) != length( planned_subpop_sample_sizes ) )
+  {
+    stop(
+      "Current-look sample-size vectors must have the same length as the planned baseline vectors."
+    )
+  }
+
+  if( any( fullpop_sample_sizes > planned_fullpop_sample_sizes ) )
+  {
+    stop( "Cumulative full-population sample sizes at a look must be <= planned full-population sample sizes." )
+  }
+
+  if( any( subpop_sample_sizes > planned_subpop_sample_sizes ) )
+  {
+    stop( "Cumulative subgroup sample sizes at a look must be <= planned subgroup sample sizes." )
+  }
+
+  return( invisible( TRUE ) )
+}
+
+ComputePEInfoFracFromControl <- function(fullpop_sample_sizes, planned_fullpop_sample_sizes)
+{
+  dNumerator <- fullpop_sample_sizes[ 1 ]
+  dDenominator <- planned_fullpop_sample_sizes[ 1 ]
+
+  if( !is.finite( dDenominator ) || dDenominator <= 0 )
+  {
+    stop( "Planned full-population control-arm sample size must be finite and > 0." )
+  }
+
+  dInfoFrac <- dNumerator / dDenominator
+
+  if( !is.finite( dInfoFrac ) || dInfoFrac <= 0 )
+  {
+    stop( "Computed information fraction must be finite and > 0." )
+  }
+
+  return( list(
+    info_frac_cur = dInfoFrac,
+    numerator_fullpop_control = dNumerator,
+    denominator_planned_fullpop_control = dDenominator
+  ) )
+}
+
 ComputePETreatmentCorrelation <- function(sample_sizes, treatment_index_1, treatment_index_2)
 {
   control_size <- sample_sizes[ 1 ]
@@ -229,7 +280,8 @@ BuildPECorrelationMatrix <- function(
 #' @param test.type Character specifying test type.
 #' Supported values: "Bonf", "Sidak", "Simes", "Dunnett", "Partly-Parametric".
 #' @param alpha One-sided type-1 error.
-#' @param info_frac Vector of cumulative information fractions.
+#' @param planned_info_frac Vector of cumulative information fractions planned at design
+#' time for the trial schedule across all looks.
 #' @param typeOfDesign Group sequential design type (rpact).
 #' @param deltaWT Parameter for typeOfDesign = "WT".
 #' @param deltaPT1 Parameter for typeOfDesign = "PT".
@@ -237,6 +289,10 @@ BuildPECorrelationMatrix <- function(
 #' @param userAlphaSpending Alpha spending values for typeOfDesign = "asUser".
 #' @param info_frac_tolerance Numeric scalar in (0, 1); absolute tolerance for
 #' matching current information fraction to planned fractions in the PC engine.
+#' @param planned_fullpop_sample_sizes Numeric vector of planned cumulative
+#' full-population sample sizes for the entire trial ordered as control first, then treatment arms.
+#' @param planned_subpop_sample_sizes Numeric vector of planned cumulative
+#' subgroup sample sizes for the entire trial ordered as control first, then treatment arms.
 #' @param MultipleWinners Logical; TRUE means reject as many hypotheses as
 #' possible, FALSE means reject at most one hypothesis.
 #' @param Selection Logical; TRUE if selection of hypotheses is allowed at
@@ -252,24 +308,31 @@ SetupAnalysis_PE_PC <- function(
     G,
     test.type = "Partly-Parametric",
     alpha = 0.025,
-    info_frac = c( 0.5, 1.0 ),
+    planned_info_frac = c( 0.5, 1.0 ),
     typeOfDesign = "asOF",
     deltaWT = 0,
     deltaPT1 = 0,
     gammaA = 2,
     userAlphaSpending = NULL,
     info_frac_tolerance = 0.05,
+    planned_fullpop_sample_sizes,
+    planned_subpop_sample_sizes,
     MultipleWinners = TRUE,
     Selection = TRUE,
     UpdateStrategy = TRUE,
     plotGraphs = TRUE )
 {
+  ValidatePESampleSizes(
+    fullpop_sample_sizes = planned_fullpop_sample_sizes,
+    subpop_sample_sizes = planned_subpop_sample_sizes
+  )
+
   state <- SetupAnalysis_PC(
     WI = WI,
     G = G,
     test.type = test.type,
     alpha = alpha,
-    info_frac = info_frac,
+    planned_info_frac = planned_info_frac,
     typeOfDesign = typeOfDesign,
     deltaWT = deltaWT,
     deltaPT1 = deltaPT1,
@@ -282,6 +345,10 @@ SetupAnalysis_PE_PC <- function(
     plotGraphs = plotGraphs
   )
 
+  state$design_params$planned_fullpop_sample_sizes <- planned_fullpop_sample_sizes
+  state$design_params$planned_subpop_sample_sizes <- planned_subpop_sample_sizes
+  state$pe_sample_history <- vector( "list", 0 )
+
   return( state )
 }
 
@@ -291,6 +358,10 @@ SetupAnalysis_PE_PC <- function(
 #' look. The look-specific population correlation matrix is derived from the
 #' supplied full- and sub-population sample sizes and then passed to
 #' [AnalyzeLook_PC()].
+#'
+#' The current-look information fraction is computed internally as
+#' \code{fullpop_sample_sizes[1] / planned_fullpop_sample_sizes[1]} using the
+#' control-arm cumulative sample size only.
 #'
 #' The two sample-size vectors must follow \code{(n0, n1, n2, ...)} where
 #' \code{n0} is the control arm and subsequent entries correspond to treatment
@@ -305,8 +376,6 @@ SetupAnalysis_PE_PC <- function(
 #' ordered as control first, then treatment arms. Must be non-decreasing across
 #' looks and the same length at every look.
 #' @param look Optional positive integer naming the current look number.
-#' @param info_frac_cur Optional numeric scalar; current-look cumulative
-#' information fraction. If NULL, the planned fraction for this look is used.
 #' @param selection Optional character vector of hypotheses to retain for this
 #' look (only meaningful when look > 1).
 #' @param new_weights Optional numeric vector of new weights for continuing
@@ -322,16 +391,43 @@ AnalyzeLook_PE_PC <- function(
     fullpop_sample_sizes,
     subpop_sample_sizes,
     look = NULL,
-    info_frac_cur = NULL,
     selection = NULL,
     new_weights = NULL,
     new_G = NULL,
     plotGraphs = TRUE )
 {
+  if( !inherits( state, "PCAnalysisState" ) )
+  {
+    stop( "state must be a PCAnalysisState object" )
+  }
+
+  if( is.null( state$design_params$planned_fullpop_sample_sizes ) ||
+      is.null( state$design_params$planned_subpop_sample_sizes ) )
+  {
+    stop(
+      "state is missing planned PE sample-size baselines. Recreate state with SetupAnalysis_PE_PC()."
+    )
+  }
+
+  ValidatePESampleSizes(
+    fullpop_sample_sizes = fullpop_sample_sizes,
+    subpop_sample_sizes = subpop_sample_sizes
+  )
+
+  vPlannedFull <- state$design_params$planned_fullpop_sample_sizes
+  vPlannedSub <- state$design_params$planned_subpop_sample_sizes
+
+  ValidatePEActualWithinPlanned(
+    fullpop_sample_sizes = fullpop_sample_sizes,
+    subpop_sample_sizes = subpop_sample_sizes,
+    planned_fullpop_sample_sizes = vPlannedFull,
+    planned_subpop_sample_sizes = vPlannedSub
+  )
+
   if( state$completed_looks > 0L )
   {
     vPrevFull <- state$pe_sample_history[[ state$completed_looks ]]$fullpop
-    vPrevSub  <- state$pe_sample_history[[ state$completed_looks ]]$subpop
+    vPrevSub <- state$pe_sample_history[[ state$completed_looks ]]$subpop
 
     if( length( fullpop_sample_sizes ) != length( vPrevFull ) ||
         length( subpop_sample_sizes ) != length( vPrevSub ) )
@@ -347,12 +443,17 @@ AnalyzeLook_PE_PC <- function(
     }
   }
 
-  n_initial <- length( state$mcpObj$IntialHypothesis )
+  lInfoFrac <- ComputePEInfoFracFromControl(
+    fullpop_sample_sizes = fullpop_sample_sizes,
+    planned_fullpop_sample_sizes = vPlannedFull
+  )
+
+  nInitial <- length( state$mcpObj$IntialHypothesis )
   dFullCorrelation <- BuildPECorrelationMatrix(
     fullpop_sample_sizes = fullpop_sample_sizes,
-    subpop_sample_sizes  = subpop_sample_sizes,
-    n_hypotheses         = n_initial,
-    hypothesis_names     = state$mcpObj$IntialHypothesis
+    subpop_sample_sizes = subpop_sample_sizes,
+    n_hypotheses = nInitial,
+    hypothesis_names = state$mcpObj$IntialHypothesis
   )
 
   # Use the post-selection active set when selection is specified at look > 1,
@@ -377,18 +478,12 @@ AnalyzeLook_PE_PC <- function(
 
   nPreviousLooks <- state$completed_looks
 
-  if (is.null(info_frac_cur)) {
-    nNextLook <- state$completed_looks + 1L
-    nPlannedLooks <- length(state$design_params$info_frac)
-    info_frac_cur <- state$design_params$info_frac[min(nNextLook, nPlannedLooks)]
-  }
-
   state <- do.call(
     AnalyzeLook_PC,
     list(
       state = state,
       p_raw = p_raw,
-      info_frac_cur = info_frac_cur,
+      info_frac_cur = lInfoFrac$info_frac_cur,
       Correlation = dCorrelation,
       look = look,
       selection = selection,
@@ -398,13 +493,23 @@ AnalyzeLook_PE_PC <- function(
     )
   )
 
-  if(state$completed_looks == nPreviousLooks + 1L)
+  if( state$completed_looks == nPreviousLooks + 1L )
   {
-    # Sample size history should be updated only if the analysis 
-    # was successfully completed for this look.
-    state$pe_sample_history[[ state$completed_looks ]] <- list(
+    # Update PE look history only after successful completion of this look.
+    lPELookInfo <- list(
       fullpop = fullpop_sample_sizes,
-      subpop  = subpop_sample_sizes
+      subpop = subpop_sample_sizes,
+      info_frac_cur = lInfoFrac$info_frac_cur,
+      numerator_fullpop_control = lInfoFrac$numerator_fullpop_control,
+      denominator_planned_fullpop_control = lInfoFrac$denominator_planned_fullpop_control
+    )
+
+    state$pe_sample_history[[ state$completed_looks ]] <- lPELookInfo
+
+    state$look_history[[ state$completed_looks ]]$pe_info_frac <- list(
+      info_frac_cur = lInfoFrac$info_frac_cur,
+      numerator_fullpop_control = lInfoFrac$numerator_fullpop_control,
+      denominator_planned_fullpop_control = lInfoFrac$denominator_planned_fullpop_control
     )
   }
 
