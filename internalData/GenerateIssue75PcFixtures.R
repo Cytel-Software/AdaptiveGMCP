@@ -436,14 +436,7 @@ GenerateIssue75Fixtures <- function()
   return( invisible( TRUE ) )
 }
 
+# IMPORTANT: Uncomment and execute the following lines only if and when you want to regenerate the fixtures.
+# Not otherwise as the fixtures are already checked into the repository and should not be changed unless necessary.
 # GenerateIssue75Fixtures()
-GenerateFixturesForMyTests()
-
-l1 <- readRDS("tests/testthat/PC-test-01.l1.mcpObj.rds")
-print(l1)
-
-l2 <- readRDS("tests/testthat/PC-test-01.l2.mcpObj.rds")
-print(l2)
-
-l3 <- readRDS("tests/testthat/PC-test-01.l3.mcpObj.rds")
-print(l3)
+# GenerateFixturesForMyTests()
