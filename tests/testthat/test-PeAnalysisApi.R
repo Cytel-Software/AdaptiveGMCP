@@ -34,6 +34,86 @@ testthat::test_that( "SetupAnalysis_PE_PC creates a design-only PE state", {
   testthat::expect_equal( peState$design_params$planned_subpop_sample_sizes, plannedSub )
 } )
 
+testthat::test_that( "SetupAnalysis_PE_PC supports one-look and rejects >2-look PE workflows", {
+  wi <- rep( 1 / 4, 4 )
+  g <- matrix( 0, nrow = 4, ncol = 4 )
+
+  oneLookState <- SetupAnalysis_PE_PC(
+    WI = wi,
+    G = g,
+    test.type = "Partly-Parametric",
+    alpha = 0.025,
+    planned_info_frac = c( 1 ),
+    typeOfDesign = "asOF",
+    planned_fullpop_sample_sizes = c( 100, 60 ),
+    planned_subpop_sample_sizes = c( 80, 45 ),
+    plotGraphs = FALSE
+  )
+
+  testthat::expect_s3_class( oneLookState, "PCAnalysisState" )
+  testthat::expect_equal( nrow( oneLookState$mcpObj$bdryTab ), 1L )
+
+  testthat::expect_error(
+    SetupAnalysis_PE_PC(
+      WI = wi,
+      G = g,
+      test.type = "Partly-Parametric",
+      alpha = 0.025,
+      planned_info_frac = c( 0.5, 0.7, 1 ),
+      typeOfDesign = "asOF",
+      planned_fullpop_sample_sizes = c( 100, 60 ),
+      planned_subpop_sample_sizes = c( 80, 45 ),
+      plotGraphs = FALSE
+    ),
+    "PE analysis currently supports one-look or two-look workflows only"
+  )
+
+  testthat::expect_error(
+    SetupAnalysis_PE_PC(
+      WI = wi,
+      G = g,
+      test.type = "Partly-Parametric",
+      alpha = 0.025,
+      planned_info_frac = c( NA_real_, 1 ),
+      typeOfDesign = "asOF",
+      planned_fullpop_sample_sizes = c( 100, 60 ),
+      planned_subpop_sample_sizes = c( 80, 45 ),
+      plotGraphs = FALSE
+    ),
+    "planned_info_frac must contain finite, non-missing numeric values"
+  )
+
+  testthat::expect_error(
+    SetupAnalysis_PE_PC(
+      WI = wi,
+      G = g,
+      test.type = "Partly-Parametric",
+      alpha = 0.025,
+      planned_info_frac = c( 0, 1 ),
+      typeOfDesign = "asOF",
+      planned_fullpop_sample_sizes = c( 100, 60 ),
+      planned_subpop_sample_sizes = c( 80, 45 ),
+      plotGraphs = FALSE
+    ),
+    "planned_info_frac values must be in"
+  )
+
+  testthat::expect_error(
+    SetupAnalysis_PE_PC(
+      WI = wi,
+      G = g,
+      test.type = "Partly-Parametric",
+      alpha = 0.025,
+      planned_info_frac = c( 0.7, 0.7 ),
+      typeOfDesign = "asOF",
+      planned_fullpop_sample_sizes = c( 100, 60 ),
+      planned_subpop_sample_sizes = c( 80, 45 ),
+      plotGraphs = FALSE
+    ),
+    "planned_info_frac must be strictly increasing"
+  )
+} )
+
 testthat::test_that( "AnalyzeLook_PE_PC derives a generic look-level correlation matrix", {
   wi <- rep( 1 / 8, 8 )
   g <- matrix( 0, nrow = 8, ncol = 8 )
@@ -148,6 +228,50 @@ testthat::test_that( "AnalyzeLook_PE_PC validates look-level sample sizes", {
       plotGraphs = FALSE
     ),
     "Cumulative subgroup sample sizes at a look must be <= planned subgroup sample sizes"
+  )
+} )
+
+testthat::test_that( "AnalyzeLook_PE_PC allows up to two looks and rejects a third call", {
+  wi <- rep( 0.5, 2 )
+  g <- matrix( c( 0, 1, 1, 0 ), byrow = TRUE, nrow = 2 )
+
+  peState <- SetupAnalysis_PE_PC(
+    WI = wi,
+    G = g,
+    test.type = "Bonf",
+    alpha = 0.025,
+    planned_info_frac = c( 1 ),
+    typeOfDesign = "asOF",
+    planned_fullpop_sample_sizes = c( 100, 100 ),
+    planned_subpop_sample_sizes = c( 50, 50 ),
+    plotGraphs = FALSE
+  )
+
+  peState <- AnalyzeLook_PE_PC(
+    state = peState,
+    p_raw = c( H1 = 0.5, H2 = 0.6 ),
+    fullpop_sample_sizes = c( 40, 40 ),
+    subpop_sample_sizes = c( 20, 20 ),
+    plotGraphs = FALSE
+  )
+
+  peState <- AnalyzeLook_PE_PC(
+    state = peState,
+    p_raw = c( H1 = 0.45, H2 = 0.55 ),
+    fullpop_sample_sizes = c( 70, 70 ),
+    subpop_sample_sizes = c( 35, 35 ),
+    plotGraphs = FALSE
+  )
+
+  testthat::expect_error(
+    AnalyzeLook_PE_PC(
+      state = peState,
+      p_raw = c( H1 = 0.4, H2 = 0.5 ),
+      fullpop_sample_sizes = c( 90, 90 ),
+      subpop_sample_sizes = c( 45, 45 ),
+      plotGraphs = FALSE
+    ),
+    "PE analysis currently supports a maximum of 2 analyzed looks per design"
   )
 } )
 

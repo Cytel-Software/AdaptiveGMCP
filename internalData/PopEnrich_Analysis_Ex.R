@@ -57,7 +57,7 @@ print(look1_out)
 wi <- rep(0.5, 2) # Initial weights for the 2 hypotheses
 
 # Transition matrix
-g <- matrix(c(0, 1, 1, 0), byrow = T, nrow = 2)
+g <- matrix(c(0, 1, 1, 0), byrow = TRUE, nrow = 2)
 
 # Test type
 test <- "Dunnett"
@@ -107,7 +107,7 @@ print(look2_out)
 #########################################################
 
 # EXAMPLE 3 #############################################
-# Severe oral mucocites example
+# Severe oral mucositis example
 # H1: high dose, full population
 # H2: low dose, full population
 # H3: high dose, HPV+ subgroup
@@ -126,7 +126,7 @@ wi <- rep(0.25, 4) # Initial weights for the 4 hypotheses
 g <- matrix(c(0, 0, 1, 0,
               0, 0, 0, 1,
               0, 1, 0, 0,
-              1, 0, 0, 0), byrow = T, nrow = 4)
+              1, 0, 0, 0), byrow = TRUE, nrow = 4)
 
 # Test type
 test <- "Dunnett"
@@ -230,7 +230,7 @@ g <- matrix(c(0, 0.5, 0.5, 0, # H1->H2, H1->H3
               0.5, 0, 0, 0.5, # H2->H1, H2->H4
               0.5, 0, 0, 0.5, # H3->H1, H3->H4
               0, 0.5, 0.5, 0), # H4->H2, H4->H3
-            byrow = T, nrow = 4)
+            byrow = TRUE, nrow = 4)
 
 # Test type
 test <- "Bonf"
@@ -278,7 +278,7 @@ g <- matrix(c(
   1, 0, 0, 0
 ), byrow = TRUE, nrow = 4)
 
-t <- c(0.5, 0.7, 1)
+t <- c(0.5, 1)
 alp <- 0.025
 
 tt <- "Partly-Parametric"
@@ -311,22 +311,11 @@ print(look1_out)
 look2_out <- AnalyzeLook_PE_PC(
   look1_out,
   p_raw = c(H1 = 0.003, H2 = 0.10, H3 = 0.08, H4 = 0.15),
-  fullpop_sample_sizes = c(70, 105, 84), # Sample sizes: first for control and then for treatment arms
-  subpop_sample_sizes = c(35, 56, 49)) # Sample sizes: first for control and then for treatment arms
+  fullpop_sample_sizes = c(100, 140, 123), # Sample sizes: first for control and then for treatment arms
+  subpop_sample_sizes = c(48, 80, 70)) # Sample sizes: first for control and then for treatment arms
 
 print(look2_out$mcpObj$Correlation)
 print(look2_out)
-
-# Performing analysis at look 3
-look3_out <- AnalyzeLook_PE_PC(
-  look2_out,
-  p_raw = c(H2 = 0.10, H3 = 0.08),
-  fullpop_sample_sizes = c(100, 140, 123), # Sample sizes: first for control and then for treatment arms
-  subpop_sample_sizes = c(48, 80, 70), # Sample sizes: first for control and then for treatment arms
-  selection = c('H2', 'H3')) # H1 rejected at look 2 and H4 dropped at this look
-
-print(look3_out$mcpObj$Correlation)
-print(look3_out)
 
 #########################################################
 
@@ -339,7 +328,7 @@ g <- matrix(c(
   1, 0, 0, 0
 ), byrow = TRUE, nrow = 4)
 
-t <- c(0.5, 0.7, 1)
+t <- c(0.7, 1)
 alp <- 0.025
 
 # Test type
@@ -359,8 +348,8 @@ print(design)
 look1_out <- AnalyzeLook_PE_PC(
   design,
   p_raw = c(H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30),
-  fullpop_sample_sizes = c(50, 50, 50), # Sample sizes: first for control and then for treatment arms
-  subpop_sample_sizes = c(25, 25, 25)) # Sample sizes: first for control and then for treatment arms
+  fullpop_sample_sizes = c(70, 105, 84), # Sample sizes: first for control and then for treatment arms
+  subpop_sample_sizes = c(35, 56, 49)) # Sample sizes: first for control and then for treatment arms
 
 print(look1_out$mcpObj$Correlation)
 print(look1_out)
@@ -370,21 +359,11 @@ look2_out <- AnalyzeLook_PE_PC(
   look1_out,
   p_raw = c(H1 = 0.02, H2 = 0.10, H4 = 0.40),
   selection = c("H1", "H2", "H4"),
-  fullpop_sample_sizes = c(70, 105, 84), # Sample sizes: first for control and then for treatment arms
-  subpop_sample_sizes = c(35, 56, 49)) # Sample sizes: first for control and then for treatment arms
-
-print(look2_out$mcpObj$Correlation)
-print(look2_out)
-
-# Performing analysis at look 3
-look3_out <- AnalyzeLook_PE_PC(
-  look2_out,
-  p_raw = c(H2 = 0.05, H4 = 0.10), # H1 rejected and H3 dropped at look 2
   fullpop_sample_sizes = c(100, 140, 123), # Sample sizes: first for control and then for treatment arms
   subpop_sample_sizes = c(48, 80, 70)) # Sample sizes: first for control and then for treatment arms
 
-print(look3_out$mcpObj$Correlation)
-print(look3_out)
+print(look2_out$mcpObj$Correlation)
+print(look2_out)
 #########################################################
 
 # EXAMPLE 7 #############################################

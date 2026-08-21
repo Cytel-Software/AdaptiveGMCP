@@ -62,3 +62,15 @@ Implemented in code:
 Pending validation/documentation regeneration:
 - Regenerate Rd docs with `devtools::document()`.
 - Run targeted package-aware tests for PE API (and PC regressions if needed).
+
+## Issue #120 Scope Update (PE Two-Look Guardrails)
+
+Decision applied:
+- PE analysis path supports one-look and two-look workflows.
+- PE analysis requests with more than two looks are rejected at setup with clear guidance.
+- PC API remains unconstrained and continues to support generic multi-look workflows.
+
+Implementation updates:
+- `SetupAnalysis_PE_PC()` now validates `planned_info_frac` length for PE scope (allowed: 1 or 2).
+- `test-PeAnalysisApi.R` includes a positive one-look setup test and a negative >2-look setup test.
+- `internalData/PopEnrich_Analysis_Ex.R` PE examples were aligned to one- or two-look workflows only.

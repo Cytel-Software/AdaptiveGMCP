@@ -49,6 +49,9 @@ Advances an existing [SetupAnalysis_PE_PC()] state object by exactly one
 look. The look-specific population correlation matrix is derived from the
 supplied full- and sub-population sample sizes and then passed to
 [AnalyzeLook_PC()].
+PE analysis currently supports a maximum of two analyzed looks per design
+state. Unplanned interim information-fraction values are allowed within
+those two looks.
 }
 \details{
 The current-look information fraction is computed internally as
