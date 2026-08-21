@@ -7,7 +7,7 @@ testthat::test_that("SetupAnalysis_PC validates info_frac_tolerance bounds", {
       WI = vWi,
       G = mG,
       test.type = "Sidak",
-      info_frac = c(0.5, 1.0),
+      planned_info_frac = c(0.5, 1.0),
       info_frac_tolerance = 0,
       plotGraphs = FALSE
     ),
@@ -19,7 +19,7 @@ testthat::test_that("SetupAnalysis_PC validates info_frac_tolerance bounds", {
       WI = vWi,
       G = mG,
       test.type = "Sidak",
-      info_frac = c(0.5, 1.0),
+      planned_info_frac = c(0.5, 1.0),
       info_frac_tolerance = 1,
       plotGraphs = FALSE
     ),
@@ -36,7 +36,7 @@ testthat::test_that("AnalyzeLook_PC treats info_frac_cur == 1 - tolerance as fin
     G = mG,
     test.type = "Sidak",
     alpha = 0.025,
-    info_frac = c(0.5, 1.0),
+    planned_info_frac = c(0.5, 1.0),
     info_frac_tolerance = 0.05,
     plotGraphs = FALSE
   )
@@ -65,7 +65,7 @@ testthat::test_that("AnalyzeLook_PC final IF > 1 uses standard rpact cutoff with
     G = mG,
     test.type = "Sidak",
     alpha = dAlpha,
-    info_frac = vInfoFrac,
+    planned_info_frac = vInfoFrac,
     info_frac_tolerance = 0.05,
     typeOfDesign = "asOF",
     plotGraphs = FALSE

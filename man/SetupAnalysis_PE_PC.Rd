@@ -9,13 +9,15 @@ SetupAnalysis_PE_PC(
   G,
   test.type = "Partly-Parametric",
   alpha = 0.025,
-  info_frac = c(0.5, 1),
+  planned_info_frac = c(0.5, 1),
   typeOfDesign = "asOF",
   deltaWT = 0,
   deltaPT1 = 0,
   gammaA = 2,
   userAlphaSpending = NULL,
   info_frac_tolerance = 0.05,
+  planned_fullpop_sample_sizes,
+  planned_subpop_sample_sizes,
   MultipleWinners = TRUE,
   Selection = TRUE,
   UpdateStrategy = TRUE,
@@ -32,7 +34,8 @@ Supported values: "Bonf", "Sidak", "Simes", "Dunnett", "Partly-Parametric".}
 
 \item{alpha}{One-sided type-1 error.}
 
-\item{info_frac}{Vector of cumulative information fractions.}
+\item{planned_info_frac}{Vector of cumulative information fractions planned at design
+time for the trial schedule across all looks.}
 
 \item{typeOfDesign}{Group sequential design type (rpact).}
 
@@ -46,6 +49,12 @@ Supported values: "Bonf", "Sidak", "Simes", "Dunnett", "Partly-Parametric".}
 
 \item{info_frac_tolerance}{Numeric scalar in (0, 1); absolute tolerance for
 matching current information fraction to planned fractions in the PC engine.}
+
+\item{planned_fullpop_sample_sizes}{Numeric vector of planned cumulative
+full-population sample sizes for the entire trial ordered as control first, then treatment arms.}
+
+\item{planned_subpop_sample_sizes}{Numeric vector of planned cumulative
+subgroup sample sizes for the entire trial ordered as control first, then treatment arms.}
 
 \item{MultipleWinners}{Logical; TRUE means reject as many hypotheses as
 possible, FALSE means reject at most one hypothesis.}

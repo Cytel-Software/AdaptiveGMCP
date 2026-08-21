@@ -10,7 +10,7 @@ SetupAnalysis_PC(
     nrow = 4),
   test.type = "Partly-Parametric",
   alpha = 0.025,
-  info_frac = c(0.5, 1),
+  planned_info_frac = c(0.5, 1),
   typeOfDesign = "asOF",
   deltaWT = 0,
   deltaPT1 = 0,
@@ -33,7 +33,7 @@ Supported values: "Bonf", "Sidak", "Simes", "Dunnett", "Partly-Parametric".}
 
 \item{alpha}{One-sided type-1 error.}
 
-\item{info_frac}{Vector of cumulative information fractions.}
+\item{planned_info_frac}{Vector of cumulative information fractions planned at design time.}
 
 \item{typeOfDesign}{Group sequential design type (rpact).
 Supported values: "OF" (O'Brien & Fleming), "P" (Pocock), "WT" (Wang & Tsiatis Delta class), 

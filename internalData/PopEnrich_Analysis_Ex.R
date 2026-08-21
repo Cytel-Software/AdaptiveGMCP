@@ -15,7 +15,7 @@ library(AdaptGMCP)
 wi <- rep(0.5, 2) # Initial weights for the 2 hypotheses
 
 # Transition matrix
-g <- matrix(c(0, 1, 1, 0), byrow = T, nrow = 2)
+g <- matrix(c(0, 1, 1, 0), byrow = TRUE, nrow = 2)
 
 # Test type
 test <- "Dunnett"
@@ -32,7 +32,9 @@ design <- SetupAnalysis_PE_PC(
   G = g,
   test.type = test,
   alpha = alp,
-  info_frac = t)
+  planned_info_frac = t,
+  planned_fullpop_sample_sizes = c( 100, 100 ),
+  planned_subpop_sample_sizes = c( 50, 50 ))
 
 print(design)
 
@@ -75,8 +77,10 @@ design <- SetupAnalysis_PE_PC(
   G = g,
   test.type = test,
   alpha = alp,
-  info_frac = t,
-  typeOfDesign = des
+  planned_info_frac = t,
+  typeOfDesign = des,
+  planned_fullpop_sample_sizes = c( 100, 100 ),
+  planned_subpop_sample_sizes = c( 53, 49 )
   )
 
 print(design)
@@ -142,8 +146,10 @@ design <- SetupAnalysis_PE_PC(
   G = g,
   test.type = test,
   alpha = alp,
-  info_frac = t,
-  typeOfDesign = des)
+  planned_info_frac = t,
+  typeOfDesign = des,
+  planned_fullpop_sample_sizes = c( 100, 100, 100 ),
+  planned_subpop_sample_sizes = c( 50, 50, 50 ))
 
 print(design)
 
@@ -176,8 +182,10 @@ design <- SetupAnalysis_PE_PC(
   G = g,
   test.type = test,
   alpha = alp,
-  info_frac = c(0.7, 1),
-  typeOfDesign = des)
+  planned_info_frac = c(0.7, 1),
+  typeOfDesign = des,
+  planned_fullpop_sample_sizes = c( 100, 100, 100 ),
+  planned_subpop_sample_sizes = c( 50, 50, 50 ))
 
 print(design)
 
@@ -242,8 +250,10 @@ design <- SetupAnalysis_PE_PC(
   G = g,
   test.type = test,
   alpha = alp,
-  info_frac = t,
-  typeOfDesign = des)
+  planned_info_frac = t,
+  typeOfDesign = des,
+  planned_fullpop_sample_sizes = c( 100, 100, 100 ),
+  planned_subpop_sample_sizes = c( 50, 50, 50 ))
 
 print(design)
 
@@ -280,8 +290,10 @@ design <- SetupAnalysis_PE_PC(
   G = g,
   test.type = tt,
   alpha = alp,
-  info_frac = t,
-  typeOfDesign = des)
+  planned_info_frac = t,
+  typeOfDesign = des,
+  planned_fullpop_sample_sizes = c( 100, 140, 123 ),
+  planned_subpop_sample_sizes = c( 48, 80, 70 ))
 
 print(design)
 
@@ -338,7 +350,8 @@ des <- "asOF"
 
 # Setting up the design first
 design <- SetupAnalysis_PE_PC(
-  WI = wi, G = g, test.type = test, alpha = alp, info_frac = t, typeOfDesign = des)
+  WI = wi, G = g, test.type = test, alpha = alp, planned_info_frac = t, typeOfDesign = des,
+  planned_fullpop_sample_sizes = c( 100, 140, 123 ), planned_subpop_sample_sizes = c( 48, 80, 70 ))
 
 print(design)
 
@@ -423,7 +436,9 @@ des <- "asOF"
 
 # Setting up the design first
 design <- SetupAnalysis_PE_PC(WI = wi, G = G, test.type = test, alpha = alp, 
-                              info_frac = t, typeOfDesign = des)
+                              planned_info_frac = t, typeOfDesign = des,
+                              planned_fullpop_sample_sizes = c( 100, 100, 100 ),
+                              planned_subpop_sample_sizes = c( 50, 50, 50 ))
 
 print(design)
 

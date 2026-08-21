@@ -41,7 +41,7 @@ testthat::test_that("Test 1: PC analysis API scaffolds", {
     G = g,
     test.type = tt,
     alpha = alp,
-    info_frac = t,
+    planned_info_frac = t,
     typeOfDesign = des,
     plotGraphs = FALSE
   )
@@ -138,7 +138,7 @@ testthat::test_that("Test 2: PC analysis API scaffolds (strategy modification)",
     G = g,
     test.type = tt,
     alpha = alp,
-    info_frac = t,
+    planned_info_frac = t,
     typeOfDesign = des,
     plotGraphs = FALSE,
     MultipleWinners = FALSE
@@ -214,7 +214,7 @@ testthat::test_that("Test 3: PC analysis API scaffolds (full transition at look 
     G = g,
     test.type = tt,
     alpha = alp,
-    info_frac = t,
+    planned_info_frac = t,
     typeOfDesign = des,
     plotGraphs = FALSE,
     MultipleWinners = TRUE
@@ -284,7 +284,7 @@ testthat::test_that("AnalyzeLook_PC: look argument validation and error handling
     G = g,
     test.type = "Bonf",
     alpha = 0.025,
-    info_frac = c(0.5, 1.0),
+    planned_info_frac = c(0.5, 1.0),
     plotGraphs = FALSE
   )
 
@@ -362,7 +362,7 @@ testthat::test_that("AnalyzeLook_PC: structural invariants hold across looks", {
     G = g,
     test.type = "Bonf",
     alpha = 0.025,
-    info_frac = c(0.5, 1.0),
+    planned_info_frac = c(0.5, 1.0),
     plotGraphs = FALSE
   )
 
@@ -422,7 +422,7 @@ testthat::test_that("Test 6a: Bonferroni, fixed-sample, 3-hypo simple allocation
     G = g,
     test.type = tt,
     alpha = alp,
-    info_frac = t,
+    planned_info_frac = t,
     plotGraphs = FALSE
   )
 
@@ -477,7 +477,7 @@ testthat::test_that("Test 6b: Bonferroni, fixed-sample, 4-hypo hierarchical gate
     G = g,
     test.type = tt,
     alpha = alp,
-    info_frac = t,
+    planned_info_frac = t,
     plotGraphs = FALSE
   )
 
@@ -530,7 +530,7 @@ testthat::test_that("Test 6c: Bonferroni, fixed-sample, 4-hypo serial gatekeepin
     G = g,
     test.type = tt,
     alpha = alp,
-    info_frac = t,
+    planned_info_frac = t,
     plotGraphs = FALSE
   )
 
@@ -589,7 +589,7 @@ testthat::test_that("Test 7: Dunnett, group-sequential, 2-look, no selection/upd
     G = g,
     test.type = tt,
     alpha = alp,
-    info_frac = t,
+    planned_info_frac = t,
     typeOfDesign = des,
     MultipleWinners = TRUE,
     plotGraphs = FALSE
@@ -666,7 +666,7 @@ testthat::test_that("Test 8: Dunnett, group-sequential, 2-look, weight modificat
     G = g,
     test.type = tt,
     alpha = alp,
-    info_frac = t,
+    planned_info_frac = t,
     typeOfDesign = des,
     MultipleWinners = TRUE,
     plotGraphs = FALSE
@@ -742,7 +742,7 @@ testthat::test_that("Test 9: Simes test, fixed-sample, 4-hypo", {
     G = g,
     test.type = tt,
     alpha = alp,
-    info_frac = t,
+    planned_info_frac = t,
     plotGraphs = FALSE
   )
 
@@ -804,7 +804,7 @@ testthat::test_that("Test 10: Dunnett, fixed-sample, 4-hypo, full correlation", 
     G = g,
     test.type = tt,
     alpha = alp,
-    info_frac = t,
+    planned_info_frac = t,
     plotGraphs = FALSE
   )
 
@@ -867,7 +867,7 @@ testthat::test_that("Test 11: Dunnett, fixed-sample, 4-hypo, equal weights", {
     G = g,
     test.type = tt,
     alpha = alp,
-    info_frac = t,
+    planned_info_frac = t,
     plotGraphs = FALSE
   )
 
@@ -923,7 +923,7 @@ testthat::test_that("PC equivalence M07: asP design", {
     G = g,
     test.type = "Dunnett",
     alpha = 0.025,
-    info_frac = c(0.5, 1.0),
+    planned_info_frac = c(0.5, 1.0),
     typeOfDesign = "asP",
     MultipleWinners = TRUE,
     Selection = FALSE,
@@ -983,7 +983,7 @@ testthat::test_that("PC equivalence M11: asHSD design", {
     G = g,
     test.type = "Dunnett",
     alpha = 0.025,
-    info_frac = c(0.5, 1.0),
+    planned_info_frac = c(0.5, 1.0),
     typeOfDesign = "asHSD",
     gammaA = 2.5,
     MultipleWinners = TRUE,
@@ -1044,7 +1044,7 @@ testthat::test_that("PC equivalence M12: asKD design", {
     G = g,
     test.type = "Dunnett",
     alpha = 0.025,
-    info_frac = c(0.5, 1.0),
+    planned_info_frac = c(0.5, 1.0),
     typeOfDesign = "asKD",
     gammaA = 2.5,
     MultipleWinners = TRUE,
@@ -1116,7 +1116,7 @@ testthat::test_that("PC equivalence M19: correlation-only adaptation", {
     G = g,
     test.type = "Dunnett",
     alpha = 0.025,
-    info_frac = c(0.5, 1.0),
+    planned_info_frac = c(0.5, 1.0),
     typeOfDesign = "asOF",
     MultipleWinners = TRUE,
     Selection = FALSE,
@@ -1177,7 +1177,7 @@ testthat::test_that("PC equivalence M22: early-stop efficacy path", {
     G = g,
     test.type = "Dunnett",
     alpha = 0.025,
-    info_frac = c(0.5, 1.0),
+    planned_info_frac = c(0.5, 1.0),
     typeOfDesign = "asOF",
     MultipleWinners = FALSE,
     Selection = FALSE,
@@ -1230,7 +1230,7 @@ testthat::test_that("PC equivalence M24: MultipleWinners FALSE", {
     G = g,
     test.type = "Dunnett",
     alpha = 0.025,
-    info_frac = c(0.5, 1.0),
+    planned_info_frac = c(0.5, 1.0),
     typeOfDesign = "asOF",
     MultipleWinners = FALSE,
     Selection = FALSE,
@@ -1290,7 +1290,7 @@ testthat::test_that("PC equivalence M09: WT design", {
     G = g,
     test.type = "Dunnett",
     alpha = 0.025,
-    info_frac = c(0.5, 1.0),
+    planned_info_frac = c(0.5, 1.0),
     typeOfDesign = "WT",
     deltaWT = 0.25,
     MultipleWinners = TRUE,
@@ -1351,7 +1351,7 @@ testthat::test_that("PC equivalence M13: asUser design", {
     G = g,
     test.type = "Dunnett",
     alpha = 0.025,
-    info_frac = c(0.5, 1.0),
+    planned_info_frac = c(0.5, 1.0),
     typeOfDesign = "asUser",
     userAlphaSpending = c(0.008, 0.025),
     MultipleWinners = TRUE,
@@ -1412,7 +1412,7 @@ testthat::test_that("PC equivalence M17: selection-only adaptation", {
     G = g,
     test.type = "Dunnett",
     alpha = 0.025,
-    info_frac = c(0.5, 1.0),
+    planned_info_frac = c(0.5, 1.0),
     typeOfDesign = "asOF",
     MultipleWinners = TRUE,
     Selection = TRUE,
@@ -1473,7 +1473,7 @@ testthat::test_that("PC equivalence M08: noEarlyEfficacy design", {
     G = g,
     test.type = "Dunnett",
     alpha = 0.025,
-    info_frac = c(0.5, 1.0),
+    planned_info_frac = c(0.5, 1.0),
     typeOfDesign = "noEarlyEfficacy",
     MultipleWinners = TRUE,
     Selection = FALSE,
@@ -1522,7 +1522,7 @@ testthat::test_that("PC equivalence M02: Sidak baseline", {
     G = g,
     test.type = "Sidak",
     alpha = 0.025,
-    info_frac = c(1.0),
+    planned_info_frac = c(1.0),
     typeOfDesign = "asOF",
     MultipleWinners = TRUE,
     Selection = FALSE,
@@ -1563,7 +1563,7 @@ testthat::test_that("SetupAnalysis_PC: WI validation - type, NA, negativity, and
   testthat::expect_error(
     SetupAnalysis_PC(
       WI = c("a", "b", "c", "d"), G = g, test.type = "Bonf",
-      alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
+      alpha = 0.025, planned_info_frac = c(1), plotGraphs = FALSE
     ),
     regexp = "numeric, non-negative, and non-NA"
   )
@@ -1572,7 +1572,7 @@ testthat::test_that("SetupAnalysis_PC: WI validation - type, NA, negativity, and
   testthat::expect_error(
     SetupAnalysis_PC(
       WI = c(0.5, NA, 0, 0), G = g, test.type = "Bonf",
-      alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
+      alpha = 0.025, planned_info_frac = c(1), plotGraphs = FALSE
     ),
     regexp = "numeric, non-negative, and non-NA"
   )
@@ -1581,7 +1581,7 @@ testthat::test_that("SetupAnalysis_PC: WI validation - type, NA, negativity, and
   testthat::expect_error(
     SetupAnalysis_PC(
       WI = c(0.5, -0.1, 0, 0), G = g, test.type = "Bonf",
-      alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
+      alpha = 0.025, planned_info_frac = c(1), plotGraphs = FALSE
     ),
     regexp = "numeric, non-negative, and non-NA"
   )
@@ -1590,7 +1590,7 @@ testthat::test_that("SetupAnalysis_PC: WI validation - type, NA, negativity, and
   testthat::expect_error(
     SetupAnalysis_PC(
       WI = c(0.6, 0.6, 0, 0), G = g, test.type = "Bonf",
-      alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
+      alpha = 0.025, planned_info_frac = c(1), plotGraphs = FALSE
     ),
     regexp = "Sum of WI"
   )
@@ -1599,7 +1599,7 @@ testthat::test_that("SetupAnalysis_PC: WI validation - type, NA, negativity, and
   testthat::expect_error(
     SetupAnalysis_PC(
       WI = c(0.5, 0.5), G = g, test.type = "Bonf",
-      alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
+      alpha = 0.025, planned_info_frac = c(1), plotGraphs = FALSE
     ),
     regexp = "transition matrix"
   )
@@ -1612,7 +1612,7 @@ testthat::test_that("SetupAnalysis_PC: G validation - matrix requirement and dim
   testthat::expect_error(
     SetupAnalysis_PC(
       WI = wi, G = c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
-      test.type = "Bonf", alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
+      test.type = "Bonf", alpha = 0.025, planned_info_frac = c(1), plotGraphs = FALSE
     ),
     regexp = "transition matrix"
   )
@@ -1622,13 +1622,13 @@ testthat::test_that("SetupAnalysis_PC: G validation - matrix requirement and dim
   testthat::expect_error(
     SetupAnalysis_PC(
       WI = wi, G = gBad, test.type = "Bonf",
-      alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
+      alpha = 0.025, planned_info_frac = c(1), plotGraphs = FALSE
     ),
     regexp = "transition matrix"
   )
 })
 
-testthat::test_that("SetupAnalysis_PC: info_frac validation - length, bounds, and monotonicity", {
+testthat::test_that("SetupAnalysis_PC: planned_info_frac validation - length, bounds, and monotonicity", {
   wi <- c(0.5, 0.5, 0, 0)
   g <- matrix(
     c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
@@ -1639,7 +1639,7 @@ testthat::test_that("SetupAnalysis_PC: info_frac validation - length, bounds, an
   testthat::expect_error(
     SetupAnalysis_PC(
       WI = wi, G = g, test.type = "Bonf",
-      alpha = 0.025, info_frac = numeric(0), plotGraphs = FALSE
+      alpha = 0.025, planned_info_frac = numeric(0), plotGraphs = FALSE
     ),
     regexp = "info_frac must have length"
   )
@@ -1648,7 +1648,7 @@ testthat::test_that("SetupAnalysis_PC: info_frac validation - length, bounds, an
   testthat::expect_error(
     SetupAnalysis_PC(
       WI = wi, G = g, test.type = "Bonf",
-      alpha = 0.025, info_frac = c(0, 0.5, 1.0), plotGraphs = FALSE
+      alpha = 0.025, planned_info_frac = c(0, 0.5, 1.0), plotGraphs = FALSE
     ),
     regexp = "info_frac must be in"
   )
@@ -1657,7 +1657,7 @@ testthat::test_that("SetupAnalysis_PC: info_frac validation - length, bounds, an
   testthat::expect_error(
     SetupAnalysis_PC(
       WI = wi, G = g, test.type = "Bonf",
-      alpha = 0.025, info_frac = c(0.5, 1.2), plotGraphs = FALSE
+      alpha = 0.025, planned_info_frac = c(0.5, 1.2), plotGraphs = FALSE
     ),
     regexp = "info_frac must be in"
   )
@@ -1666,7 +1666,7 @@ testthat::test_that("SetupAnalysis_PC: info_frac validation - length, bounds, an
   testthat::expect_error(
     SetupAnalysis_PC(
       WI = wi, G = g, test.type = "Bonf",
-      alpha = 0.025, info_frac = c(0.5, 0.5, 1.0), plotGraphs = FALSE
+      alpha = 0.025, planned_info_frac = c(0.5, 0.5, 1.0), plotGraphs = FALSE
     ),
     regexp = "strictly increasing"
   )
@@ -1675,7 +1675,7 @@ testthat::test_that("SetupAnalysis_PC: info_frac validation - length, bounds, an
   testthat::expect_error(
     SetupAnalysis_PC(
       WI = wi, G = g, test.type = "Bonf",
-      alpha = 0.025, info_frac = c(0.7, 0.5, 1.0), plotGraphs = FALSE
+      alpha = 0.025, planned_info_frac = c(0.7, 0.5, 1.0), plotGraphs = FALSE
     ),
     regexp = "strictly increasing"
   )
@@ -1691,7 +1691,7 @@ testthat::test_that("SetupAnalysis_PC: unsupported test.type is rejected", {
   testthat::expect_error(
     SetupAnalysis_PC(
       WI = wi, G = g, test.type = "Unknown",
-      alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
+      alpha = 0.025, planned_info_frac = c(1), plotGraphs = FALSE
     ),
     regexp = "Unsupported test.type"
   )
@@ -1706,20 +1706,20 @@ testthat::test_that("SetupAnalysis_PC: correlation policy by test.type", {
   # Dunnett and Partly-Parametric defer Correlation to AnalyzeLook_PC
   stateDunnett <- SetupAnalysis_PC(
     WI = wi, G = g, test.type = "Dunnett",
-    alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
+    alpha = 0.025, planned_info_frac = c(1), plotGraphs = FALSE
   )
   testthat::expect_null(stateDunnett$mcpObj$Correlation)
 
   statePP <- SetupAnalysis_PC(
     WI = wi, G = g, test.type = "Partly-Parametric",
-    alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
+    alpha = 0.025, planned_info_frac = c(1), plotGraphs = FALSE
   )
   testthat::expect_null(statePP$mcpObj$Correlation)
 
   # Bonf: overrides Correlation to identity with NA off-diagonal
   stateBonf <- SetupAnalysis_PC(
     WI = wi, G = g, test.type = "Bonf",
-    alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
+    alpha = 0.025, planned_info_frac = c(1), plotGraphs = FALSE
   )
   corrExpBonf <- diag(4)
   corrExpBonf[corrExpBonf == 0] <- NA
@@ -1728,14 +1728,14 @@ testthat::test_that("SetupAnalysis_PC: correlation policy by test.type", {
   # Sidak: sets Correlation to NA
   stateSidak <- SetupAnalysis_PC(
     WI = wi, G = g, test.type = "Sidak",
-    alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
+    alpha = 0.025, planned_info_frac = c(1), plotGraphs = FALSE
   )
   testthat::expect_true(is.na(stateSidak$mcpObj$Correlation))
 
   # Simes: sets Correlation to NA
   stateSimes <- SetupAnalysis_PC(
     WI = wi, G = g, test.type = "Simes",
-    alpha = 0.025, info_frac = c(1), plotGraphs = FALSE
+    alpha = 0.025, planned_info_frac = c(1), plotGraphs = FALSE
   )
   testthat::expect_true(is.na(stateSimes$mcpObj$Correlation))
 })
@@ -1750,7 +1750,7 @@ testthat::test_that("SetupAnalysis_PC: asUser typeOfDesign requires userAlphaSpe
   testthat::expect_error(
     SetupAnalysis_PC(
       WI = wi, G = g, test.type = "Dunnett",
-      alpha = 0.025, info_frac = c(0.5, 1.0),
+      alpha = 0.025, planned_info_frac = c(0.5, 1.0),
       typeOfDesign = "asUser",
       plotGraphs = FALSE
     ),
@@ -1761,7 +1761,7 @@ testthat::test_that("SetupAnalysis_PC: asUser typeOfDesign requires userAlphaSpe
   testthat::expect_no_error(
     SetupAnalysis_PC(
       WI = wi, G = g, test.type = "Dunnett",
-      alpha = 0.025, info_frac = c(0.5, 1.0),
+      alpha = 0.025, planned_info_frac = c(0.5, 1.0),
       typeOfDesign = "asUser",
       userAlphaSpending = c(0.008, 0.025),
       plotGraphs = FALSE
@@ -1791,7 +1791,7 @@ testthat::test_that("AnalyzeLook_PC: p_raw contract validation", {
 
   state0 <- SetupAnalysis_PC(
     WI = wi, G = g, test.type = "Bonf",
-    alpha = 0.025, info_frac = c(0.5, 1.0),
+    alpha = 0.025, planned_info_frac = c(0.5, 1.0),
     plotGraphs = FALSE
   )
 
@@ -1850,7 +1850,7 @@ testthat::test_that("AnalyzeLook_PC: look 1 adaptation prohibition and correlati
 
   state0 <- SetupAnalysis_PC(
     WI = wi, G = g, test.type = "Partly-Parametric",
-    alpha = 0.025, info_frac = c(0.5, 1.0),
+    alpha = 0.025, planned_info_frac = c(0.5, 1.0),
     plotGraphs = FALSE
   )
 
@@ -1910,7 +1910,7 @@ testthat::test_that("AnalyzeLook_PC: feature-flag gates at look > 1", {
   # Both feature flags disabled
   stateNoAdapt <- SetupAnalysis_PC(
     WI = wi, G = g, test.type = "Dunnett",
-    alpha = 0.025, info_frac = c(0.5, 1.0),
+    alpha = 0.025, planned_info_frac = c(0.5, 1.0),
     Selection = FALSE, UpdateStrategy = FALSE,
     plotGraphs = FALSE
   )
@@ -1956,7 +1956,7 @@ testthat::test_that("AnalyzeLook_PC: selection validity at look > 1", {
 
   state1 <- SetupAnalysis_PC(
     WI = wi, G = g, test.type = "Dunnett",
-    alpha = 0.025, info_frac = c(0.5, 1.0),
+    alpha = 0.025, planned_info_frac = c(0.5, 1.0),
     Selection = TRUE, UpdateStrategy = FALSE,
     plotGraphs = FALSE
   )
@@ -2020,7 +2020,7 @@ testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
 
   state1 <- SetupAnalysis_PC(
     WI = wi, G = g, test.type = "Dunnett",
-    alpha = 0.025, info_frac = c(0.5, 1.0),
+    alpha = 0.025, planned_info_frac = c(0.5, 1.0),
     Selection = FALSE, UpdateStrategy = TRUE,
     plotGraphs = FALSE
   )
@@ -2167,7 +2167,7 @@ testthat::test_that("AnalyzeLook_PC: correlation update validity at look > 1", {
 
   state1 <- SetupAnalysis_PC(
     WI = wi, G = g, test.type = "Dunnett",
-    alpha = 0.025, info_frac = c(0.5, 1.0),
+    alpha = 0.025, planned_info_frac = c(0.5, 1.0),
     Selection = FALSE, UpdateStrategy = FALSE,
     plotGraphs = FALSE
   )
@@ -2272,7 +2272,7 @@ testthat::test_that("AnalyzeLook_PC: look-level sized correlation update maps to
 
   state <- SetupAnalysis_PC(
     WI = wi, G = g, test.type = "Dunnett",
-    alpha = 0.025, info_frac = c(0.5, 1.0),
+    alpha = 0.025, planned_info_frac = c(0.5, 1.0),
     Selection = TRUE, UpdateStrategy = TRUE,
     plotGraphs = FALSE
   )
@@ -2333,7 +2333,7 @@ testthat::test_that("AnalyzeLook_PC: Dunnett stays Dunnett when updated correlat
 
   state1 <- SetupAnalysis_PC(
     WI = wi, G = g, test.type = "Dunnett",
-    alpha = 0.025, info_frac = c(0.5, 1.0),
+    alpha = 0.025, planned_info_frac = c(0.5, 1.0),
     Selection = FALSE, UpdateStrategy = FALSE,
     plotGraphs = FALSE
   )
@@ -2374,7 +2374,7 @@ testthat::test_that("AnalyzeLook_PC output validation", {
 
     # Setting up the design
     state <- SetupAnalysis_PC(WI = c(1/2,1/2,0,0), G = G, test.type = "Partly-Parametric",
-                alpha = 0.025, info_frac = c(0.5,0.7,1), typeOfDesign = "asOF",
+                alpha = 0.025, planned_info_frac = c(0.5,0.7,1), typeOfDesign = "asOF",
                 plotGraphs = FALSE)
 
     # print("Initial design:")
