@@ -35,7 +35,9 @@ Supported values: "Bonf", "Sidak", "Simes", "Dunnett", "Partly-Parametric".}
 \item{alpha}{One-sided type-1 error.}
 
 \item{planned_info_frac}{Vector of cumulative information fractions planned at design
-time for the trial schedule across all looks.}
+time for the trial schedule across looks. PE analysis currently supports
+one-look or two-look workflows only. Values must be finite, strictly
+increasing, and in (0, 1].}
 
 \item{typeOfDesign}{Group sequential design type (rpact).}
 

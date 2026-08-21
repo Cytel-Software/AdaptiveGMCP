@@ -281,7 +281,9 @@ BuildPECorrelationMatrix <- function(
 #' Supported values: "Bonf", "Sidak", "Simes", "Dunnett", "Partly-Parametric".
 #' @param alpha One-sided type-1 error.
 #' @param planned_info_frac Vector of cumulative information fractions planned at design
-#' time for the trial schedule across all looks.
+#' time for the trial schedule across looks. PE analysis currently supports
+#' one-look or two-look workflows only. Values must be finite, strictly
+#' increasing, and in (0, 1].
 #' @param typeOfDesign Group sequential design type (rpact).
 #' @param deltaWT Parameter for typeOfDesign = "WT".
 #' @param deltaPT1 Parameter for typeOfDesign = "PT".
@@ -322,6 +324,30 @@ SetupAnalysis_PE_PC <- function(
     UpdateStrategy = TRUE,
     plotGraphs = TRUE )
 {
+  if( !is.numeric( planned_info_frac ) || length( planned_info_frac ) < 1L ||
+      length( planned_info_frac ) > 2L )
+  {
+    stop(
+      "PE analysis currently supports one-look or two-look workflows only. ",
+      "planned_info_frac must be a numeric vector of length 1 or 2."
+    )
+  }
+
+  if( anyNA( planned_info_frac ) || !all( is.finite( planned_info_frac ) ) )
+  {
+    stop( "planned_info_frac must contain finite, non-missing numeric values." )
+  }
+
+  if( any( planned_info_frac <= 0 ) || any( planned_info_frac > 1 ) )
+  {
+    stop( "planned_info_frac values must be in (0, 1]." )
+  }
+
+  if( length( planned_info_frac ) > 1L && any( diff( planned_info_frac ) <= 0 ) )
+  {
+    stop( "planned_info_frac must be strictly increasing." )
+  }
+
   ValidatePESampleSizes(
     fullpop_sample_sizes = planned_fullpop_sample_sizes,
     subpop_sample_sizes = planned_subpop_sample_sizes
@@ -358,6 +384,9 @@ SetupAnalysis_PE_PC <- function(
 #' look. The look-specific population correlation matrix is derived from the
 #' supplied full- and sub-population sample sizes and then passed to
 #' [AnalyzeLook_PC()].
+#' PE analysis currently supports a maximum of two analyzed looks per design
+#' state. Unplanned interim information-fraction values are allowed within
+#' those two looks.
 #'
 #' The current-look information fraction is computed internally as
 #' \code{fullpop_sample_sizes[1] / planned_fullpop_sample_sizes[1]} using the
@@ -399,6 +428,13 @@ AnalyzeLook_PE_PC <- function(
   if( !inherits( state, "PCAnalysisState" ) )
   {
     stop( "state must be a PCAnalysisState object" )
+  }
+
+  if( state$completed_looks >= 2L )
+  {
+    stop(
+      "PE analysis currently supports a maximum of 2 analyzed looks per design."
+    )
   }
 
   if( is.null( state$design_params$planned_fullpop_sample_sizes ) ||
