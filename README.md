@@ -88,9 +88,8 @@ state <- SetupAnalysis_PC(
   G            = G,
   test.type    = "Partly-Parametric",
   alpha        = 0.025,
-  info_frac    = c(0.5, 0.7, 1),
+  planned_info_frac = c(0.5, 0.7, 1),
   typeOfDesign = "asOF",
-  Correlation  = Correlation,
   plotGraphs   = FALSE
 )
 
@@ -98,6 +97,7 @@ state <- SetupAnalysis_PC(
 state <- AnalyzeLook_PC(
   state,
   p_raw      = c(H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30),
+  Correlation = Correlation,
   plotGraphs = FALSE
 )
 

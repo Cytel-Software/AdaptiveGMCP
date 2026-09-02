@@ -98,14 +98,17 @@
 #' Setup analysis object for Adaptive GMCP (P-value combination method)
 #'
 #' Creates a non-interactive analysis state object. Use [AnalyzeLook_PC()] to
-#' advance the analysis one look at a time.
+#' advance through the pre-specified looks one at a time. The inverse-normal
+#' weights and stopping boundaries are fixed at setup and are not recalculated
+#' during analysis.
 #'
 #' @param WI Vector of node weights for the initial graph
 #' @param G Transition matrix for the graph.
 #' @param test.type Character specifying test type.
 #' Supported values: "Bonf", "Sidak", "Simes", "Dunnett", "Partly-Parametric".
 #' @param alpha One-sided type-1 error.
-#' @param planned_info_frac Vector of cumulative information fractions planned at design time.
+#' @param planned_info_frac Vector of cumulative information fractions planned at design
+#' time. Its length determines the number of formal analysis looks.
 #' @param typeOfDesign Group sequential design type (rpact).
 #' Supported values: "OF" (O'Brien & Fleming), "P" (Pocock), "WT" (Wang & Tsiatis Delta class), 
 #'      "PT" (Pampallona & Tsiatis), "HP" (Haybittle & Peto), 
@@ -117,9 +120,6 @@
 #' @param deltaPT1 Parameter for typeOfDesign = "PT".
 #' @param gammaA Parameter for typeOfDesign = "asHSD" or "asKD".
 #' @param userAlphaSpending Alpha spending values for typeOfDesign = "asUser".
-#' @param info_frac_tolerance Numeric scalar in (0, 1); absolute tolerance used
-#' to map the current look's actual information fraction to planned information
-#' fractions.
 #' @param MultipleWinners Logical; TRUE means reject as many hypotheses as possible, 
 #'        FALSE means reject at most one hypothesis
 #' @param Selection Logical; TRUE if selection of hypotheses is allowed at interim looks
@@ -146,7 +146,6 @@ SetupAnalysis_PC <- function(
     deltaPT1 = 0,
     gammaA = 2,
     userAlphaSpending = NULL,
-    info_frac_tolerance = 0.05,
     MultipleWinners = TRUE,
     Selection = TRUE, # TODO: Check if Selection parameter is really required at setup stage.
     UpdateStrategy = TRUE, # TODO: Check if UpdateStrategy parameter is really required at setup stage.
@@ -160,12 +159,6 @@ SetupAnalysis_PC <- function(
   if (k < 1) stop("planned_info_frac must have length >= 1")
   if (any(planned_info_frac <= 0) || any(planned_info_frac > 1)) stop("planned_info_frac must be in (0, 1]")
   if (any(diff(planned_info_frac) <= 0)) stop("planned_info_frac must be strictly increasing")
-  if (!is.numeric(info_frac_tolerance) || length(info_frac_tolerance) != 1L || is.na(info_frac_tolerance)) {
-    stop("info_frac_tolerance must be a single numeric value")
-  }
-  if (info_frac_tolerance <= 0 || info_frac_tolerance >= 1) {
-    stop("info_frac_tolerance must be strictly > 0 and < 1")
-  }
 
   GlobalIndexSet <- paste0("H", seq_len(d))
 
@@ -272,7 +265,6 @@ SetupAnalysis_PC <- function(
     deltaPT1 = deltaPT1,
     gammaA = gammaA,
     userAlphaSpending = userAlphaSpending,
-    info_frac_tolerance = info_frac_tolerance,
     MultipleWinners = MultipleWinners,
     Selection = Selection,
     UpdateStrategy = UpdateStrategy
@@ -299,14 +291,15 @@ SetupAnalysis_PC <- function(
 #' Analyze one look for Adaptive GMCP (P-value combination method)
 #'
 #' Advances an existing [SetupAnalysis_PC()] state object by exactly one look.
+#' The state-implied look number selects the pre-specified inverse-normal
+#' combination weights and stopping boundary. The caller is responsible for
+#' performing each formal analysis at its scheduled information fraction.
 #' Optional selection / strategy modification / correlation updates may be applied
 #' before the look is analyzed (these represent decisions made after the previous look).
 #'
 #' @param state A "PCAnalysisState" object.
 #' @param p_raw Named numeric vector of raw p-values for the current look, for the
 #'   currently active hypotheses (state$mcpObj$IndexSet).
-#' @param info_frac_cur Numeric scalar; cumulative information fraction observed
-#'   at the current look.
 #' @param Correlation Optional D_active x D_active correlation matrix for the
 #'   currently active hypotheses (\code{length(state$mcpObj$IndexSet)}). Mandatory
 #'   at look 1 when \code{test.type} is \code{"Dunnett"} or \code{"Partly-Parametric"}.
@@ -329,7 +322,6 @@ SetupAnalysis_PC <- function(
 AnalyzeLook_PC <- function(
     state,
     p_raw,
-    info_frac_cur,
     Correlation = NULL,
     look = NULL,
     selection = NULL,
@@ -350,46 +342,6 @@ AnalyzeLook_PC <- function(
 
   mcpObj <- state$mcpObj
   next_look <- as.integer(state$completed_looks + 1L)
-
-  if (!is.numeric(info_frac_cur) || length(info_frac_cur) != 1L || is.na(info_frac_cur)) {
-    stop("info_frac_cur must be a single numeric value")
-  }
-
-  tolerance <- state$design_params$info_frac_tolerance
-  if (is.null(tolerance)) {
-    tolerance <- 0.05
-  }
-
-  is_final_look <- info_frac_cur >= (1.0 - tolerance)
-  if (!is_final_look) {
-    if (info_frac_cur <= 0 || info_frac_cur >= (1.0 - tolerance)) {
-      stop(
-        "For interim looks, info_frac_cur must be in (0, ",
-        round(1.0 - tolerance, 6), "). Got ",
-        info_frac_cur
-      )
-    }
-  } else if (info_frac_cur > (1.0 + tolerance)) {
-    stop(
-      "For final look, info_frac_cur must be <= ",
-      round(1.0 + tolerance, 6), ". Got ",
-      info_frac_cur
-    )
-  }
-
-  prev_info_frac <- if (next_look > 1L) {
-    state$look_history[[next_look - 1L]]$info_frac_cur
-  } else {
-    0
-  }
-  if (next_look > 1L && (is.null(prev_info_frac) || info_frac_cur <= prev_info_frac)) {
-    stop(
-      "info_frac_cur must be strictly increasing across looks. Previous: ",
-      prev_info_frac,
-      ", Current: ",
-      info_frac_cur
-    )
-  }
 
   if (!is.null(look)) {
     if (!is.numeric(look) || length(look) != 1L || look != as.integer(look) || look < 1L) {
@@ -479,70 +431,7 @@ AnalyzeLook_PC <- function(
   }
 
   mcpObj$p_raw <- addNAPvalue(p_raw, mcpObj$IntialHypothesis)
-
-  planned_info_frac <- state$design_params$info_frac
-  observed_info_frac <- c(
-    vapply(state$look_history, function(x) x$info_frac_cur, numeric(1), USE.NAMES = FALSE),
-    info_frac_cur
-  )
-
-  if (is_final_look) {
-    reconstructed_info_frac <- observed_info_frac
-  } else {
-    matched_idx <- which(abs(planned_info_frac - info_frac_cur) <= tolerance)
-    if (length(matched_idx) > 0L) {
-      mapped_idx <- matched_idx[which.min(abs(planned_info_frac[matched_idx] - info_frac_cur))]
-      if (mapped_idx < length(planned_info_frac)) {
-        planned_future_info_frac <- planned_info_frac[seq.int(mapped_idx + 1L, length(planned_info_frac))]
-      } else {
-        planned_future_info_frac <- numeric(0)
-      }
-    } else {
-      planned_future_info_frac <- planned_info_frac[planned_info_frac > info_frac_cur]
-    }
-
-    if (length(planned_future_info_frac) == 0L) {
-      stop(
-        "No future planned IF remains in a non-final look. ",
-        "Check IF finality logic or planned IF vector."
-      )
-    }
-    reconstructed_info_frac <- c(observed_info_frac, planned_future_info_frac)
-  }
-
-  k_reconstructed <- length(reconstructed_info_frac)
-  rpact_info_frac <- reconstructed_info_frac
-  if (is_final_look && info_frac_cur > 1.0) {
-    rpact_info_frac[next_look] <- 1.0
-  }
-
-  des <- .pc_get_design_group_sequential(
-    design_params = state$design_params,
-    information_rates = rpact_info_frac,
-    k_max = k_reconstructed
-  )
-
-  thresholds <- des$stageLevels
-  alpha_spent <- des$alphaSpent
-  current_cutoff <- thresholds[next_look]
-
-  inv_norm <- .pc_compute_invnorm_weights(reconstructed_info_frac)
-  mcpObj$InvNormWeights <- inv_norm$InvNormWeights
-  mcpObj$W_Norm <- inv_norm$W_Norm
-
-  incr_alpha <- c(alpha_spent[1], diff(alpha_spent))
-  mcpObj$bdryTab <- data.frame(
-    Look = seq_len(k_reconstructed),
-    Information_Fraction = reconstructed_info_frac,
-    Incr_alpha_spent = incr_alpha,
-    ZScale_Eff_Bbry = des$criticalValues,
-    PValue_Eff_Bbry = thresholds,
-    row.names = NULL
-  )
-
-  state$thresholds <- thresholds
-  mcpObj$LastLook <- k_reconstructed
-  mcpObj$CutOff <- current_cutoff
+  mcpObj$CutOff <- state$thresholds[next_look]
 
   mcpObj <- PerLookMCPAnalysis(mcpObj, mvtnorm_algo = state$mvtnorm_algo)
 
@@ -562,12 +451,10 @@ AnalyzeLook_PC <- function(
   state$design_params$test.type <- mcpObj$test.type
 
   state$look_history[[next_look]] <- list(
-    info_frac_cur = info_frac_cur,
-    is_final_look = is_final_look,
+    is_final_look = next_look == mcpObj$LastLook,
     mcpObj = mcpObj,
     inputs = list(
       p_raw = p_raw,
-      info_frac_cur = info_frac_cur,
       Correlation = Correlation,
       selection = selection,
       new_weights = new_weights,
@@ -575,11 +462,11 @@ AnalyzeLook_PC <- function(
     )
   )
 
-  if (isTRUE(StopTrial(mcpObj)) || length(mcpObj$IndexSet) == 0 || is_final_look) {
+  if (isTRUE(StopTrial(mcpObj)) || length(mcpObj$IndexSet) == 0 || next_look == mcpObj$LastLook) {
     state$trial_completed <- TRUE
     if (length(mcpObj$IndexSet) == 0) {
       state$completion_reason <- "all_hypotheses_dropped"
-    } else if (is_final_look) {
+    } else if (next_look == mcpObj$LastLook) {
       state$completion_reason <- "final_look"
     } else {
       state$completion_reason <- "early_stop_efficacy"

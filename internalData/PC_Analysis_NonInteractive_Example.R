@@ -83,7 +83,6 @@ print(state2$mcpObj$bdryTab)
 # state2_s1 <- AnalyzeLook_PC(
 #   state2_s1,
 #   look          = 1,
-#   info_frac_cur = 1.0/3.0,
 #   p_raw         = c(H1 = 0.00001, H2 = 0.40),
 #   Correlation   = Correlation2,
 #   plotGraphs    = plotGraphs2
@@ -96,11 +95,10 @@ print(state2$mcpObj$bdryTab)
 # state2_s1 <- AnalyzeLook_PC(
 #   state2_s1,
 #   look          = 2,
-#   info_frac_cur = 2.0/3.0,
 #   p_raw         = c(H2 = 0.20),
 #   plotGraphs    = plotGraphs2
 # )
-# print("SCENARIO (1) - Recomputed stopping boundaries after look 2:")
+# print("SCENARIO (1) - Pre-specified stopping boundaries:")
 # print(state2_s1$mcpObj$bdryTab)
 
 #===================================================================================
@@ -113,7 +111,6 @@ state2_s2 <- state2
 state2_s2 <- AnalyzeLook_PC(
   state2_s2,
   look          = 1,
-  info_frac_cur = 1.0/3.0,
   p_raw         = c(H1 = 0.10, H2 = 0.20),
   Correlation   = Correlation2,
   plotGraphs    = plotGraphs2
@@ -126,12 +123,11 @@ print(state2_s2)
 state2_s2 <- AnalyzeLook_PC(
   state2_s2,
   look          = 2,
-  info_frac_cur = 2.0/3.0,
   p_raw         = c(H1 = 0.03),
   selection     = c("H1"),
   plotGraphs    = plotGraphs2
 )
-print("SCENARIO (2) - Recomputed stopping boundaries after look 2:")
+print("SCENARIO (2) - Pre-specified stopping boundaries:")
 print(state2_s2$mcpObj$bdryTab)
 ###################################################################################
 
@@ -195,7 +191,6 @@ print(state)
 state <- AnalyzeLook_PC(
   state,
   look         = 1,
-  info_frac_cur = 0.5,
   p_raw        = c(H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30),
   Correlation  = Correlation,
   plotGraphs = plotGraphs
@@ -207,7 +202,6 @@ print(state)
 state <- AnalyzeLook_PC(
   state,
   look         = 2,
-  info_frac_cur = 0.7,
   p_raw        = c(H1 = 0.02, H2 = 0.10, H4 = 0.40),
   selection    = c("H1", "H2", "H4"),
   plotGraphs = plotGraphs
@@ -218,7 +212,6 @@ print(state)
 state <- AnalyzeLook_PC(
   state,
   look         = 3,
-  info_frac_cur = 1.0,
   p_raw        = c(H2 = 0.005, H4 = 0.10),
   plotGraphs = plotGraphs
 )

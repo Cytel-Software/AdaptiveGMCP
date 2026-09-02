@@ -15,9 +15,6 @@ SetupAnalysis_PE_PC(
   deltaPT1 = 0,
   gammaA = 2,
   userAlphaSpending = NULL,
-  info_frac_tolerance = 0.05,
-  planned_fullpop_sample_sizes,
-  planned_subpop_sample_sizes,
   MultipleWinners = TRUE,
   Selection = TRUE,
   UpdateStrategy = TRUE,
@@ -36,7 +33,8 @@ Supported values: "Bonf", "Sidak", "Simes", "Dunnett", "Partly-Parametric".}
 
 \item{planned_info_frac}{Vector of cumulative information fractions planned at design
 time for the trial schedule across looks. PE analysis currently supports
-one-look or two-look workflows only. Values must be finite, strictly
+one-look or two-look workflows only. Values determine the fixed PC
+combination weights and stopping boundaries, and must be finite, strictly
 increasing, and in (0, 1].}
 
 \item{typeOfDesign}{Group sequential design type (rpact).}
@@ -48,15 +46,6 @@ increasing, and in (0, 1].}
 \item{gammaA}{Parameter for typeOfDesign = "asHSD" or "asKD".}
 
 \item{userAlphaSpending}{Alpha spending values for typeOfDesign = "asUser".}
-
-\item{info_frac_tolerance}{Numeric scalar in (0, 1); absolute tolerance for
-matching current information fraction to planned fractions in the PC engine.}
-
-\item{planned_fullpop_sample_sizes}{Numeric vector of planned cumulative
-full-population sample sizes for the entire trial ordered as control first, then treatment arms.}
-
-\item{planned_subpop_sample_sizes}{Numeric vector of planned cumulative
-subgroup sample sizes for the entire trial ordered as control first, then treatment arms.}
 
 \item{MultipleWinners}{Logical; TRUE means reject as many hypotheses as
 possible, FALSE means reject at most one hypothesis.}

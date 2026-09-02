@@ -1,5 +1,11 @@
 # AdaptGMCP 2.1.0 (2026-04-11)
 
+## Bug Fixes
+
+* Non-interactive PC and PE-PC analyses now retain their design-time
+  inverse-normal combination weights and stopping boundaries for all formal looks.
+  `AnalyzeLook_PC()` no longer accepts a current information fraction.
+
 ## New Features
 
 ### Non-Interactive Analysis Interface (P-Value Combination Method)

@@ -1,13 +1,6 @@
 AnalyzeLook_PC_TestWrapper <- function( state, ... )
 {
   lArgs <- list( ... )
-  if( inherits( state, "PCAnalysisState" ) && is.null( lArgs$info_frac_cur ) )
-  {
-    nNextLook <- state$completed_looks + 1L
-    nPlannedLooks <- length( state$design_params$info_frac )
-    lArgs$info_frac_cur <- state$design_params$info_frac[ min( nNextLook, nPlannedLooks ) ]
-  }
-
   lArgs$state <- state
   return( do.call( AnalyzeLook_PC, lArgs ) )
 }
@@ -2381,7 +2374,7 @@ testthat::test_that("AnalyzeLook_PC output validation", {
     # print(state)
 
     # Look 1 Analysis
-    state <- AnalyzeLook_PC(state, look = 1, info_frac_cur = 0.5,
+    state <- AnalyzeLook_PC(state, look = 1,
                 p_raw = c(H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30),
                 Correlation  = corr, plotGraphs = FALSE)
 
@@ -2398,7 +2391,7 @@ testthat::test_that("AnalyzeLook_PC output validation", {
     testthat::expect_true( CompareImportantMcpMembers( act_out, exp_out ) )
 
     # Look 2 Analysis
-    state <- AnalyzeLook_PC(state, look = 2, info_frac_cur = 0.7,
+    state <- AnalyzeLook_PC(state, look = 2,
                 p_raw = c(H1 = 0.02, H2 = 0.10, H4 = 0.40),
                 selection = c("H1", "H2", "H4"), plotGraphs = FALSE)
 
@@ -2408,7 +2401,7 @@ testthat::test_that("AnalyzeLook_PC output validation", {
     testthat::expect_true( CompareImportantMcpMembers( act_out, exp_out ) )
 
     # Look 3 Analysis
-    state <- AnalyzeLook_PC(state, look = 3, info_frac_cur = 1,
+    state <- AnalyzeLook_PC(state, look = 3,
                 p_raw = c(H2 = 0.005, H4 = 0.10), plotGraphs = FALSE)
 
     exp_out <- readRDS(testthat::test_path("PC-test-01.l3.mcpObj.rds"))
