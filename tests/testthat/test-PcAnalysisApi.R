@@ -319,16 +319,16 @@ testthat::test_that("AnalyzeLook_PC: look argument validation and error handling
 
   testthat::expect_equal(state1_null, state1_expl)
 
-  # --- After final look: specific "final look" error ---
+  # --- After final look: completed-trial error ---
 
   # Run look 2 to complete the trial
   state2 <- AnalyzeLook_PC_TestWrapper(state1_null, p_raw = c(H1 = 0.10, H2 = 0.20), look = 2L, plotGraphs = FALSE)
   testthat::expect_true(state2$trial_completed)
 
-  # Calling again after final look must name the final look in the error message
+  # Calling again after final look must report that the trial has concluded.
   testthat::expect_error(
     AnalyzeLook_PC_TestWrapper(state2, p_raw = c(H1 = 0.10, H2 = 0.20), plotGraphs = FALSE),
-    regexp = "was the final look"
+    regexp = "Trial already concluded"
   )
 
   # --- Early stopping: trial already concluded before final look ---

@@ -226,7 +226,7 @@ testthat::test_that( "AnalyzeLook_PE_PC rejects a call after the planned final l
       subpop_sample_sizes = c( 45, 45 ),
       plotGraphs = FALSE
     ),
-    "Look 2 was the final look - the trial analysis is already complete"
+    "Trial already concluded - stopping criteria met"
   )
 } )
 

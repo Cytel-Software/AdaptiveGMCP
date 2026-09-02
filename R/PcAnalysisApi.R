@@ -331,17 +331,18 @@ AnalyzeLook_PC <- function(
   if (!inherits(state, "PCAnalysisState")) stop("state must be a PCAnalysisState object")
 
   if (isTRUE(state$trial_completed)) {
-    if (state$completed_looks >= state$mcpObj$LastLook) {
-      stop(
-        "Look ", state$mcpObj$LastLook, " was the final look - ",
-        "the trial analysis is already complete."
-      )
-    }
     stop("Trial already concluded - stopping criteria met.")
   }
 
   mcpObj <- state$mcpObj
   next_look <- as.integer(state$completed_looks + 1L)
+
+  if (next_look > mcpObj$LastLook) {
+    stop(
+      "All planned looks have been analyzed. ",
+      "The trial analysis is already complete."
+    )
+  }
 
   if (!is.null(look)) {
     if (!is.numeric(look) || length(look) != 1L || look != as.integer(look) || look < 1L) {

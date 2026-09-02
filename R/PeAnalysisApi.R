@@ -361,14 +361,6 @@ AnalyzeLook_PE_PC <- function(
 
   if( isTRUE( state$trial_completed ) )
   {
-    if( state$completed_looks >= state$mcpObj$LastLook )
-    {
-      stop(
-        "Look ", state$mcpObj$LastLook, " was the final look - ",
-        "the trial analysis is already complete."
-      )
-    }
-
     stop( "Trial already concluded - stopping criteria met." )
   }
 
