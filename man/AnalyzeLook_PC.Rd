@@ -7,7 +7,6 @@
 AnalyzeLook_PC(
   state,
   p_raw,
-  info_frac_cur,
   Correlation = NULL,
   look = NULL,
   selection = NULL,
@@ -21,9 +20,6 @@ AnalyzeLook_PC(
 
 \item{p_raw}{Named numeric vector of raw p-values for the current look, for the
 currently active hypotheses (state$mcpObj$IndexSet).}
-
-\item{info_frac_cur}{Numeric scalar; cumulative information fraction observed
-at the current look.}
 
 \item{Correlation}{Optional D_active x D_active correlation matrix for the
 currently active hypotheses (\code{length(state$mcpObj$IndexSet)}). Mandatory
@@ -52,6 +48,9 @@ Updated "PCAnalysisState".
 }
 \description{
 Advances an existing [SetupAnalysis_PC()] state object by exactly one look.
+The state-implied look number selects the pre-specified inverse-normal
+combination weights and stopping boundary. The caller is responsible for
+performing each formal analysis at its scheduled information fraction.
 Optional selection / strategy modification / correlation updates may be applied
 before the look is analyzed (these represent decisions made after the previous look).
 }

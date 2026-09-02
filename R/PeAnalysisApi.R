@@ -41,57 +41,6 @@ ValidatePESampleSizes <- function(fullpop_sample_sizes, subpop_sample_sizes)
   return( invisible( TRUE ) )
 }
 
-ValidatePEActualWithinPlanned <- function(
-    fullpop_sample_sizes,
-    subpop_sample_sizes,
-    planned_fullpop_sample_sizes,
-    planned_subpop_sample_sizes)
-{
-  if( length( fullpop_sample_sizes ) != length( planned_fullpop_sample_sizes ) ||
-      length( subpop_sample_sizes ) != length( planned_subpop_sample_sizes ) )
-  {
-    stop(
-      "Current-look sample-size vectors must have the same length as the planned baseline vectors."
-    )
-  }
-
-  if( any( fullpop_sample_sizes > planned_fullpop_sample_sizes ) )
-  {
-    stop( "Cumulative full-population sample sizes at a look must be <= planned full-population sample sizes." )
-  }
-
-  if( any( subpop_sample_sizes > planned_subpop_sample_sizes ) )
-  {
-    stop( "Cumulative subgroup sample sizes at a look must be <= planned subgroup sample sizes." )
-  }
-
-  return( invisible( TRUE ) )
-}
-
-ComputePEInfoFracFromControl <- function(fullpop_sample_sizes, planned_fullpop_sample_sizes)
-{
-  dNumerator <- fullpop_sample_sizes[ 1 ]
-  dDenominator <- planned_fullpop_sample_sizes[ 1 ]
-
-  if( !is.finite( dDenominator ) || dDenominator <= 0 )
-  {
-    stop( "Planned full-population control-arm sample size must be finite and > 0." )
-  }
-
-  dInfoFrac <- dNumerator / dDenominator
-
-  if( !is.finite( dInfoFrac ) || dInfoFrac <= 0 )
-  {
-    stop( "Computed information fraction must be finite and > 0." )
-  }
-
-  return( list(
-    info_frac_cur = dInfoFrac,
-    numerator_fullpop_control = dNumerator,
-    denominator_planned_fullpop_control = dDenominator
-  ) )
-}
-
 ComputePETreatmentCorrelation <- function(sample_sizes, treatment_index_1, treatment_index_2)
 {
   control_size <- sample_sizes[ 1 ]
@@ -282,19 +231,14 @@ BuildPECorrelationMatrix <- function(
 #' @param alpha One-sided type-1 error.
 #' @param planned_info_frac Vector of cumulative information fractions planned at design
 #' time for the trial schedule across looks. PE analysis currently supports
-#' one-look or two-look workflows only. Values must be finite, strictly
+#' one-look or two-look workflows only. Values determine the fixed PC
+#' combination weights and stopping boundaries, and must be finite, strictly
 #' increasing, and in (0, 1].
 #' @param typeOfDesign Group sequential design type (rpact).
 #' @param deltaWT Parameter for typeOfDesign = "WT".
 #' @param deltaPT1 Parameter for typeOfDesign = "PT".
 #' @param gammaA Parameter for typeOfDesign = "asHSD" or "asKD".
 #' @param userAlphaSpending Alpha spending values for typeOfDesign = "asUser".
-#' @param info_frac_tolerance Numeric scalar in (0, 1); absolute tolerance for
-#' matching current information fraction to planned fractions in the PC engine.
-#' @param planned_fullpop_sample_sizes Numeric vector of planned cumulative
-#' full-population sample sizes for the entire trial ordered as control first, then treatment arms.
-#' @param planned_subpop_sample_sizes Numeric vector of planned cumulative
-#' subgroup sample sizes for the entire trial ordered as control first, then treatment arms.
 #' @param MultipleWinners Logical; TRUE means reject as many hypotheses as
 #' possible, FALSE means reject at most one hypothesis.
 #' @param Selection Logical; TRUE if selection of hypotheses is allowed at
@@ -316,9 +260,6 @@ SetupAnalysis_PE_PC <- function(
     deltaPT1 = 0,
     gammaA = 2,
     userAlphaSpending = NULL,
-    info_frac_tolerance = 0.05,
-    planned_fullpop_sample_sizes,
-    planned_subpop_sample_sizes,
     MultipleWinners = TRUE,
     Selection = TRUE,
     UpdateStrategy = TRUE,
@@ -348,11 +289,6 @@ SetupAnalysis_PE_PC <- function(
     stop( "planned_info_frac must be strictly increasing." )
   }
 
-  ValidatePESampleSizes(
-    fullpop_sample_sizes = planned_fullpop_sample_sizes,
-    subpop_sample_sizes = planned_subpop_sample_sizes
-  )
-
   state <- SetupAnalysis_PC(
     WI = WI,
     G = G,
@@ -364,15 +300,12 @@ SetupAnalysis_PE_PC <- function(
     deltaPT1 = deltaPT1,
     gammaA = gammaA,
     userAlphaSpending = userAlphaSpending,
-    info_frac_tolerance = info_frac_tolerance,
     MultipleWinners = MultipleWinners,
     Selection = Selection,
     UpdateStrategy = UpdateStrategy,
     plotGraphs = plotGraphs
   )
 
-  state$design_params$planned_fullpop_sample_sizes <- planned_fullpop_sample_sizes
-  state$design_params$planned_subpop_sample_sizes <- planned_subpop_sample_sizes
   state$pe_sample_history <- vector( "list", 0 )
 
   return( state )
@@ -384,13 +317,9 @@ SetupAnalysis_PE_PC <- function(
 #' look. The look-specific population correlation matrix is derived from the
 #' supplied full- and sub-population sample sizes and then passed to
 #' [AnalyzeLook_PC()].
-#' PE analysis currently supports a maximum of two analyzed looks per design
-#' state. Unplanned interim information-fraction values are allowed within
-#' those two looks.
-#'
-#' The current-look information fraction is computed internally as
-#' \code{fullpop_sample_sizes[1] / planned_fullpop_sample_sizes[1]} using the
-#' control-arm cumulative sample size only.
+#' PE analysis currently supports a maximum of two analyzed looks per design state.
+#' The caller is responsible for performing each formal analysis at its
+#' scheduled information fraction.
 #'
 #' The two sample-size vectors must follow \code{(n0, n1, n2, ...)} where
 #' \code{n0} is the control arm and subsequent entries correspond to treatment
@@ -430,6 +359,11 @@ AnalyzeLook_PE_PC <- function(
     stop( "state must be a PCAnalysisState object" )
   }
 
+  if( isTRUE( state$trial_completed ) )
+  {
+    stop( "Trial already concluded - stopping criteria met." )
+  }
+
   if( state$completed_looks >= 2L )
   {
     stop(
@@ -437,27 +371,9 @@ AnalyzeLook_PE_PC <- function(
     )
   }
 
-  if( is.null( state$design_params$planned_fullpop_sample_sizes ) ||
-      is.null( state$design_params$planned_subpop_sample_sizes ) )
-  {
-    stop(
-      "state is missing planned PE sample-size baselines. Recreate state with SetupAnalysis_PE_PC()."
-    )
-  }
-
   ValidatePESampleSizes(
     fullpop_sample_sizes = fullpop_sample_sizes,
     subpop_sample_sizes = subpop_sample_sizes
-  )
-
-  vPlannedFull <- state$design_params$planned_fullpop_sample_sizes
-  vPlannedSub <- state$design_params$planned_subpop_sample_sizes
-
-  ValidatePEActualWithinPlanned(
-    fullpop_sample_sizes = fullpop_sample_sizes,
-    subpop_sample_sizes = subpop_sample_sizes,
-    planned_fullpop_sample_sizes = vPlannedFull,
-    planned_subpop_sample_sizes = vPlannedSub
   )
 
   if( state$completed_looks > 0L )
@@ -478,11 +394,6 @@ AnalyzeLook_PE_PC <- function(
       stop( "Cumulative sample sizes must be non-decreasing across looks." )
     }
   }
-
-  lInfoFrac <- ComputePEInfoFracFromControl(
-    fullpop_sample_sizes = fullpop_sample_sizes,
-    planned_fullpop_sample_sizes = vPlannedFull
-  )
 
   nInitial <- length( state$mcpObj$IntialHypothesis )
   dFullCorrelation <- BuildPECorrelationMatrix(
@@ -519,7 +430,6 @@ AnalyzeLook_PE_PC <- function(
     list(
       state = state,
       p_raw = p_raw,
-      info_frac_cur = lInfoFrac$info_frac_cur,
       Correlation = dCorrelation,
       look = look,
       selection = selection,
@@ -534,19 +444,10 @@ AnalyzeLook_PE_PC <- function(
     # Update PE look history only after successful completion of this look.
     lPELookInfo <- list(
       fullpop = fullpop_sample_sizes,
-      subpop = subpop_sample_sizes,
-      info_frac_cur = lInfoFrac$info_frac_cur,
-      numerator_fullpop_control = lInfoFrac$numerator_fullpop_control,
-      denominator_planned_fullpop_control = lInfoFrac$denominator_planned_fullpop_control
+      subpop = subpop_sample_sizes
     )
 
     state$pe_sample_history[[ state$completed_looks ]] <- lPELookInfo
-
-    state$look_history[[ state$completed_looks ]]$pe_info_frac <- list(
-      info_frac_cur = lInfoFrac$info_frac_cur,
-      numerator_fullpop_control = lInfoFrac$numerator_fullpop_control,
-      denominator_planned_fullpop_control = lInfoFrac$denominator_planned_fullpop_control
-    )
   }
 
   return( state )

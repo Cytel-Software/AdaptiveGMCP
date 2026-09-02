@@ -33,8 +33,7 @@ library(AdaptGMCP)
 #   test.type = test,
 #   alpha = alp,
 #   planned_info_frac = t,
-#   planned_fullpop_sample_sizes = c( 100, 100 ),
-#   planned_subpop_sample_sizes = c( 50, 50 ))
+#   plotGraphs = FALSE)
 
 # print(design)
 
@@ -79,8 +78,7 @@ library(AdaptGMCP)
 #   alpha = alp,
 #   planned_info_frac = t,
 #   typeOfDesign = des,
-#   planned_fullpop_sample_sizes = c( 100, 100 ),
-#   planned_subpop_sample_sizes = c( 53, 49 )
+#   plotGraphs = FALSE
 #   )
 
 # print(design)
@@ -148,8 +146,7 @@ design <- SetupAnalysis_PE_PC(
   alpha = alp,
   planned_info_frac = t,
   typeOfDesign = des,
-  planned_fullpop_sample_sizes = c( 100, 100, 100 ),
-  planned_subpop_sample_sizes = c( 50, 50, 50 ))
+  plotGraphs = FALSE)
 
 print(design)
 
@@ -185,8 +182,7 @@ design <- SetupAnalysis_PE_PC(
   alpha = alp,
   planned_info_frac = c(0.7, 1),
   typeOfDesign = des,
-  planned_fullpop_sample_sizes = c( 100, 100, 100 ),
-  planned_subpop_sample_sizes = c( 50, 50, 50 ))
+  plotGraphs = FALSE)
 
 print(design)
 
@@ -253,8 +249,7 @@ design <- SetupAnalysis_PE_PC(
   alpha = alp,
   planned_info_frac = t,
   typeOfDesign = des,
-  planned_fullpop_sample_sizes = c( 100, 100, 100 ),
-  planned_subpop_sample_sizes = c( 50, 50, 50 ))
+  plotGraphs = FALSE)
 
 print(design)
 
@@ -293,8 +288,7 @@ design <- SetupAnalysis_PE_PC(
   alpha = alp,
   planned_info_frac = t,
   typeOfDesign = des,
-  planned_fullpop_sample_sizes = c( 100, 140, 123 ),
-  planned_subpop_sample_sizes = c( 48, 80, 70 ))
+  plotGraphs = FALSE)
 
 print(design)
 
@@ -341,7 +335,7 @@ des <- "asOF"
 # Setting up the design first
 design <- SetupAnalysis_PE_PC(
   WI = wi, G = g, test.type = test, alpha = alp, planned_info_frac = t, typeOfDesign = des,
-  planned_fullpop_sample_sizes = c( 100, 140, 123 ), planned_subpop_sample_sizes = c( 48, 80, 70 ))
+  plotGraphs = FALSE)
 
 print(design)
 
@@ -417,8 +411,7 @@ des <- "asOF"
 # Setting up the design first
 design <- SetupAnalysis_PE_PC(WI = wi, G = G, test.type = test, alpha = alp, 
                               planned_info_frac = t, typeOfDesign = des,
-                              planned_fullpop_sample_sizes = c( 100, 100, 100 ),
-                              planned_subpop_sample_sizes = c( 50, 50, 50 ))
+                              plotGraphs = FALSE)
 
 print(design)
 

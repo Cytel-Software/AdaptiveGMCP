@@ -16,7 +16,6 @@ SetupAnalysis_PC(
   deltaPT1 = 0,
   gammaA = 2,
   userAlphaSpending = NULL,
-  info_frac_tolerance = 0.05,
   MultipleWinners = TRUE,
   Selection = TRUE,
   UpdateStrategy = TRUE,
@@ -33,7 +32,8 @@ Supported values: "Bonf", "Sidak", "Simes", "Dunnett", "Partly-Parametric".}
 
 \item{alpha}{One-sided type-1 error.}
 
-\item{planned_info_frac}{Vector of cumulative information fractions planned at design time.}
+\item{planned_info_frac}{Vector of cumulative information fractions planned at design
+time. Its length determines the number of formal analysis looks.}
 
 \item{typeOfDesign}{Group sequential design type (rpact).
 Supported values: "OF" (O'Brien & Fleming), "P" (Pocock), "WT" (Wang & Tsiatis Delta class), 
@@ -51,10 +51,6 @@ Supported values: "OF" (O'Brien & Fleming), "P" (Pocock), "WT" (Wang & Tsiatis D
 
 \item{userAlphaSpending}{Alpha spending values for typeOfDesign = "asUser".}
 
-\item{info_frac_tolerance}{Numeric scalar in (0, 1); absolute tolerance used
-to map the current look's actual information fraction to planned information
-fractions.}
-
 \item{MultipleWinners}{Logical; TRUE means reject as many hypotheses as possible, 
 FALSE means reject at most one hypothesis}
 
@@ -69,5 +65,7 @@ An object of class "PCAnalysisState".
 }
 \description{
 Creates a non-interactive analysis state object. Use [AnalyzeLook_PC()] to
-advance the analysis one look at a time.
+advance through the pre-specified looks one at a time. The inverse-normal
+weights and stopping boundaries are fixed at setup and are not recalculated
+during analysis.
 }
