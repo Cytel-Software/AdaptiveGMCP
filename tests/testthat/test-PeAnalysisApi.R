@@ -188,7 +188,7 @@ testthat::test_that( "AnalyzeLook_PE_PC validates look-level sample sizes", {
 
 } )
 
-testthat::test_that( "AnalyzeLook_PE_PC allows up to two looks and rejects a third call", {
+testthat::test_that( "AnalyzeLook_PE_PC rejects a call after the planned final look", {
   wi <- rep( 0.5, 2 )
   g <- matrix( c( 0, 1, 1, 0 ), byrow = TRUE, nrow = 2 )
 
@@ -226,7 +226,30 @@ testthat::test_that( "AnalyzeLook_PE_PC allows up to two looks and rejects a thi
       subpop_sample_sizes = c( 45, 45 ),
       plotGraphs = FALSE
     ),
-    "PE analysis currently supports a maximum of 2 analyzed looks per design"
+    "Look 2 was the final look - the trial analysis is already complete"
+  )
+} )
+
+testthat::test_that( "AnalyzeLook_PE_PC short-circuits completed trials", {
+  peState <- SetupAnalysis_PE_PC(
+    WI = c( 0.5, 0.5 ),
+    G = matrix( c( 0, 1, 1, 0 ), byrow = TRUE, nrow = 2 ),
+    test.type = "Bonf",
+    planned_info_frac = c( 1 ),
+    plotGraphs = FALSE
+  )
+
+  peState$trial_completed <- TRUE
+
+  testthat::expect_error(
+    AnalyzeLook_PE_PC(
+      state = peState,
+      p_raw = c( H1 = 0.5, H2 = 0.6 ),
+      fullpop_sample_sizes = numeric( 0 ),
+      subpop_sample_sizes = numeric( 0 ),
+      plotGraphs = FALSE
+    ),
+    "Trial already concluded - stopping criteria met"
   )
 } )
 
