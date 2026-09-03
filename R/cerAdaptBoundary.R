@@ -109,7 +109,7 @@ adaptBdryCER <- function(mcpObj, mvtnorm_algo, ModifiedStage2Weights = F) {
     #ScaleWeights[i] <- adaptOut$ScaledWeights
   }
 
-  if (gmcpSimObj$Debug) {
+  if (exists("gmcpSimObj") && gmcpSimObj$Debug) {
     ### Added for debugging purposes, should be removed once the code is verified to be working fine
     # browser()
   }
@@ -323,7 +323,7 @@ getAdaptBdry2 <- function(J, w1, w2, a2, a1, p1, test.type, HypoMap,
   #Martin.p: if total CER >= 1 reject the intersection hypothesis
   if(totalCER >= 1){
     ### Added for debugging purposes, should be removed once the code is verified to be working fine
-    if(!gmcpSimObj$Debug) {
+    if(exists("gmcpSimObj") && !gmcpSimObj$Debug) {
       #   gmcpSimObj$Debug <<- TRUE
       # browser()
     }

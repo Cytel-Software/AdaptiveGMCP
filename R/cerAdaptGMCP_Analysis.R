@@ -138,6 +138,7 @@ adaptGMCP_CER <- function(
     "HypoMap" = HypoMap,
     "AllocSampleSize" = NA,
     "Stage2AllocSampleSize" = NA,
+    "Stage2CumPValues" = NA,
     "Stage1Obj" = NA,
     "AdaptObj" = NA,
     "allGraphsPrev" = allGraphs,
@@ -222,7 +223,7 @@ adaptGMCP_CER <- function(
         }
       ))
 
-      CERTab <- getCER(b2 = Stage1Test$Stage1Obj$plan_Bdry$Stage2Bdry[oldIdx, ],
+      CERTab <- getCER(b2 = Stage1Test$Stage1Obj$plan_Bdry$Stage2Bdry[oldIdx, , drop = FALSE],
                        WH = mcpObj$WH,
                        p1 = mcpObj$p_raw,
                        test.type = mcpObj$test.type,
@@ -276,6 +277,7 @@ adaptGMCP_CER <- function(
       }
       cat("Stage-2 Output Tables \n")
       print(Stage2Test$Stage2Tables)
+      mcpObj$Stage2CumPValues <- Stage2Test$CumulativeStage2PValues
       mcpObj$rej_flag_Curr <- Stage2Test$RejStat
 
       if (plotGraphs) # Plot after Stage-2 analysis

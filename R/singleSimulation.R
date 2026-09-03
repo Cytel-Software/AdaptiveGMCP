@@ -247,7 +247,7 @@ SingleSimCER <- function(simID, gmcpSimObj, preSimObjs) {
 
         AdaptResults <- adaptBdryCER(mcpObj, mvtnorm_algo = gmcpSimObj$mvtnorm_algo)
 
-        if (gmcpSimObj$Debug) {
+        if (exists("gmcpSimObj") && gmcpSimObj$Debug) {
           ### Added for debugging purposes, should be removed once the code is verified to be working fine
           # browser()
         }
