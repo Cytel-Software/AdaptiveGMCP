@@ -80,10 +80,85 @@ BuildCerRegressionScenarios <- function()
     )
   )
 
+  # CER Scenario 4: Example from AdaptGMCP_CER_Analysis_Example.R
+  # 3-arm, 1-endpoint Parametric with stringent p-value thresholds
+  lScenario4 <- list(
+    rowId = "CER-Examp-AdaptGMCP-01",
+    nArms = 3,
+    nEps = 1,
+    sampleSize = 300,
+    epType = list( "EP1" = "Continuous" ),
+    sigma = list( "EP1" = c( 1, 1, 1 ) ),
+    CommonStdDev = TRUE,
+    prop.ctr = list( "EP1" = NA ),
+    allocRatio = c( 1, 1, 1 ),
+    WI = c( 0.5, 0.5 ),
+    G = matrix( c( 0, 1, 1, 0 ), nrow = 2, byrow = TRUE ),
+    testType = "Parametric",
+    alpha = 0.025,
+    infoFrac = c( 0.5, 1.0 ),
+    typeOfDesign = "asOF",
+    lookInputs = list(
+      list( p_raw = c( H1 = 0.00001, H2 = 0.02 ) ),
+      list( p_raw = c( H1 = 0.0001, H2 = 0.01 ) )
+    )
+  )
+
+  # CER Scenario 5: Example from CER Analysis 3arm-1ep.R
+  # 3-arm, 1-endpoint Parametric with varying standard deviations
+  lScenario5 <- list(
+    rowId = "CER-Examp-3arm-1ep",
+    nArms = 3,
+    nEps = 1,
+    sampleSize = 210,
+    epType = list( "EP1" = "Continuous" ),
+    sigma = list( "EP1" = c( 2, 2, 2 ) ),
+    CommonStdDev = FALSE,
+    prop.ctr = list( "EP1" = NA ),
+    allocRatio = c( 1, 1, 1 ),
+    WI = c( 0.5, 0.5 ),
+    G = matrix( c( 0, 1, 1, 0 ), nrow = 2, byrow = TRUE ),
+    testType = "Parametric",
+    alpha = 0.025,
+    infoFrac = c( 0.5, 1.0 ),
+    typeOfDesign = "asOF",
+    lookInputs = list(
+      list( p_raw = c( H1 = 0.05, H2 = 0.15 ) ),
+      list( p_raw = c( H1 = 0.02, H2 = 0.08 ) )
+    )
+  )
+
+  # CER Scenario 6: Example from CER.Analysis.2primary-2secondary.R
+  # 3-arm, 2-endpoint Partly-Parametric design with multiple hypotheses
+  lScenario6 <- list(
+    rowId = "CER-Examp-2ep",
+    nArms = 3,
+    nEps = 2,
+    sampleSize = 400,
+    epType = list( "EP1" = "Continuous", "EP2" = "Continuous" ),
+    sigma = list( "EP1" = c( 1, 1, 1 ), "EP2" = c( 1, 1, 1 ) ),
+    CommonStdDev = TRUE,
+    prop.ctr = list( "EP1" = NA, "EP2" = NA ),
+    allocRatio = c( 1, 1, 1 ),
+    WI = c( 0.5, 0.5, 0, 0 ),
+    G = matrix( c( 0, 1/2, 1/2, 0, 1/2, 0, 0, 1/2, 0, 1, 0, 0, 1, 0, 0, 0 ), nrow = 4, byrow = TRUE ),
+    testType = "Partly-Parametric",
+    alpha = 0.025,
+    infoFrac = c( 0.5, 1.0 ),
+    typeOfDesign = "asOF",
+    lookInputs = list(
+      list( p_raw = c( H1 = 0.15, H2 = 0.25, H3 = 0.10, H4 = 0.20 ) ),
+      list( p_raw = c( H1 = 0.05, H2 = 0.10, H3 = 0.03, H4 = 0.12 ) )
+    )
+  )
+
   return( list(
     "CER-regression-01" = lScenario1,
     "CER-regression-02" = lScenario2,
-    "CER-regression-03" = lScenario3
+    "CER-regression-03" = lScenario3,
+    "CER-Examp-AdaptGMCP-01" = lScenario4,
+    "CER-Examp-3arm-1ep" = lScenario5,
+    "CER-Examp-2ep" = lScenario6
   ) )
 }
 
@@ -262,6 +337,42 @@ testthat::test_that( "CER-regression-02 matches fixture outputs", {
 testthat::test_that( "CER-regression-03 matches fixture outputs", {
   lActual <- CaptureCerRegressionOutputsForTest( lCerScenarios[[ "CER-regression-03" ]] )
   lExpected <- LoadCerRegressionFixtures( "CER-regression-03" )
+
+  testthat::expect_equal( names( lActual ), names( lExpected ) )
+
+  for( strLook in names( lExpected ) )
+  {
+    ExpectCerRegressionLookEqual( lActual[[ strLook ]], lExpected[[ strLook ]] )
+  }
+} )
+
+testthat::test_that( "CER-Examp-AdaptGMCP-01 matches fixture outputs", {
+  lActual <- CaptureCerRegressionOutputsForTest( lCerScenarios[[ "CER-Examp-AdaptGMCP-01" ]] )
+  lExpected <- LoadCerRegressionFixtures( "CER-Examp-AdaptGMCP-01" )
+
+  testthat::expect_equal( names( lActual ), names( lExpected ) )
+
+  for( strLook in names( lExpected ) )
+  {
+    ExpectCerRegressionLookEqual( lActual[[ strLook ]], lExpected[[ strLook ]] )
+  }
+} )
+
+testthat::test_that( "CER-Examp-3arm-1ep matches fixture outputs", {
+  lActual <- CaptureCerRegressionOutputsForTest( lCerScenarios[[ "CER-Examp-3arm-1ep" ]] )
+  lExpected <- LoadCerRegressionFixtures( "CER-Examp-3arm-1ep" )
+
+  testthat::expect_equal( names( lActual ), names( lExpected ) )
+
+  for( strLook in names( lExpected ) )
+  {
+    ExpectCerRegressionLookEqual( lActual[[ strLook ]], lExpected[[ strLook ]] )
+  }
+} )
+
+testthat::test_that( "CER-Examp-2ep matches fixture outputs", {
+  lActual <- CaptureCerRegressionOutputsForTest( lCerScenarios[[ "CER-Examp-2ep" ]] )
+  lExpected <- LoadCerRegressionFixtures( "CER-Examp-2ep" )
 
   testthat::expect_equal( names( lActual ), names( lExpected ) )
 
