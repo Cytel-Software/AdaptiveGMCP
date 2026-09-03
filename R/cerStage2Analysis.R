@@ -6,6 +6,7 @@
 
 PerformStage2Test <- function(mcpObj, AdaptStage2) {
   Stage1Objs <- mcpObj$Stage1Obj
+  cumulative_stage2_pvalues <- NA
   if (!AdaptStage2) {
     WH_modified_idx <- as.vector(apply(
       mcpObj$WH[, grep("H", names(mcpObj$WH))], 1,
@@ -86,6 +87,7 @@ PerformStage2Test <- function(mcpObj, AdaptStage2) {
 
     adapted_p_value_stage2 <- 1 - pnorm(sqrt(v_adapted_info_fraction)*qnorm(1 - mcpObj$p_raw_stage1) +
                                           sqrt(1 - v_adapted_info_fraction)*qnorm(1 - mcpObj$p_raw))
+    cumulative_stage2_pvalues <- adapted_p_value_stage2
     cat("Cumulative Stage2 p-values:\n")
     print(adapted_p_value_stage2)
     cat("\n")
@@ -126,7 +128,11 @@ PerformStage2Test <- function(mcpObj, AdaptStage2) {
     )
   }
 
-  list("Stage2Tables" = Stage2Tables, "RejStat" = Stage2Analysis$PrimaryHypoTest)
+  list(
+    "Stage2Tables" = Stage2Tables,
+    "RejStat" = Stage2Analysis$PrimaryHypoTest,
+    "CumulativeStage2PValues" = cumulative_stage2_pvalues
+  )
 }
 
 # To modify the stage-2 sample size(SSR)
