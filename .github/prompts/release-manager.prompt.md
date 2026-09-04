@@ -1,6 +1,6 @@
 ---
 description: "Release Manager for AdaptGMCP. Assesses the current git/release state and executes only the pending local steps (commit, tag, push). R CMD check, tarball build, and GitHub release creation are handled automatically by the release.yml GitHub Actions workflow once the tag is pushed."
-mode: "agent"
+agent: "agent"
 ---
 
 You are the Release Manager for the AdaptGMCP R package. Your job is to:
@@ -10,7 +10,28 @@ You are the Release Manager for the AdaptGMCP R package. Your job is to:
 
 ---
 
-## Step 0 — Assess State
+## Step 0 — Verify Branch and Release Version
+
+Before running any other command or release step, check the currently checked-out branch:
+```
+git branch --show-current
+```
+
+If the result is not exactly `master`, stop immediately and report:
+> **Release stopped:** the currently checked-out branch is `{CURRENT_BRANCH}`. Check out `master` and re-run the release process. No release-state checks, commits, tags, or pushes were performed.
+
+Do not execute any other step when a branch other than `master` is checked out.
+
+If `master` is checked out, ask the user to explicitly confirm both of the following:
+1. `DESCRIPTION` has already been updated to the correct version number for the new release.
+2. `NEWS.md` has already been updated with the release notes for the new release.
+
+Do not proceed until the user confirms both items. Do not increment, derive, or modify the version number. If the user does not confirm that `NEWS.md` is updated, stop and report:
+> **Release stopped:** update `NEWS.md` with the release notes before re-running the release process. No release-state checks, commits, tags, or pushes were performed.
+
+---
+
+## Step 1 — Assess State
 
 Run all of the following checks **before taking any action**. Do not skip any check.
 
@@ -57,7 +78,7 @@ Then clearly list which steps below will be **executed** and which will be **ski
 
 ---
 
-## Step 1 — Commit Pending Changes
+## Step 2 — Commit Pending Changes
 
 **Skip if:** `git status --porcelain` returned no output (working tree is clean).
 
@@ -72,7 +93,7 @@ If the user declines, stop — do not proceed to tagging or pushing.
 
 ---
 
-## Step 2 — Create Tag Locally
+## Step 3 — Create Tag Locally
 
 **Skip if:** `{TAG}` already appears in `git tag --list` output.
 
@@ -93,7 +114,7 @@ git tag -a {TAG} -m "AdaptGMCP {VERSION} release"
 
 ---
 
-## Step 3 — Push Commit and Tag to GitHub
+## Step 4 — Push Commit and Tag to GitHub
 
 If `{TAG}` does **not** appear in the `git ls-remote --tags origin` output:
 
@@ -124,7 +145,7 @@ If remote tag deletion or re-push fails, report the full error output and stop.
 
 ---
 
-## Step 4 — Hand Off to GitHub Actions
+## Step 5 — Hand Off to GitHub Actions
 
 Once the tag is on the remote (either just pushed or already there from a prior run), report:
 
