@@ -1,10 +1,22 @@
+# AdaptGMCP 2.2.0 (2026-09-04)
+
+## New Features
+
+### Non-Interactive Interface for Population-Enrichment Analysis using P-Value Combination Method
+
+* `SetupAnalysis_PE_PC()`: Creates a non-interactive population-enrichment
+  P-value-combination analysis state from design parameters.
+* `AnalyzeLook_PE_PC()`: Advances the analysis state by one look using raw
+  p-values and cumulative full-population and subgroup sample sizes. The
+  look-specific correlation matrix is calculated from those sample sizes.
+
+## Quality Improvements
+
+* Added regression testing for `adaptGMCP_CER()`
+
+---
+
 # AdaptGMCP 2.1.0 (2026-04-11)
-
-## Bug Fixes
-
-* Non-interactive PC and PE-PC analyses now retain their design-time
-  inverse-normal combination weights and stopping boundaries for all formal looks.
-  `AnalyzeLook_PC()` no longer accepts a current information fraction.
 
 ## New Features
 
