@@ -1,3 +1,16 @@
+# AdaptGMCP (development version)
+
+## Quality Improvements
+
+* Added reusable PC API test fixtures/assertion helpers and expanded
+  `SetupAnalysis_PC()`/`AnalyzeLook_PC()`/`PlotAnalysisGraph()` test coverage:
+  state-transition and completion-semantics tests (`completion_reason`,
+  `look_history` integrity, post-completion error stability), remaining
+  `typeOfDesign` and `chooseMVTAlgo()` branch coverage, and `PlotAnalysisGraph()`
+  stage edge-case/validation tests.
+
+---
+
 # AdaptGMCP 2.2.0 (2026-09-04)
 
 ## New Features
