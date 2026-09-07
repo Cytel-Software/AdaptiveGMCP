@@ -1,9 +1,6 @@
-AnalyzeLook_PC_TestWrapper <- function( state, ... )
-{
-  lArgs <- list( ... )
-  lArgs$state <- state
-  return( do.call( AnalyzeLook_PC, lArgs ) )
-}
+# AnalyzeLook_PC_TestWrapper() and shared PC fixture/assertion helpers now live in
+# tests/testthat/helper.R (Issue #68) so they can be reused across all
+# test-PcAnalysisApi*.R files.
 
 ############
 # Test1 # COMPLETED
