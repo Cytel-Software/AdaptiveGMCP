@@ -56,6 +56,7 @@ For detailed usage and arguments of each function, please refer to the help sect
 
 For automated pipelines, batch processing, or scripted analyses, the non-interactive interface
 avoids R console prompts by accepting all look-level inputs as function arguments.
+The generic PC interface supports one, two, three, or more planned looks.
 
 **Key functions:**
 - `SetupAnalysis_PC()`: Initialises the analysis state (design parameters, graph, boundaries).
@@ -127,6 +128,66 @@ PlotAnalysisGraph(state, stage = 2)
   ?AnalyzeLook_PC
   ?PlotAnalysisGraph
   ```
+
+### Non-Interactive Population-Enrichment Analysis (PE-PC)
+
+PE-PC is a population-enrichment specialization of the generic PC interface.
+Use its two wrapper functions when hypotheses are defined for a full population
+and a nested subgroup. PE-PC currently supports one-look or two-look designs
+and derives each look's correlation matrix from the cumulative full-population
+and subgroup sample sizes supplied at that look. This two-look restriction does
+not apply to the generic `SetupAnalysis_PC()`/`AnalyzeLook_PC()` interface.
+
+```R
+library( AdaptGMCP )
+
+state <- SetupAnalysis_PE_PC(
+  WI = c( 0.5, 0.5, 0, 0 ),
+  G = matrix(
+    c( 0, 0.5, 0.5, 0,
+       0.5, 0, 0, 0.5,
+       0, 1, 0, 0,
+       1, 0, 0, 0 ),
+    byrow = TRUE,
+    nrow = 4
+  ),
+  test.type = "Partly-Parametric",
+  planned_info_frac = c( 0.5, 1 ),
+  typeOfDesign = "asOF",
+  plotGraphs = FALSE
+)
+
+state <- AnalyzeLook_PE_PC(
+  state = state,
+  look = 1,
+  p_raw = c( H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30 ),
+  fullpop_sample_sizes = c( 70, 105, 84 ),
+  subpop_sample_sizes = c( 35, 56, 49 ),
+  plotGraphs = FALSE
+)
+
+state <- AnalyzeLook_PE_PC(
+  state = state,
+  look = 2,
+  p_raw = c( H1 = 0.02, H2 = 0.10, H4 = 0.40 ),
+  selection = c( "H1", "H2", "H4" ),
+  fullpop_sample_sizes = c( 100, 140, 123 ),
+  subpop_sample_sizes = c( 48, 80, 70 ),
+  plotGraphs = FALSE
+)
+
+state$mcpObj$AdjPValues
+state$mcpObj$CombinedPValuesTable
+state$mcpObj$rej_flag_Curr
+```
+
+`planned_info_frac` controls the planned look schedule and boundaries; the
+sample-size vectors are cumulative observed counts used to derive the
+look-specific correlation. Use `(control, treatment 1, treatment 2, ...)` in
+every vector, keep subgroup counts no greater than full-population counts, and
+keep counts non-decreasing across looks. The complete runnable workflow,
+including interpretation and troubleshooting notes, is in
+`internalData/PopEnrich_Analysis_Ex.R`.
 
 ### `AdaptGMCPSimApp` (Shiny App)
 

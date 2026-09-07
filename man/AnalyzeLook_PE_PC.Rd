@@ -57,4 +57,8 @@ scheduled information fraction.
 The two sample-size vectors must follow \code{(n0, n1, n2, ...)} where
 \code{n0} is the control arm and subsequent entries correspond to treatment
 arms in the same order used to define hypotheses.
+Sample sizes are cumulative counts observed at the formal look, not
+increment-only counts. They may differ from the planned information
+fractions, but must have the same length at every look, remain
+non-decreasing, and satisfy subgroup \code{<=} full-population counts.
 }
