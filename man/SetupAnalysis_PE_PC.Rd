@@ -71,8 +71,16 @@ PE wrapper contract:
 - [SetupAnalysis_PE_PC()] does not compute or store a correlation matrix.
 - [AnalyzeLook_PE_PC()] requires look-specific population sample sizes and
   computes the correlation matrix for that look.
+- \code{planned_info_frac} defines the planned analysis schedule and
+  boundaries; it is distinct from the cumulative sample sizes supplied to
+  [AnalyzeLook_PE_PC()] at each formal look.
 - Sample-size vectors follow order \code{(n0, n1, n2, ...)} where \code{n0}
   is the control arm.
 - Hypothesis ordering is endpoint-major, treatment-minor, with a full-
   population block followed by a subgroup block.
+
+Common input requirements are that subgroup sample sizes do not exceed
+full-population sample sizes, cumulative sample sizes do not decrease
+between looks, and the same arm order is used for the graph, p-values, and
+both sample-size vectors.
 }

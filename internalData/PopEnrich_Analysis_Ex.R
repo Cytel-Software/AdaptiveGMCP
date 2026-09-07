@@ -425,3 +425,84 @@ look1_out <- AnalyzeLook_PE_PC(
 print(look1_out$mcpObj$Correlation)
 print(look1_out)
 #########################################################
+
+# FINAL NON-INTERACTIVE PE-PC WORKFLOW ##################
+#
+# PE-PC is the population-enrichment specialization of the generic PC
+# analysis interface. Unlike SetupAnalysis_PC()/AnalyzeLook_PC(), the PE-PC
+# wrapper currently supports one-look or two-look designs only.
+#
+# planned_info_frac defines the planned look schedule and boundaries. The
+# cumulative sample-size vectors supplied to each AnalyzeLook_PE_PC() call
+# define that look's population correlation matrix and may differ from the
+# nominal information fractions.
+
+wi <- c( 0.35, 0.35, 0, 0, 0.15, 0.15, 0, 0 )
+names( wi ) <- paste0( "H", seq_along( wi ) )
+
+G <- matrix(
+  c(
+    0, 0.2, 0.4, 0, 0.2, 0.2, 0, 0,
+    0.2, 0, 0, 0.4, 0.2, 0.2, 0, 0,
+    0, 1 / 3, 0, 0, 1 / 3, 1 / 3, 0, 0,
+    1 / 3, 0, 0, 0, 1 / 3, 1 / 3, 0, 0,
+    0.2, 0.2, 0, 0, 0, 0.2, 0.4, 0,
+    0.2, 0.2, 0, 0, 0.2, 0, 0, 0.4,
+    1 / 3, 1 / 3, 0, 0, 0, 1 / 3, 0, 0,
+    1 / 3, 1 / 3, 0, 0, 1 / 3, 0, 0, 0
+  ),
+  byrow = TRUE,
+  nrow = 8
+)
+
+pe_state <- SetupAnalysis_PE_PC(
+  WI = wi,
+  G = G,
+  test.type = "Partly-Parametric",
+  alpha = 0.025,
+  planned_info_frac = c( 0.5, 1.0 ),
+  typeOfDesign = "asOF",
+  plotGraphs = FALSE
+)
+
+# Hypotheses are endpoint-major and treatment-minor, with the full-population
+# block followed by the subgroup block. Sample-size vectors use
+# (control, treatment 1, treatment 2, ...).
+pe_state <- AnalyzeLook_PE_PC(
+  state = pe_state,
+  look = 1,
+  p_raw = c(
+    H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30,
+    H5 = 0.02, H6 = 0.25, H7 = 0.10, H8 = 0.40
+  ),
+  fullpop_sample_sizes = c( 70, 105, 84 ),
+  subpop_sample_sizes = c( 35, 56, 49 ),
+  plotGraphs = FALSE
+)
+
+print( pe_state$mcpObj$AdjPValues )
+
+# Counts are cumulative and must be non-decreasing from look 1 to look 2.
+pe_state <- AnalyzeLook_PE_PC(
+  state = pe_state,
+  look = 2,
+  p_raw = c( H1 = 0.02, H2 = 0.10, H4 = 0.40, H5 = 0.01, H6 = 0.15 ),
+  selection = c( "H1", "H2", "H4", "H5", "H6" ),
+  fullpop_sample_sizes = c( 100, 140, 123 ),
+  subpop_sample_sizes = c( 48, 80, 70 ),
+  plotGraphs = FALSE
+)
+
+# AdjPValues contains look-specific adjusted p-values and the combined
+# p-values used for decisions. rej_flag_Curr identifies current rejections.
+print( pe_state$mcpObj$AdjPValues )
+print( pe_state$mcpObj$CombinedPValuesTable )
+print( pe_state$mcpObj$rej_flag_Curr )
+print( pe_state$completion_reason )
+
+# Troubleshooting:
+# - Keep the same arm order in WI/G, p_raw, and both sample-size vectors.
+# - Supply cumulative counts, not increment-only counts.
+# - Subgroup counts must be <= full-population counts.
+# - At look 2, selection must contain only currently active hypotheses, and
+#   p_raw must contain a value for every selected hypothesis.

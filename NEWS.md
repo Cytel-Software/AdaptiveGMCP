@@ -22,6 +22,10 @@
 * `AnalyzeLook_PE_PC()`: Advances the analysis state by one look using raw
   p-values and cumulative full-population and subgroup sample sizes. The
   look-specific correlation matrix is calculated from those sample sizes.
+* Refreshed the population-enrichment PE-PC example and user documentation
+  with the finalized two-look workflow, planned-versus-observed sample-size
+  guidance, p-value interpretation, and input troubleshooting notes. The
+  generic PC example remains a separate multi-look workflow.
 
 ## Quality Improvements
 
