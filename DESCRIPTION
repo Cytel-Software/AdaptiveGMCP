@@ -21,6 +21,6 @@ Imports: data.table, dplyr, gMCPLite, htmltools, knitr, Matrix, matrixcalc, mvtn
          pbapply, plyr, RColorBrewer, rpact, shiny, stringr, tidyr
 Suggests: future, ggplot2, gridExtra, lintr, promises, reshape2, 
           rhandsontable, rmarkdown, shinycssloaders, testthat (>= 3.0.0), usethis, 
-          visNetwork, gMCP, purrr, tidyverse, graphicalMCP
+          visNetwork, gMCP, purrr, tidyverse, graphicalMCP, pkgload
 Config/testthat/edition: 3
 VignetteBuilder: knitr
