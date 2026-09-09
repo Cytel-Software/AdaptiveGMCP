@@ -1,110 +1,7 @@
 # Examples for analysis in the population enrichment case
 library(AdaptGMCP)
 
-# #########################################################
-
-# # EXAMPLE 1 #############################################
-# # Simplest population enrichment problem with 1 treatment and 1 control arm
-# # 1 endpoint, and 1 full population and 1 subpopulation
-# # Fixed sample design
-# # Total sample size = 200, balanced allocation between treatment and control arms
-# # Subpopulation is 50% of full population
-
-# # Setting input parameters for the function
-# # Weights
-# wi <- rep(0.5, 2) # Initial weights for the 2 hypotheses
-
-# # Transition matrix
-# g <- matrix(c(0, 1, 1, 0), byrow = TRUE, nrow = 2)
-
-# # Test type
-# test <- "Dunnett"
-
-# # Type I error
-# alp <- 0.025
-
-# # Info fraction
-# t <- 1
-
-# # Setting up the design first
-# design <- SetupAnalysis_PE_PC(
-#   WI = wi,
-#   G = g,
-#   test.type = test,
-#   alpha = alp,
-#   planned_info_frac = t,
-#   plotGraphs = FALSE)
-
-# print(design)
-
-# # Performing analysis
-# look1_out <- AnalyzeLook_PE_PC(
-#   design,
-#   p_raw = c(H1 = 0.1, H2 = 0.0025),
-#   fullpop_sample_sizes = c(100, 100), # Sample sizes are specified first for control and then for treatment arm
-#   subpop_sample_sizes = c(50, 50)) # Sample sizes are specified first for control and then for treatment arm
-
-# print(look1_out$mcpObj$Correlation)
-# print(look1_out)
-# #########################################################
-
-# # EXAMPLE 2 #############################################
-# # Same as Example 1, but with 1 interim look
-
-# # Setting input parameters for the function
-# # Weights
-# wi <- rep(0.5, 2) # Initial weights for the 2 hypotheses
-
-# # Transition matrix
-# g <- matrix(c(0, 1, 1, 0), byrow = TRUE, nrow = 2)
-
-# # Test type
-# test <- "Dunnett"
-
-# # Type I error
-# alp <- 0.025
-
-# # Info fraction
-# t <- c(0.5, 1)
-
-# # Design type
-# des <- "asOF"
-
-# # Setting up the design first
-# design <- SetupAnalysis_PE_PC(
-#   WI = wi,
-#   G = g,
-#   test.type = test,
-#   alpha = alp,
-#   planned_info_frac = t,
-#   typeOfDesign = des,
-#   plotGraphs = FALSE
-#   )
-
-# print(design)
-
-# # Performing analysis for look 1
-# look1_out <- AnalyzeLook_PE_PC(
-#   design,
-#   p_raw = c(H1 = 0.1, H2 = 0.075),
-#   fullpop_sample_sizes = c(48, 53), # Sample sizes are specified first for control and then for treatment arm
-#   subpop_sample_sizes = c(26, 24)) # Sample sizes are specified first for control and then for treatment arm
-
-# print(look1_out$mcpObj$Correlation)
-# print(look1_out)
-
-# # Performing analysis for look 2
-# look2_out <- AnalyzeLook_PE_PC(
-#   look1_out,
-#   p_raw = c(H1 = 0.08, H2 = 0.003),
-#   fullpop_sample_sizes = c(100, 100), # Sample sizes are specified first for control and then for treatment arm
-#   subpop_sample_sizes = c(53, 49)) # Sample sizes are specified first for control and then for treatment arm
-
-# print(look2_out$mcpObj$Correlation)
-# print(look2_out)
-# #########################################################
-
-# EXAMPLE 3 #############################################
+# EXAMPLE 1 #############################################
 # Severe oral mucositis example
 # H1: high dose, full population
 # H2: low dose, full population
@@ -173,14 +70,48 @@ look2_out <- AnalyzeLook_PE_PC(
 print(look2_out$mcpObj$Correlation)
 print(look2_out)
 
-# >>> Trying with higher look 1 info fract
+# EXAMPLE 2 #############################################
+# SAME AS EXAMPLE 1 BUT WITH HIGHER LOOK 1 INFO FRACTION
+# Severe oral mucositis example
+# H1: high dose, full population
+# H2: low dose, full population
+# H3: high dose, HPV+ subgroup
+# H4: low dose, HPV+ subgroup
+# Single endpoint
+# Total sample size = 300, balanced allocation to all arms
+# Subpopulation is 50% of full population
+# One interim look at 70% information fraction
+# Ref: CIT\MAMS\adaptgmcp-resources\GMCP papers, etc\Cyrus' Talk - AdaptGMCP - Sep 2025.pdf
+
+# Setting input parameters for the function
+# Weights
+wi <- rep(0.25, 4) # Initial weights for the 4 hypotheses
+
+# Transition matrix
+g <- matrix(c(0, 0, 1, 0,
+              0, 0, 0, 1,
+              0, 1, 0, 0,
+              1, 0, 0, 0), byrow = TRUE, nrow = 4)
+
+# Test type
+test <- "Dunnett"
+
+# Type I error
+alp <- 0.025
+
+# Info fraction
+t <- c(0.7, 1)
+
+# Design type
+des <- "asOF"
+
 # Setting up the design first
 design <- SetupAnalysis_PE_PC(
   WI = wi,
   G = g,
   test.type = test,
   alpha = alp,
-  planned_info_frac = c(0.7, 1),
+  planned_info_frac = t,
   typeOfDesign = des,
   plotGraphs = FALSE)
 
@@ -201,7 +132,7 @@ print(look1_out)
 # Performing analysis at look 2
 look2_out <- AnalyzeLook_PE_PC(
   look1_out,
-  p_raw = c(H1 = 0.00045, H2 = 0.1121, H3 = 0.0112, H4 = 0.1153),
+  p_raw = c(H2 = 0.1121, H3 = 0.0112, H4 = 0.1153),
   fullpop_sample_sizes = c(100, 100, 100), # Sample sizes: first for control and then for treatment arms
   subpop_sample_sizes = c(50, 50, 50)) # Sample sizes: first for control and then for treatment arms
 
@@ -210,7 +141,7 @@ print(look2_out)
 
 #########################################################
 
-# EXAMPLE 4 #############################################
+# EXAMPLE 3 #############################################
 # Problem: Full population and a subpopulation (50% of full population)
 # High dose and low dose of the drug being tested
 # 2 stage trial with interim look at 50% information fraction
@@ -265,7 +196,7 @@ print(look1_out)
 
 #########################################################
 
-# EXAMPLE 5 #################################################
+# EXAMPLE 4 #################################################
 wi <- c(1 / 2, 1 / 2, 0, 0)
 g <- matrix(c(
   0, 1 / 2, 1 / 2, 0,
@@ -314,7 +245,7 @@ print(look2_out)
 
 #########################################################
 
-# EXAMPLE 6 #############################################
+# EXAMPLE 5 #############################################
 wi <- c(1 / 2, 1 / 2, 0, 0)
 g <- matrix(c(
   0, 1 / 2, 1 / 2, 0,
@@ -361,7 +292,7 @@ print(look2_out$mcpObj$Correlation)
 print(look2_out)
 #########################################################
 
-# EXAMPLE 7 #############################################
+# EXAMPLE 6 #############################################
 # Phase-3 clinical trial in severe oral mucositis
 # 2 doses (low, high) compared to placebo, 2 normal endpoints (primary and secondary) evaluated
 # In addition to the full population, a subgroup of patients with HPV+ status is also evaluated.
@@ -506,3 +437,107 @@ print( pe_state$completion_reason )
 # - Subgroup counts must be <= full-population counts.
 # - At look 2, selection must contain only currently active hypotheses, and
 #   p_raw must contain a value for every selected hypothesis.
+
+# #########################################################
+
+# EXAMPLE 7 #############################################
+# Simplest population enrichment problem with 1 treatment and 1 control arm
+# 1 endpoint, and 1 full population and 1 subpopulation
+# Fixed sample design
+# Total sample size = 200, balanced allocation between treatment and control arms
+# Subpopulation is 50% of full population
+
+# Setting input parameters for the function
+# Weights
+wi <- rep(0.5, 2) # Initial weights for the 2 hypotheses
+
+# Transition matrix
+g <- matrix(c(0, 1, 1, 0), byrow = TRUE, nrow = 2)
+
+# Test type
+test <- "Dunnett"
+
+# Type I error
+alp <- 0.025
+
+# Info fraction
+t <- 1
+
+# Setting up the design first
+design <- SetupAnalysis_PE_PC(
+  WI = wi,
+  G = g,
+  test.type = test,
+  alpha = alp,
+  planned_info_frac = t,
+  plotGraphs = FALSE)
+
+print(design)
+
+# Performing analysis
+look1_out <- AnalyzeLook_PE_PC(
+  design,
+  p_raw = c(H1 = 0.1, H2 = 0.0025),
+  fullpop_sample_sizes = c(100, 100), # Sample sizes are specified first for control and then for treatment arm
+  subpop_sample_sizes = c(50, 50)) # Sample sizes are specified first for control and then for treatment arm
+
+print(look1_out$mcpObj$Correlation)
+print(look1_out)
+#########################################################
+
+# EXAMPLE 8 #############################################
+# Same as Example 1, but with 1 interim look
+
+# Setting input parameters for the function
+# Weights
+wi <- rep(0.5, 2) # Initial weights for the 2 hypotheses
+
+# Transition matrix
+g <- matrix(c(0, 1, 1, 0), byrow = TRUE, nrow = 2)
+
+# Test type
+test <- "Dunnett"
+
+# Type I error
+alp <- 0.025
+
+# Info fraction
+t <- c(0.5, 1)
+
+# Design type
+des <- "asOF"
+
+# Setting up the design first
+design <- SetupAnalysis_PE_PC(
+  WI = wi,
+  G = g,
+  test.type = test,
+  alpha = alp,
+  planned_info_frac = t,
+  typeOfDesign = des,
+  plotGraphs = FALSE
+  )
+
+print(design)
+
+# Performing analysis for look 1
+look1_out <- AnalyzeLook_PE_PC(
+  design,
+  p_raw = c(H1 = 0.1, H2 = 0.075),
+  fullpop_sample_sizes = c(48, 53), # Sample sizes are specified first for control and then for treatment arm
+  subpop_sample_sizes = c(26, 24)) # Sample sizes are specified first for control and then for treatment arm
+
+print(look1_out$mcpObj$Correlation)
+print(look1_out)
+
+# Performing analysis for look 2
+look2_out <- AnalyzeLook_PE_PC(
+  look1_out,
+  p_raw = c(H1 = 0.08, H2 = 0.003),
+  fullpop_sample_sizes = c(100, 100), # Sample sizes are specified first for control and then for treatment arm
+  subpop_sample_sizes = c(53, 49)) # Sample sizes are specified first for control and then for treatment arm
+
+print(look2_out$mcpObj$Correlation)
+print(look2_out)
+#########################################################
+
