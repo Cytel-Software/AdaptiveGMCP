@@ -87,12 +87,26 @@ CaptureCERRegressionOutputs <- function( lScenario )
         vCumulativeStage2PValues <- mcpObj$Stage2CumPValues
       }
 
+      vAdaptedCovariance <- NA
+      if( is.list( mcpObj$AdaptObj ) && !is.null( mcpObj$AdaptObj$Stage2Sigma ) ) {
+        vAdaptedCovariance <- mcpObj$AdaptObj$Stage2Sigma
+      }
+
       eCapture$outputs[[ as.character( nLook ) ]] <- list(
         stage1_boundary = vStage1Boundary,
         stage2_boundary = vStage2Boundary,
         cumulative_stage2_pvalues = vCumulativeStage2PValues,
         adjusted_boundary = vAdjustedBoundary,
-        final_rejection_status = mcpObj$rej_flag_Curr
+        final_rejection_status = mcpObj$rej_flag_Curr,
+        stage1_intersect_test = mcpObj$Stage1Obj$Stage1Analysis$IntersectHypoTest,
+        stage1_primary_test = mcpObj$Stage1Obj$Stage1Analysis$PrimaryHypoTest,
+        active_hypotheses = mcpObj$IndexSet,
+        selected_hypotheses = mcpObj$SelectedIndex,
+        dropped_flag = mcpObj$DroppedFlag,
+        planned_sample_allocation = mcpObj$AllocSampleSize,
+        adapted_sample_allocation = mcpObj$Stage2AllocSampleSize,
+        adapted_covariance = vAdaptedCovariance,
+        structured_cer_pcer = mcpObj$CERTab
       )
 
       if( StopTrial( mcpObj ) )
@@ -119,11 +133,21 @@ CaptureCERRegressionOutputs <- function( lScenario )
     },
     do_modifyStrategy = function( mcpObj, showExistingStrategy = FALSE )
     {
-      return( mcpObj )
+      nNextLook <- as.integer( length( na.omit( unique( c( names( eCapture$outputs ) ) ) ) ) ) + 1L
+      if( nNextLook > nPlannedLooks ) return( mcpObj )
+
+      lStrategyUpdate <- lScenario$lookInputs[[ nNextLook ]]$strategy_update
+      if( is.null( lStrategyUpdate ) ) return( mcpObj )
+
+      return( applyStrategyUpdate(
+        mcpObj,
+        new_weights = lStrategyUpdate$new_weights,
+        new_G = lStrategyUpdate$new_G
+      ) )
     },
     do_ModifyStage2Sample = function( allocRatio, ArmsPresent, AllocSampleSize )
     {
-      nNextLook <- as.integer( length( na.omit( unique( c( names( eCapture$outputs ) ) ) ) ) + 1L )
+      nNextLook <- as.integer( length( na.omit( unique( c( names( eCapture$outputs ) ) ) ) ) ) + 1L
       if( nNextLook > nPlannedLooks ) {
         return( list(
           newAllocSampleSize = AllocSampleSize,
@@ -333,7 +357,125 @@ GenerateCERRegressionFixtures <- function()
     )
   )
 
-  lScenarios <- list( lScenario1, lScenario2, lScenario3, lScenario4, lScenario5, lScenario6 )
+  # CER Scenario 7: GS_GMCP_Example.R EXAMPLE 4, 1st adaptGMCP_CER() call.
+  # Look 1: H1=0.00045 (rejected), H2=0.0952, H3=0.0225, H4=0.1104.
+  # Look 2: selection retains H2,H4 (drops H3); sample-size change for
+  # Control/Treatment2; real strategy update to a 2-node fully-connected graph.
+  lScenario7 <- list(
+    rowId = "CER-GSExample4-01",
+    nArms = 3,
+    nEps = 2,
+    sampleSize = 210,
+    epType = list( "EP1" = "Continuous", "EP2" = "Continuous" ),
+    sigma = list( "EP1" = c( 1, 1, 1 ), "EP2" = c( 1, 1, 1 ) ),
+    CommonStdDev = FALSE,
+    prop.ctr = list( "EP1" = NA, "EP2" = NA ),
+    allocRatio = c( 1, 1, 1 ),
+    WI = c( 0.5, 0.5, 0, 0 ),
+    G = matrix( c( 0, 1/2, 1/2, 0, 1/2, 0, 0, 1/2, 0, 1, 0, 0, 1, 0, 0, 0 ), nrow = 4, byrow = TRUE ),
+    testType = "Parametric",
+    alpha = 0.025,
+    infoFrac = c( 0.5, 1.0 ),
+    typeOfDesign = "asOF",
+    lookInputs = list(
+      list( p_raw = c( H1 = 0.00045, H2 = 0.0952, H3 = 0.0225, H4 = 0.1104 ) ),
+      list(
+        p_raw = c( H2 = 0.0299, H4 = 0.0586 ),
+        selection = c( "H2", "H4" ),
+        stage2_cumulative_sample_size = c( Control = 88, Treatment2 = 87 ),
+        strategy_update = list(
+          new_weights = c( H2 = 0.5, H4 = 0.5 ),
+          new_G = matrix( c( 0, 1, 1, 0 ), nrow = 2, byrow = TRUE )
+        )
+      )
+    )
+  )
+
+  # CER Scenario 8: GS_GMCP_Example.R EXAMPLE 4, 2nd adaptGMCP_CER() call.
+  # Same design and Look 1 as scenario 7. Look 2: all of H2,H3,H4 retained (no
+  # drop), no sample-size change (no-op adaptation path), real strategy update
+  # to a 3-node graph with unequal weights.
+  lScenario8 <- list(
+    rowId = "CER-GSExample4-02",
+    nArms = 3,
+    nEps = 2,
+    sampleSize = 210,
+    epType = list( "EP1" = "Continuous", "EP2" = "Continuous" ),
+    sigma = list( "EP1" = c( 1, 1, 1 ), "EP2" = c( 1, 1, 1 ) ),
+    CommonStdDev = FALSE,
+    prop.ctr = list( "EP1" = NA, "EP2" = NA ),
+    allocRatio = c( 1, 1, 1 ),
+    WI = c( 0.5, 0.5, 0, 0 ),
+    G = matrix( c( 0, 1/2, 1/2, 0, 1/2, 0, 0, 1/2, 0, 1, 0, 0, 1, 0, 0, 0 ), nrow = 4, byrow = TRUE ),
+    testType = "Parametric",
+    alpha = 0.025,
+    infoFrac = c( 0.5, 1.0 ),
+    typeOfDesign = "asOF",
+    lookInputs = list(
+      list( p_raw = c( H1 = 0.00045, H2 = 0.0952, H3 = 0.0225, H4 = 0.1104 ) ),
+      list(
+        p_raw = c( H2 = 0.0299, H3 = 0.0225, H4 = 0.0586 ),
+        strategy_update = list(
+          new_weights = c( H2 = 0.5, H3 = 0.25, H4 = 0.25 ),
+          new_G = matrix( c( 0, 1/3, 2/3, 1, 0, 0, 1/2, 1/2, 0 ), nrow = 3, byrow = TRUE )
+        )
+      )
+    )
+  )
+
+  # CER Scenario 9: GS_GMCP_Example.R EXAMPLE 2 (Cumulative MAMS). Stage 1
+  # analysis only, per explicit scope decision (Stage 2 intentionally ignored
+  # because Look 2 inputs are not documented anywhere in the source file).
+  lScenario9 <- list(
+    rowId = "CER-GSExample2-01",
+    nArms = 3,
+    nEps = 1,
+    sampleSize = 210,
+    epType = list( "EP1" = "Continuous" ),
+    sigma = list( "EP1" = c( 1, 1, 1 ) ),
+    CommonStdDev = TRUE,
+    prop.ctr = list( "EP1" = NA ),
+    allocRatio = c( 1, 1, 1 ),
+    WI = c( 0.5, 0.5 ),
+    G = matrix( c( 0, 1, 1, 0 ), nrow = 2, byrow = TRUE ),
+    testType = "Parametric",
+    alpha = 0.025,
+    infoFrac = c( 0.5, 1.0 ),
+    typeOfDesign = "asOF",
+    lookInputs = list(
+      list( p_raw = c( H1 = 0.0294, H2 = 0.0463 ) )
+    )
+  )
+
+  # CER Scenario 10: AdaptGMCP_CER_Analysis_Example.R Example 2. Stage 1
+  # analysis only, per explicit scope decision. Look 1 p-values are
+  # reasonable placeholders (not documented in source) because the source
+  # only says to follow interactive console prompts.
+  lScenario10 <- list(
+    rowId = "CER-AdaptExample2-01",
+    nArms = 3,
+    nEps = 2,
+    sampleSize = 400,
+    epType = list( "EP1" = "Continuous", "EP2" = "Continuous" ),
+    sigma = list( "EP1" = c( 1, 1, 1 ), "EP2" = c( 1, 1, 1 ) ),
+    CommonStdDev = FALSE,
+    prop.ctr = list( "EP1" = NA, "EP2" = NA ),
+    allocRatio = c( 1, 1, 1 ),
+    WI = c( 0.5, 0.5, 0, 0 ),
+    G = matrix( c( 0, 1/2, 1/2, 0, 1/2, 0, 0, 1/2, 0, 1, 0, 0, 1, 0, 0, 0 ), nrow = 4, byrow = TRUE ),
+    testType = "Parametric",
+    alpha = 0.025,
+    infoFrac = c( 0.5, 1.0 ),
+    typeOfDesign = "asOF",
+    lookInputs = list(
+      list( p_raw = c( H1 = 0.01, H2 = 0.05, H3 = 0.02, H4 = 0.08 ) )
+    )
+  )
+
+  lScenarios <- list(
+    lScenario1, lScenario2, lScenario3, lScenario4, lScenario5, lScenario6,
+    lScenario7, lScenario8, lScenario9, lScenario10
+  )
 
   for( lScenario in lScenarios )
   {

@@ -4,7 +4,9 @@
 
 - Epic: [#54](https://github.com/Cytel-Software/AdaptiveGMCP/issues/54)
 - Branch: `54-CER-non-interactive-analysis-interface`
-- Status: Planning; implementation has not started
+- Status: Phase 0 and Phase 1 complete (2026-09-10); awaiting explicit approval
+  at Review Checkpoint 1 before Phase 2 begins. No child issue's implementation
+  scope has started yet — see "Phase 1 Results" below.
 - Delivery model: Incremental implementation with mandatory user review checkpoints
 
 ## Objective
@@ -109,9 +111,23 @@ means structural validation will not detect every same-shaped but statistically
 different design. This is a documented residual risk and can be revisited if
 the initial implementation shows that stronger binding is necessary.
 
+### Decoupled Plotting
+
+`PlotGraph_CER(design, state = NULL)` reconstructs and plots the
+intersection-hypothesis graph for a given point in the analysis: the initial
+planned graph when `state` is `NULL`, or the graph as of the most recently
+completed look otherwise. It is a thin wrapper around the existing
+`plotGraph()` helper and has no effect on any analysis result. This lets a
+caller regenerate any graph on demand instead of relying solely on the inline
+`plotGraphs` argument of `AnalyzeLook_CER()`.
+
 ## Compatibility Requirements
 
-- `adaptGMCP_CER()` remains public and behavior-compatible.
+- `adaptGMCP_CER()` remains public and behavior-compatible; it is never
+  modified by this epic. No other existing code is modified unless strictly
+  required for implementing the new non-interactive API. If such a
+  modification is required, it is explained to the user along with the
+  rationale and approved before it is made.
 - The interactive API will not be rewritten around the new API until numerical
   parity is proven and such a refactor is demonstrably low risk.
 - Existing statistical helpers should be reused where practical.
@@ -153,35 +169,74 @@ will pause for clarification rather than inventing inputs.
 
 ## Implementation Phases
 
-### Phase 0: Repository and Baseline Gate
+### Phase 0: Repository and Baseline Gate — **Complete (2026-09-09)**
 
-1. Run the mandatory Git state and synchronization checks.
-2. Restore the `renv` environment.
-3. Run the existing CER regression tests and record the baseline.
-4. Keep this document updated as the living scope and progress ledger.
+1. Run the mandatory Git state and synchronization checks. Done; pre-existing
+   unrelated dirty files were flagged (`.github/copilot-instructions.md`,
+   `.github/instructions/development.instructions.md`) and left untouched.
+2. Run the existing CER regression tests and record the baseline. Done —
+   baseline: `devtools::test(filter = 'CER')` → 75 passed, 0 failed.
+3. Keep this document updated as the living scope and progress ledger. Ongoing.
 
-### Phase 1: Equivalence Baseline and Scenario Coverage
+### Phase 1: Equivalence Baseline and Scenario Coverage — **Steps 1-7 complete (2026-09-10); steps 8-9 deferred**
 
-1. Inventory every active `adaptGMCP_CER()` call.
-2. Convert each console workflow into a complete deterministic scenario.
+1. Inventory every active `adaptGMCP_CER()` call. Done.
+2. Convert each console workflow into a complete deterministic scenario. Done —
+   see "Phase 1 Results" below for the full scenario matrix.
 3. Extend the fixture harness to support real selection, sample-size changes,
-   and strategy updates instead of no-op mocks where required.
+   and strategy updates instead of no-op mocks where required. Done —
+   `do_modifyStrategy` now reuses PC's existing `applyStrategyUpdate()` helper
+   instead of a no-op.
 4. Expand fixture outputs to include:
-   - Planned Stage 1 and Stage 2 boundaries
-   - Stage 1 intersection and elementary decisions
-   - Structured CER and PCER results
-   - Active and dropped hypotheses
-   - Planned and adapted sample allocations
-   - Adapted covariance and Stage 2 boundaries
-   - Cumulative Stage 2 p-values
-   - Final rejection decisions
+   - Planned Stage 1 and Stage 2 boundaries — already captured; unchanged.
+   - Stage 1 intersection and elementary decisions — added.
+   - Structured CER and PCER results — added (required exposing `mcpObj$CERTab`
+     in `R/cerAdaptGMCP_Analysis.R`; see "Known Risks" item 6 and "Planned
+     Files").
+   - Active and dropped hypotheses — added.
+   - Planned and adapted sample allocations — added.
+   - Adapted covariance and Stage 2 boundaries — added.
+   - Cumulative Stage 2 p-values — already captured; unchanged.
+   - Final rejection decisions — already captured; unchanged.
 5. Preserve existing fixtures unless a verified defect requires an intentional
-   fixture update.
-6. Run the targeted CER regression suite.
+   fixture update. Done — the 6 pre-existing fixtures' original field values
+   are unchanged; only the new fields from step 4 were added to them.
+6. Review any existing tests for `adaptGMCP_CER()` that already exist and do not duplicate them while doing 1 to 5. Done — extended rather than duplicated.
+7. Add tests for `adaptGMCP_CER()` for any new scenarios discovered while doing 1 to 5. Done — 4 new scenarios and `test_that()` blocks added.
+8. Add corresponding tests for the new non-interactive CER analysis API using the same scenarios as for `adaptGMCP_CER()`. Deferred — the new API does not
+   exist until Phase 3+. Revisit per-scenario once `SetupDesign_CER()` and
+   `AnalyzeLook_CER()` exist (Phase 4/5 already require comparing against
+   these same fixtures).
+9. Make sure that the new non-interactive api gives the same output as `adaptGMCP_CER()` for the same scenario. Deferred for the same reason as step 8.
 
-**Review checkpoint 1:** Stop and present the complete scenario matrix,
-fixtures, exclusions, ambiguities, and regression results. Do not begin Phase 2
-without explicit approval.
+#### Phase 1 Results: Scenario Matrix
+
+All 10 scenarios live in `internalData/GenerateCERRegressionFixtures.R` and
+`tests/testthat/test-CERRegressionApi.R`.
+
+| rowId | Source | Notes |
+|---|---|---|
+| `CER-regression-01/02/03` | Synthetic (pre-existing, #56) | Basic continuation, selection, sample-size change |
+| `CER-Examp-AdaptGMCP-01` | `AdaptGMCP_CER_Analysis_Example.R` Ex. 1 (pre-existing, #56) | |
+| `CER-Examp-3arm-1ep` | `CER Analysis 3arm-1ep.R` (pre-existing, #56) | |
+| `CER-Examp-2ep` | `CER.Analysis.2primary-2secondary.R` (pre-existing, #56) | |
+| `CER-GSExample4-01` | `GS_GMCP_Example.R` EXAMPLE 4, 1st call (new) | Real selection (drops H3) + sample-size change + real strategy update |
+| `CER-GSExample4-02` | `GS_GMCP_Example.R` EXAMPLE 4, 2nd call (new) | No selection drop, no-op sample-size adaptation, real strategy update |
+| `CER-GSExample2-01` | `GS_GMCP_Example.R` EXAMPLE 2 (new) | Stage-1-only by explicit decision (Look 2 undocumented in source) |
+| `CER-AdaptExample2-01` | `AdaptGMCP_CER_Analysis_Example.R` Example 2 (new) | Stage-1-only, placeholder Look-1 p-values, by explicit decision (source undocumented; `nEps=2`/`Parametric` kept as-is) |
+
+**Excluded / deferred coverage (per Scenario Coverage Contract):** the commented-out
+`AdaptGMCP_CER_Analysis_NormBin_Example.R` call and the plain-text
+`internalData/TestCases/Extreme CER Scenario.txt` scenario remain optional
+follow-up coverage — not currently runnable, left in the ledger only.
+
+**Validation:** full package suite after all Phase 1 changes — 762 passed, 1
+failed (pre-existing, unrelated: a `Parallel = TRUE` PC-simulation test failing
+in this dev environment because the package is only `load_all()`-loaded, not
+installed, for parallel workers), 37 warnings, 3 skipped.
+
+**Review checkpoint 1:** Reached, pending your explicit approval to begin
+Phase 2. Steps 8-9 above are intentionally deferred rather than skipped.
 
 ### Phase 2: Object Contracts and TDD Red
 
@@ -225,7 +280,8 @@ Issue: #60.
 7. Return only `CERDesign`.
 8. Prove that setup is non-interactive and does not mutate caller inputs.
 9. Make the setup tests green and rerun the CER regression suite.
-10. Update issue wording that still refers to `SetupAnalysis_CER()` before the
+10. Confirm issue wording still matches `SetupDesign_CER()` naming (already
+    aligned per Known Risk #6); correct any newly discovered drift before the
     affected issues are closed.
 
 **Review checkpoint 3:** Stop with a reusable planned-design API and report its
@@ -294,15 +350,16 @@ numerical tolerances or behavior differences for approval.
 
 Issue: #64.
 
-1. Extract shared pure logic between the legacy and new APIs only after parity
-   tests are green.
-2. Keep console prompting and display behavior in the legacy API.
-3. Harden validation and verify state/history invariants.
-4. Complete print methods for both new classes.
-5. Add initial, Look 1, and Look 2 graph reconstruction without coupling plots
-   to analysis.
-6. Run targeted CER tests after every refactor and run affected PC tests when a
-   shared helper changes.
+1. Confirm the "Compatibility Requirements" rule on not modifying existing
+   code was honored throughout Phases 1-5; `adaptGMCP_CER()` itself must
+   remain untouched.
+2. Harden validation and verify state/history invariants for the new API.
+3. Complete print methods for both new classes.
+4. Implement `PlotGraph_CER(design, state = NULL)` for initial, Look 1, and
+   Look 2 graph reconstruction (see "Decoupled Plotting" in Architecture),
+   without coupling plots to analysis.
+5. Run targeted CER tests after every refactor.
+6. PC analysis code or tests are not expected to change due to the non-interactive CER analysis API. However, if this assumption turns out to be false, flag it clearly so that the user (the human developer) can review it and take appropriate decision.
 7. Run changed-file lint and the broader package test suite.
 
 **Review checkpoint 6:** Stop with before-and-after behavior evidence and a
@@ -317,10 +374,10 @@ Issues: #63 and #54.
    - `AnalyzeLook_CER()`
    - `print.CERDesign()`
    - `print.CERAnalysisState()`
-   - Any exported plotting helper
+   - `PlotGraph_CER()`
 2. Explain design/state separation, `state = NULL` at Look 1, incremental Stage
    2 p-values, two-look enforcement, adaptation timing, history, and errors.
-3. Add a fully non-interactive `internalData/SetupDesign_CER_Example.R` showing
+3. Add a fully non-interactive `internalData/CER_Analysis_NonInteractive_Example.R` showing
    design creation and a complete adapted analysis.
 4. Update user-facing documentation where needed.
 5. Update `NEWS.md` and record the `DESCRIPTION` version decision.
@@ -360,18 +417,34 @@ numerical tolerance.
 
 ## Planned Files
 
-- `R/CerDesign.R`: design constructor and S3 methods
-- `R/CerAnalysisState.R`: analysis-state constructor and S3 methods
-- `R/CerAnalysisApi.R`: `SetupDesign_CER()` and `AnalyzeLook_CER()`
-- `R/cerStage1Analysis.R`: shared pure planned-design computation
-- `R/cerStage2Analysis.R`: prompt-free Stage 2 sample-size handling
-- `R/cerAdaptBoundary.R`: reused conditional-error recalibration
-- `R/cerComputation.R`: structured CER/PCER results
-- `tests/testthat/test-CerAnalysisApi.R`: setup and analysis tests
-- `tests/testthat/test-CERRegressionApi.R`: complete compatibility baseline
-- `internalData/GenerateCERRegressionFixtures.R`: deterministic fixtures
-- `internalData/SetupDesign_CER_Example.R`: worked example
-- `NEWS.md`, `DESCRIPTION`, `NAMESPACE`, and generated `man/` files
+### New files
+
+- `R/CERDesign.R`: design constructor and S3 methods
+- `R/CERAnalysisState.R`: analysis-state constructor and S3 methods
+- `R/CERAnalysisApi.R`: `SetupDesign_CER()`, `AnalyzeLook_CER()`, and `PlotGraph_CER()`
+- `tests/testthat/test-CERAnalysisApi.R`: setup and analysis tests
+- `internalData/CER_Analysis_NonInteractive_Example.R`: worked example
+
+### Existing files to modify or extend
+
+- `R/cerStage1Analysis.R`: already contains `PerformStage1Test()`; extract the
+  shared pure planned-design computation from it.
+- `R/cerStage2Analysis.R`: already contains `PerformStage2Test()`; add
+  prompt-free Stage 2 sample-size handling.
+- `R/cerAdaptBoundary.R`: already contains conditional-error recalibration
+  logic; reuse as-is unless a defect fix is required.
+- `R/cerComputation.R`: already contains `getCER()`; extend to expose
+  structured CER/PCER results alongside the existing `kable` output.
+- `tests/testthat/test-CERRegressionApi.R`: already contains the interactive
+  `adaptGMCP_CER()` regression baseline from issue #56; extend with any newly
+  discovered scenarios and with equivalence tests against the new API.
+- `internalData/GenerateCERRegressionFixtures.R`: already generates the
+  existing regression fixtures; extend for any newly discovered scenarios.
+- `R/cerAdaptGMCP_Analysis.R`: already contains `adaptGMCP_CER()`; a single
+  additive line (`mcpObj$CERTab <- CERTab`) was added during Phase 1 to expose
+  the CER/PCER table for fixture capture (approved 2026-09-09; see Known Risks
+  item 6). No other behavior was changed.
+- `NEWS.md`, `DESCRIPTION`, `NAMESPACE`, and generated `man/` files.
 
 Test files may be divided into setup, lifecycle, adaptation, and plotting files
 if a single file becomes difficult to review.
@@ -391,9 +464,21 @@ if a single file becomes difficult to review.
 5. Deferring a persistent design signature allows a same-shaped but different
    design to pass structural compatibility checks. Revisit this if testing or
    usage demonstrates a practical risk.
-6. Existing issue titles and acceptance criteria refer to
-   `SetupAnalysis_CER()`. They must be revised to `SetupDesign_CER()` before
-   implementation issues are completed.
+6. Resolved 2026-09-09: issues #54, #55, #57–#64 were rewritten to match this
+   living plan's `CERDesign`/`CERAnalysisState` split and `SetupDesign_CER()`
+   naming (previously they described a single combined state object and
+   `SetupAnalysis_CER()`, mirrored from the PC method). Issue #56 was left
+   unchanged because it is closed and only concerns `adaptGMCP_CER()`
+   regression fixtures, which are unaffected by the split.
+7. Investigated 2026-09-10: the item 2 `getArmsFromHypo()` defect was confirmed
+   to have no effect on the regression fixtures, because `mcpObj$ArmsPresent`
+   (the field corrupted by the bug) is only consumed by the real, non-mocked
+   `do_ModifyStage2Sample()`, which no regression scenario calls. The defect
+   itself is still unresolved and remains a risk once the new API accepts real
+   (non-mocked) sample-size adaptation.
+8. Resolved 2026-09-09: `mcpObj$CERTab` is now exposed (see "Planned Files" /
+   `R/cerAdaptGMCP_Analysis.R`), closing the gap that previously blocked
+   capturing "structured CER and PCER results" per item 1.
 
 ## Governance Checklist
 
