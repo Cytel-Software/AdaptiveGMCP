@@ -19,7 +19,7 @@ Install these VS Code extensions:
 
 Install this R package:
 
-- vscDebugger: Go to Command Panel and select "R Debugger: Install or update the required R package (quick)". This will install the vscDebugger package.
+- vscDebugger: Open the Command Palette and select "R Debugger: Install or update the required R package (quick)". This will install the vscDebugger package.
 
 ## One-Time Setup
 
