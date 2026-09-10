@@ -109,7 +109,69 @@ testthat::test_that("Section 1 positive contract: simMAMSMEP runs mixed endpoint
   ExpectValidSimContract(out = out)
 })
 
-# Section 2: simMAMSMEP negative/validation cases.
+# Section 2: serial and parallel simulations produce identical results.
+
+testthat::test_that("Section 2 parallelism: CER matches serial simulation exactly", {
+  withr::local_envvar(c("_R_CHECK_LIMIT_CORES_" = "TRUE"))
+
+  lSimArgs <- list(
+    Method = "CER", alpha = 0.025, SampleSize = 500,
+    TestStatCont = "t-equal", CommonStdDev = FALSE, FWERControl = "None",
+    nArms = 5, nEps = 1, lEpType = list(EP1 = "Continuous"),
+    Arms.Mean = list(EP1 = c(0, 0, 0, 0, 0.25)),
+    Arms.std.dev = list(EP1 = c(1, 1, 1, 1, 1)),
+    Arms.alloc.ratio = c(1, 0.5, 0.5, 0.5, 0.5), EP.Corr = matrix(1),
+    WI = rep(1 / 4, 4),
+    G = rbind(
+      H1 = c(0, 1 / 3, 1 / 3, 1 / 3),
+      H2 = c(1 / 3, 0, 1 / 3, 1 / 3),
+      H3 = c(1 / 3, 1 / 3, 0, 1 / 3),
+      H4 = c(1 / 3, 1 / 3, 1 / 3, 0)
+    ),
+    test.type = "Parametric", info_frac = c(1 / 2, 1),
+    typeOfDesign = "asOF", MultipleWinners = TRUE, Selection = FALSE,
+    ImplicitSSR = "None", nSimulation = 10, nSimulation_Stage2 = 10,
+    Seed = 1234, SummaryStat = TRUE, plotGraphs = FALSE,
+    Parallel = FALSE, Verbose = FALSE
+  )
+
+  lSerialResult <- do.call(simMAMSMEP, lSimArgs)
+  lSimArgs$Parallel <- TRUE
+  lParallelResult <- do.call(simMAMSMEP, lSimArgs)
+
+  testthat::expect_identical(
+    lParallelResult$Overall_Powers_df,
+    lSerialResult$Overall_Powers_df
+  )
+})
+
+testthat::test_that("Section 2 parallelism: CombPValue matches serial simulation exactly", {
+  withr::local_envvar(c("_R_CHECK_LIMIT_CORES_" = "TRUE"))
+
+  lSimArgs <- list(
+    Method = "CombPValue", alpha = 0.025, SampleSize = 500,
+    TestStatBin = "UnPooled", FWERControl = "CombinationTest",
+    nArms = 5, nEps = 1, lEpType = list(EP1 = "Binary"),
+    Arms.Prop = list(EP1 = c(0.1, 0.1, 0.1, 0.1, 0.1)),
+    Arms.alloc.ratio = c(1, 1, 1, 1, 1), EP.Corr = matrix(1),
+    WI = rep(1 / 4, 4), G = matrix(rep(0, 16), byrow = TRUE, nrow = 4),
+    test.type = "Bonf", info_frac = 1,
+    typeOfDesign = "asOF", MultipleWinners = FALSE, Selection = FALSE,
+    ImplicitSSR = "None", nSimulation = 10, Seed = 1234,
+    SummaryStat = TRUE, plotGraphs = FALSE, Parallel = FALSE, Verbose = FALSE
+  )
+
+  lSerialResult <- do.call(simMAMSMEP, lSimArgs)
+  lSimArgs$Parallel <- TRUE
+  lParallelResult <- do.call(simMAMSMEP, lSimArgs)
+
+  testthat::expect_identical(
+    lParallelResult$Overall_Powers_df,
+    lSerialResult$Overall_Powers_df
+  )
+})
+
+# Section 3: simMAMSMEP negative/validation cases.
 # simMAMSMEP validates inputs and, on failure, returns a list of "Invalid argument in '<field>'"
 # messages instead of throwing. Each test induces one specific invalidity and asserts that message.
 
@@ -121,7 +183,7 @@ ExpectInvalidInput <- function(out, field)
   testthat::expect_true(any(grepl(field, msgs, fixed = TRUE)))
 }
 
-testthat::test_that("Section 2 negative: inconsistent nEps vs lEpType is rejected", {
+testthat::test_that("Section 3 negative: inconsistent nEps vs lEpType is rejected", {
   # nEps = 1 but lEpType has length 2 (malformed endpoint definition).
   lEpType <- list(EP1 = "Binary", EP2 = "Binary")
   Arms.Prop <- list(EP1 = c(0.1, 0.1, 0.1, 0.1, 0.1))
@@ -143,7 +205,7 @@ testthat::test_that("Section 2 negative: inconsistent nEps vs lEpType is rejecte
   ExpectInvalidInput(out = out, field = "'lEpType'")
 })
 
-testthat::test_that("Section 2 negative: CER with more than two looks is rejected", {
+testthat::test_that("Section 3 negative: CER with more than two looks is rejected", {
   # CER supports at most two looks; three-look info_frac is invalid.
   lEpType <- list(EP1 = "Continuous")
   Arms.Mean <- list(EP1 = c(0, 0, 0, 0, 0.25))
@@ -172,7 +234,7 @@ testthat::test_that("Section 2 negative: CER with more than two looks is rejecte
   ExpectInvalidInput(out = out, field = "'info_frac'")
 })
 
-testthat::test_that("Section 2 negative: invalid SelectionCriterion is rejected", {
+testthat::test_that("Section 3 negative: invalid SelectionCriterion is rejected", {
   # Two-look design with Selection = TRUE but an unsupported SelectionCriterion.
   lEpType <- list(EP1 = "Continuous")
   Arms.Mean <- list(EP1 = c(0, 0, 0, 0, 0.25))
@@ -204,7 +266,7 @@ testthat::test_that("Section 2 negative: invalid SelectionCriterion is rejected"
   ExpectInvalidInput(out = out, field = "'SelectionCriterion'")
 })
 
-testthat::test_that("Section 2 negative: WI length mismatch is rejected", {
+testthat::test_that("Section 3 negative: WI length mismatch is rejected", {
   # WI must have length nEps * (nArms - 1) = 4; length 3 is invalid.
   lEpType <- list(EP1 = "Binary")
   Arms.Prop <- list(EP1 = c(0.1, 0.1, 0.1, 0.1, 0.1))
@@ -226,7 +288,7 @@ testthat::test_that("Section 2 negative: WI length mismatch is rejected", {
   ExpectInvalidInput(out = out, field = "'WI'")
 })
 
-# Section 3: simMAMSMEP_Wrapper positive contract cases.
+# Section 4: simMAMSMEP_Wrapper positive contract cases.
 # The wrapper consumes a data frame of scenario rows (CSV-style) and maps each row to simMAMSMEP
 # via run1TestCase. Input rows are built inline with hard-coded values (expression columns as
 # R-code strings). nSimulation / nSimulation_Stage2 / Parallel are set to fast, serial values.
@@ -273,7 +335,7 @@ ExpectValidWrapperOutput <- function(dfOut, expectedModelIds)
   testthat::expect_setequal(dfOut$ModelID, expectedModelIds)
 }
 
-testthat::test_that("Section 3 positive contract: wrapper runs binary CombPValue scenario", {
+testthat::test_that("Section 4 positive contract: wrapper runs binary CombPValue scenario", {
   dfInput <- MakeWrapperInputDF(
     ModelID = 1, Scenario = "Binary CombPValue", Method = "CombPValue",
     SampleSize = 500, alpha = 0.025, TestStatCont = NA, CommonStdDev = NA,
@@ -297,7 +359,7 @@ testthat::test_that("Section 3 positive contract: wrapper runs binary CombPValue
   testthat::expect_equal(dfOut$Method, "CombPValue")
 })
 
-testthat::test_that("Section 3 positive contract: wrapper runs continuous CER scenario", {
+testthat::test_that("Section 4 positive contract: wrapper runs continuous CER scenario", {
   dfInput <- MakeWrapperInputDF(
     ModelID = 2, Scenario = "Continuous CER", Method = "CER",
     SampleSize = 500, alpha = 0.025, TestStatCont = "t-equal", CommonStdDev = FALSE,
@@ -322,7 +384,7 @@ testthat::test_that("Section 3 positive contract: wrapper runs continuous CER sc
   testthat::expect_equal(dfOut$Method, "CER")
 })
 
-testthat::test_that("Section 3 positive contract: wrapper runs mixed endpoint CombPValue scenario", {
+testthat::test_that("Section 4 positive contract: wrapper runs mixed endpoint CombPValue scenario", {
   gMixed <- paste0(
     "matrix(c(0,1/12,1/12,1/12,3/4,0,0,0, ",
     "1/12,0,1/12,1/12,0,3/4,0,0, ",
@@ -358,7 +420,7 @@ testthat::test_that("Section 3 positive contract: wrapper runs mixed endpoint Co
   testthat::expect_equal(dfOut$Method, "CombPValue")
 })
 
-# Section 4: simMAMSMEP_Wrapper negative/validation cases.
+# Section 5: simMAMSMEP_Wrapper negative/validation cases.
 # The wrapper skips rows whose scenario fails; when no row succeeds it has no results to
 # assemble and errors while finalizing output. Each test induces one bad row and asserts the
 # wrapper surfaces a failure rather than returning a valid result.
@@ -383,7 +445,7 @@ MakeValidBinaryWrapperInput <- function()
   ))
 }
 
-testthat::test_that("Section 4 negative: wrapper fails when a required column is missing", {
+testthat::test_that("Section 5 negative: wrapper fails when a required column is missing", {
   # Drop a directly-read column; an expression column would trigger parse(text = NULL),
   # which reads from stdin and blocks in an interactive session.
   dfInput <- MakeValidBinaryWrapperInput()
@@ -394,7 +456,7 @@ testthat::test_that("Section 4 negative: wrapper fails when a required column is
   )
 })
 
-testthat::test_that("Section 4 negative: wrapper fails on an unparseable expression column", {
+testthat::test_that("Section 5 negative: wrapper fails on an unparseable expression column", {
   dfInput <- MakeValidBinaryWrapperInput()
   dfInput$WI <- "c(1/4, 1/4, 1/4,"
 
@@ -403,7 +465,7 @@ testthat::test_that("Section 4 negative: wrapper fails on an unparseable express
   )
 })
 
-testthat::test_that("Section 4 negative: wrapper fails on inconsistent per-row dimensions", {
+testthat::test_that("Section 5 negative: wrapper fails on inconsistent per-row dimensions", {
   # Arms.alloc.ratio has length 3 but nArms = 5.
   dfInput <- MakeValidBinaryWrapperInput()
   dfInput$Arms.alloc.ratio <- "c(1, 1, 1)"
