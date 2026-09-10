@@ -53,11 +53,12 @@ test_that("p value combination simulation produces expected results", {
     nSimulation_Stage2 = 1,
     Seed = 100,
     SummaryStat = FALSE,
-    plotGraphs = TRUE,
+    plotGraphs = FALSE,
     EastSumStat = NULL,
-    Parallel = TRUE
+    Parallel = FALSE
   )
 
 
-expect_snapshot(result$Overall_Powers_df)
+expected <- readRDS(testthat::test_path("overall_powers_df_pvaluecomb.rds"))
+expect_equal(result$Overall_Powers_df, expected, tolerance = 1e-8)
 })

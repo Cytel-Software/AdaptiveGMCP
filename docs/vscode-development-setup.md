@@ -17,6 +17,10 @@ Install these VS Code extensions:
 - Quarto (`quarto.quarto`) for `.qmd` work
 - GitHub Pull Requests (`GitHub.vscode-pull-request-github`) (optional but useful)
 
+Install this R package:
+
+- vscDebugger: Open the Command Palette and select "R Debugger: Install or update the required R package (quick)". This will install the vscDebugger package.
+
 ## One-Time Setup
 
 1. Clone the repository and open it in VS Code.

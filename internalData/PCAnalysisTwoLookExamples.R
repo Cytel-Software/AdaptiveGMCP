@@ -13,6 +13,7 @@ library(AdaptGMCP)
 # rejected at look 1 and H2 is rejected at look 2.  MultipleWinners = TRUE
 # keeps the trial running after the first rejection.
 
+# Setting all input parameters
 wi_ex1 <- c(H1 = 1 / 3, H2 = 1 / 3, H3 = 1 / 3)
 g_ex1 <- matrix(
   c(
@@ -36,6 +37,7 @@ corr_ex1 <- matrix(
   dimnames = list(names(wi_ex1), names(wi_ex1))
 )
 
+# Setting up the design
 state_ex1 <- SetupAnalysis_PC(
   WI = wi_ex1,
   G = g_ex1,
@@ -47,6 +49,9 @@ state_ex1 <- SetupAnalysis_PC(
   plotGraphs = FALSE
 )
 
+print("Example 1: Design")
+print(state_ex1)
+
 state_ex1 <- AnalyzeLook_PC(
   state = state_ex1,
   look = 1,
@@ -55,8 +60,8 @@ state_ex1 <- AnalyzeLook_PC(
   plotGraphs = FALSE
 )
 
-print("EXAMPLE 1 - Look-1 rejection; the trial continues:")
-print(state_ex1$mcpObj$rej_flag_Curr)
+print("EXAMPLE 1 - Look-1 analysis output")
+print(state_ex1$mcpObj)
 
 state_ex1 <- AnalyzeLook_PC(
   state = state_ex1,
@@ -65,8 +70,8 @@ state_ex1 <- AnalyzeLook_PC(
   plotGraphs = FALSE
 )
 
-print("EXAMPLE 1 - Look-2 rejection and final state:")
-print(state_ex1$mcpObj$rej_flag_Curr)
+print("EXAMPLE 1 - Look-2 analysis output")
+print(state_ex1$mcpObj)
 print(state_ex1$completion_reason)
 
 #===================================================================================================
@@ -74,7 +79,7 @@ print(state_ex1$completion_reason)
 #===================================================================================================
 # H1/H2 are endpoint 1 for treatments 1/2, and H3/H4 are endpoint 2 for
 # treatments 1/2.  At look 2, treatment 2 is dropped across both endpoints.
-
+# Setting all input parameters
 wi_ex2 <- c(H1 = 0.5, H2 = 0.5, H3 = 0, H4 = 0)
 g_ex2 <- matrix(
   c(
@@ -100,6 +105,7 @@ corr_ex2 <- matrix(
   dimnames = list(names(wi_ex2), names(wi_ex2))
 )
 
+# Setting up the design
 state_ex2 <- SetupAnalysis_PC(
   WI = wi_ex2,
   G = g_ex2,
@@ -110,6 +116,9 @@ state_ex2 <- SetupAnalysis_PC(
   plotGraphs = FALSE
 )
 
+print("Example 2: Design")
+print(state_ex2)
+
 state_ex2 <- AnalyzeLook_PC(
   state = state_ex2,
   look = 1,
@@ -117,6 +126,9 @@ state_ex2 <- AnalyzeLook_PC(
   Correlation = corr_ex2,
   plotGraphs = FALSE
 )
+
+print("EXAMPLE 2 - Look-1 analysis output")
+print(state_ex2$mcpObj)
 
 state_ex2 <- AnalyzeLook_PC(
   state = state_ex2,
@@ -126,9 +138,8 @@ state_ex2 <- AnalyzeLook_PC(
   plotGraphs = FALSE
 )
 
-print("EXAMPLE 2 - Active hypotheses after look-2 selection and analysis:")
-print(state_ex2$mcpObj$IndexSet)
-print(state_ex2$mcpObj$rej_flag_Curr)
+print("EXAMPLE 2 - Look-2 analysis output")
+print(state_ex2$mcpObj)
 print(state_ex2$completion_reason)
 
 #===================================================================================================
@@ -138,7 +149,7 @@ print(state_ex2$completion_reason)
 # treatment arms.  The inferential strategy is also changed at that look:
 # H1 receives the largest initial weight, and the transition matrix gives
 # rejected H1 weight to H2/H3 rather than retaining the original graph.
-
+# Setting up all input parameters
 wi_ex3 <- c(H1 = 0.5, H2 = 0.5, H3 = 0, H4 = 0)
 g_ex3 <- matrix(
   c(
@@ -154,6 +165,7 @@ g_ex3 <- matrix(
 
 corr_ex3 <- corr_ex2
 
+# Setting up the design
 state_ex3 <- SetupAnalysis_PC(
   WI = wi_ex3,
   G = g_ex3,
@@ -164,6 +176,9 @@ state_ex3 <- SetupAnalysis_PC(
   plotGraphs = FALSE
 )
 
+print("Example 3: Design")
+print(state_ex3)
+
 state_ex3 <- AnalyzeLook_PC(
   state = state_ex3,
   look = 1,
@@ -172,6 +187,10 @@ state_ex3 <- AnalyzeLook_PC(
   plotGraphs = FALSE
 )
 
+print("EXAMPLE 3 - Look-1 analysis output")
+print(state_ex3$mcpObj)
+
+# Setting up new weights and transition matrix for look 2
 new_w_ex3 <- c(H1 = 0.5, H2 = 0.25, H3 = 0.25)
 new_g_ex3 <- matrix(
   c(
@@ -203,7 +222,6 @@ state_ex3 <- AnalyzeLook_PC(
   plotGraphs = FALSE
 )
 
-print("EXAMPLE 3 - Final state after selection and strategy adaptation:")
-print(state_ex3$mcpObj$IndexSet)
-print(state_ex3$mcpObj$rej_flag_Curr)
+print("EXAMPLE 3 - analysis output for look 2")
+print(state_ex3$mcpObj)
 print(state_ex3$completion_reason)

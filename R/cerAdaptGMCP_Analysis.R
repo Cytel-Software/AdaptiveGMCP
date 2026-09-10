@@ -239,6 +239,7 @@ adaptGMCP_CER <- function(
                        mvtnorm_algo = mvtnorm_algo)
       cat("Table of CER and PCER values conditional on stage one p-values \n")
       print(CERTab)
+      mcpObj$CERTab <- CERTab # exposed for non-interactive introspection/testing
       # #--------------------------------------
 
       if (plotGraphs) # Plot after Stage-1 analysis

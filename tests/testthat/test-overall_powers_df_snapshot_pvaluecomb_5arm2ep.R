@@ -38,7 +38,7 @@ test_that("p value combination  results match benchmark for 5 arm 2 ep", {
                  1/3,0,1/3,1/3,0,0,0,0,
                  1/3,1/3,0,1/3,0,0,0,0,
                  1/3,1/3,1/3,0,0,0,0,0),
-               nrow = nEps*(nArms-1), byrow = T),
+               nrow = nEps*(nArms-1), byrow = TRUE),
     test.type = "Partly-Parametric",
     info_frac = info_frac,
     typeOfDesign = "asOF",
@@ -66,5 +66,6 @@ test_that("p value combination  results match benchmark for 5 arm 2 ep", {
   )
 
 
-  expect_snapshot(result$Overall_Powers_df)
+  expected <- readRDS(testthat::test_path("overall_powers_df_pvaluecomb_5arm2ep.rds"))
+  expect_equal(result$Overall_Powers_df, expected, tolerance = 1e-8)
 })
