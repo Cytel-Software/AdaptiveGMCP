@@ -117,7 +117,7 @@ For each remaining intersection:
 - Non-parametric subsets use PCER calculations based on Stage 1 and Stage 2 sample sizes.
 - Mixed intersections combine these subset contributions.
 
-The CER table is printed after Stage 1, but it is currently held only in the local `CERTab` variable rather than saved in `mcpObj`.
+The CER table is printed after Stage 1 and is also saved on `mcpObj$CERTab` for non-interactive introspection and regression testing.
 
 **Interim Decisions**
 
