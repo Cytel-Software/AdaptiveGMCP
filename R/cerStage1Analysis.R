@@ -4,35 +4,56 @@
 #
 # --------------------------------------------------------------------------------------------------
 
+# Planned CER design artifacts -------------------------- -
+ComputeCERPlannedDesign <- function(
+    nEps, nLooks, nHypothesis, EpType, sigma, prop.ctr, allocRatio,
+    SampleSize, alpha, info_frac, typeOfDesign, deltaWT, deltaPT1, gammaA,
+    userAlphaSpending, test.type, HypoMap, CommonStdDev, WH, mvtnorm_algo,
+    compute_covariance = TRUE )
+{
+  lAllocation <- getPlanAllocatedSamples(
+    SS = SampleSize, allocRatio = allocRatio, info_frac = info_frac
+  )
+  dSigma <- if( isTRUE( compute_covariance ) ) getSigma(
+    SS_Cum = lAllocation$CumulativeSamples, EpType = EpType,
+    sigma = sigma, prop.ctr = prop.ctr, allocRatio = allocRatio,
+    CommonStdDev = CommonStdDev, info_frac = info_frac
+  ) else NA
+  lBoundary <- planBdryCER(
+    nHypothesis = nHypothesis, nEps = nEps, nLooks = nLooks,
+    alpha = alpha, info_frac = info_frac, typeOfDesign = typeOfDesign,
+    deltaWT = deltaWT, deltaPT1 = deltaPT1, gammaA = gammaA,
+    userAlphaSpending = userAlphaSpending, test.type = test.type,
+    Sigma = dSigma, WH = WH, HypoMap = HypoMap, Scale = "Score",
+    planSSCum = lAllocation$CumulativeSamples, mvtnorm_algo = mvtnorm_algo
+  )
+  return( list(
+    allocation = lAllocation,
+    Sigma = dSigma,
+    plan_boundary = lBoundary
+  ) )
+}
+
 # Perform Stage-1 Test -------------------------- -
 PerformStage1Test <- function(nArms, nEps, EpType, nLooks, nHypothesis, 
     sigma, prop.ctr, allocRatio, SampleSize, alpha, info_frac, typeOfDesign, 
     deltaWT, deltaPT1, gammaA, des.type, test.type, Stage1Pvalues, HypoMap,
-    CommonStdDev, WH, mvtnorm_algo) {
-  # Stage-Wise Cumulative Sample Size
-  SS_alloc <- getPlanAllocatedSamples(SS = SampleSize, allocRatio = allocRatio, info_frac = info_frac)
-  SS_Cum <- SS_alloc$CumulativeSamples
-
-  # Computed covariance matrix
-  if (test.type == "Partly-Parametric" || test.type == "Parametric") {
-    Sigma <- getSigma(
-      SS_Cum = SS_Cum, EpType = EpType, sigma = sigma,
-      prop.ctr = prop.ctr, allocRatio = allocRatio,
-      CommonStdDev = CommonStdDev, info_frac = info_frac
-    )
-  } else {
-    Sigma <- NA
-  }
-
-  # Planned Boundaries
-  plan_Bdry <- planBdryCER(
-    nHypothesis = nHypothesis, nEps = nEps, nLooks = nLooks,
-    alpha = alpha, info_frac = info_frac, typeOfDesign = typeOfDesign,
-    deltaWT = deltaWT, deltaPT1 = deltaPT1, gammaA = gammaA, userAlphaSpending = userAlphaSpending,
-    test.type = test.type,
-    Sigma = Sigma, WH = WH, HypoMap = HypoMap, Scale = "Score", planSSCum = SS_Cum,
-    mvtnorm_algo = mvtnorm_algo
+    CommonStdDev, WH, mvtnorm_algo, userAlphaSpending = NULL) {
+  lPlanned <- ComputeCERPlannedDesign(
+    nEps = nEps, nLooks = nLooks, nHypothesis = nHypothesis,
+    EpType = EpType, sigma = sigma, prop.ctr = prop.ctr,
+    allocRatio = allocRatio, SampleSize = SampleSize, alpha = alpha,
+    info_frac = info_frac, typeOfDesign = typeOfDesign, deltaWT = deltaWT,
+    deltaPT1 = deltaPT1, gammaA = gammaA,
+    userAlphaSpending = userAlphaSpending, test.type = test.type,
+    HypoMap = HypoMap, CommonStdDev = CommonStdDev, WH = WH,
+    mvtnorm_algo = mvtnorm_algo,
+    compute_covariance = test.type %in% c( "Partly-Parametric", "Parametric" )
   )
+  SS_alloc <- lPlanned$allocation
+  SS_Cum <- SS_alloc$CumulativeSamples
+  Sigma <- lPlanned$Sigma
+  plan_Bdry <- lPlanned$plan_boundary
 
   # Stage1 Analysis
   Stage1Analysis <- closedTest(

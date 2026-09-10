@@ -18,7 +18,8 @@ getCER(
   EpType,
   prop.ctr,
   t1,
-  mvtnorm_algo
+  mvtnorm_algo,
+  structured = FALSE
 )
 }
 \arguments{
@@ -49,9 +50,14 @@ getCER(
 \item{t1}{planned information fraction at stage-1}
 
 \item{mvtnorm_algo}{algorithm to compute multivariate normal probabilities}
+
+\item{structured}{Logical; if `TRUE`, return the legacy display table and a
+structured data frame with CER and PCER values. The default preserves the
+legacy `knitr::kable` return value.}
 }
 \value{
-A list containing CER values and related information
+The legacy CER display table, or a list containing that table and
+  structured values when `structured = TRUE`.
 }
 \description{
 Compute CER for all intersection hypotheses after stage-1 analysis

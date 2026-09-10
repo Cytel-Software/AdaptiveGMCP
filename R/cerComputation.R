@@ -25,13 +25,19 @@
 #' @param prop.ctr planned control group response rate (for binary endpoint)
 #' @param t1 planned information fraction at stage-1
 #' @param mvtnorm_algo algorithm to compute multivariate normal probabilities
-#' @return A list containing CER values and related information
+#' @param structured Logical; if `TRUE`, return the legacy display table and a
+#'   structured data frame with CER and PCER values. The default preserves the
+#'   legacy `knitr::kable` return value.
+#' @return The legacy CER display table, or a list containing that table and
+#'   structured values when `structured = TRUE`.
 #' @keywords internal
 getCER <- function(b2,WH,p1,test.type,HypoMap,CommonStdDev,
                    allocRatio,sigma,Sigma,AllocSampleSize,
-                   EpType,prop.ctr, t1, mvtnorm_algo){
+                   EpType,prop.ctr, t1, mvtnorm_algo, structured = FALSE){
 
   SUBSETS <- CONDERR <- c()
+  CERValues <- vector("list", nrow(WH))
+  PCERValues <- vector("list", nrow(WH))
   Stage2Sigma <- getStage2PlanSigma(CommonStdDev = CommonStdDev,
                                     allocRatio = allocRatio,
                                     sigma = sigma,
@@ -154,6 +160,8 @@ getCER <- function(b2,WH,p1,test.type,HypoMap,CommonStdDev,
 
     SUBSETS <- c(SUBSETS, SubSets)
     CONDERR <- c(CONDERR, ConditionalError)
+    CERValues[[hypIDX]] <- if( length( cerParamGrps ) == 0L ) numeric( 0 ) else cerParamGrps
+    PCERValues[[hypIDX]] <- if( length( pcerNParamGrps ) == 0L ) numeric( 0 ) else pcerNParamGrps
   }
 
   # Modified weights table
@@ -170,11 +178,28 @@ getCER <- function(b2,WH,p1,test.type,HypoMap,CommonStdDev,
     paste(w[J], collapse = ",")
   })
 
-  knitr::kable(data.frame("Hypotheses" = InterHyp,
+  cerTable <- knitr::kable(data.frame("Hypotheses" = InterHyp,
              "Weights"=InterWeight,
              "SubSets"=SUBSETS,
              "CER"=CONDERR),
              align = "c")
+
+  if (isTRUE(structured)) {
+    structuredTable <- data.frame(
+      Hypotheses = InterHyp,
+      Weights = InterWeight,
+      SubSets = SUBSETS,
+      stringsAsFactors = FALSE
+    )
+    structuredTable$CER <- CERValues
+    structuredTable$PCER <- PCERValues
+    return(list(
+      table = cerTable,
+      data = structuredTable
+    ))
+  }
+
+  return(cerTable)
 }
 
 
@@ -263,6 +288,3 @@ getStage2PlanSigma <- function(CommonStdDev,allocRatio, sigma,
        "SigmaSIncr"=SigmaSIncr,
        "InfoMatrix"=InfoMatrix)
 }
-
-
-
