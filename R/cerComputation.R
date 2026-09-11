@@ -38,13 +38,19 @@ getCER <- function(b2,WH,p1,test.type,HypoMap,CommonStdDev,
   SUBSETS <- CONDERR <- c()
   CERValues <- vector("list", nrow(WH))
   PCERValues <- vector("list", nrow(WH))
-  Stage2Sigma <- getStage2PlanSigma(CommonStdDev = CommonStdDev,
-                                    allocRatio = allocRatio,
-                                    sigma = sigma,
-                                    Sigma = Sigma,
-                                    AllocSampleSize = AllocSampleSize,
-                                    EpType = EpType,
-                                    prop.ctr = prop.ctr)
+  Stage2Sigma <- NULL
+  if( test.type != "Non-Parametric" )
+  {
+    Stage2Sigma <- getStage2PlanSigma(
+      CommonStdDev = CommonStdDev,
+      allocRatio = allocRatio,
+      sigma = sigma,
+      Sigma = Sigma,
+      AllocSampleSize = AllocSampleSize,
+      EpType = EpType,
+      prop.ctr = prop.ctr
+    )
+  }
 
   PlanSSHyp <- getHypoSS(SS = AllocSampleSize,
                          HypoMap = HypoMap)
@@ -90,8 +96,12 @@ getCER <- function(b2,WH,p1,test.type,HypoMap,CommonStdDev,
           pJh <- p1[pGrp]
 
           # Compute Parametric CER based on old weights
-          stage2sigmaS <- Stage2Sigma$SigmaSIncr[[epIDX]][floor(pGrp / epIDX), floor(pGrp / epIDX)]
-          InfoMatrix <- Sigma$InfoMatrix[[epIDX]][floor(pGrp / epIDX), ]
+          hypothesesInGroup <- which( HypoMap$Groups == epIDX )
+          withinGroupIndices <- match( pGrp, hypothesesInGroup )
+          stage2sigmaS <- Stage2Sigma$SigmaSIncr[[ epIDX ]][
+            withinGroupIndices, withinGroupIndices
+          ]
+          InfoMatrix <- Sigma$InfoMatrix[[ epIDX ]][ withinGroupIndices, ]
 
           cerParam <- exitProbStage2Cond(cJ2 = cJ2, p1 = pJh, w = wJh, InfoMatrix = InfoMatrix, 
                         stage2sigmaS = stage2sigmaS, mvtnorm_algo = mvtnorm_algo, Conditional = TRUE
@@ -109,8 +119,14 @@ getCER <- function(b2,WH,p1,test.type,HypoMap,CommonStdDev,
       aJh <- as.numeric(a2[NParamGrps])
       pJh <- as.numeric(p1[NParamGrps])
 
-      pcer <- unlist(lapply(1:length(NParamGrps), function(x) {
-        getPCER(a2 = aJh[x], p1 = pJh[x], ss1 = PlanSSHyp[[1]][x], ss2 = PlanSSHyp[[2]][x], t1 = t1)
+      pcer <- unlist(lapply(seq_along( NParamGrps ), function(x) {
+        iHypothesis <- NParamGrps[ x ]
+        getPCER(
+          a2 = aJh[ x ], p1 = pJh[ x ],
+          ss1 = PlanSSHyp[[ 1L ]][ iHypothesis ],
+          ss2 = PlanSSHyp[[ 2L ]][ iHypothesis ],
+          t1 = t1
+        )
       }))
 
       pcerNParamGrps <- pcer

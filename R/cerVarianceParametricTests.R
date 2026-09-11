@@ -67,7 +67,7 @@ getSigma <- function(EpType, SS_Cum, sigma, prop.ctr, allocRatio, CommonStdDev, 
 
   for (i in 1:nEps) {
     if (EpType[[i]] == "Continuous") {
-      nHypothesisEp <- length(sigma[[1]]) - 1 # Two equal dimension sigma matrix for two endpoints
+      nHypothesisEp <- length(sigma[[i]]) - 1
       nLooksEp <- length(ctrSS)
 
       epSig <- sigma[[i]]
