@@ -271,7 +271,8 @@
   {
     stop( "p_raw must be a named numeric vector with values in [0, 1]." )
   }
-  if( anyDuplicated( names( p_raw ) ) ||
+  if( anyDuplicated( names( p_raw ) ) || anyNA( names( p_raw ) ) ||
+      any( !nzchar( names( p_raw ) ) ) ||
       any( !names( p_raw ) %in% initial_hypotheses ) )
   {
     stop( "p_raw names must be unique and belong to the planned hypotheses." )
