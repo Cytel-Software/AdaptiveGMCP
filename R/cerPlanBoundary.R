@@ -34,6 +34,13 @@ planBdryCER <- function(nHypothesis, nEps, nLooks, alpha, info_frac,
       typeOfDesign = typeOfDesign,
       gammaA = gammaA
     )$alphaSpent[1]
+  }else if(typeOfDesign == "asUser"){
+    alpha1 <- rpact::getDesignGroupSequential(
+      kMax = nLooks, alpha = alpha,
+      informationRates = info_frac,
+      typeOfDesign = typeOfDesign,
+      userAlphaSpending = userAlphaSpending
+    )$alphaSpent[1]
   }else{
     alpha1 <- rpact::getDesignGroupSequential(
       kMax = nLooks, alpha = alpha,

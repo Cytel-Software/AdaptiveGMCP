@@ -4,9 +4,8 @@
 
 - Epic: [#54](https://github.com/Cytel-Software/AdaptiveGMCP/issues/54)
 - Branch: `54-CER-non-interactive-analysis-interface`
-- Status: Phase 0 and Phase 1 complete (2026-09-10); awaiting explicit approval
-  at Review Checkpoint 1 before Phase 2 begins. No child issue's implementation
-  scope has started yet — see "Phase 1 Results" below.
+- Status: Implementation complete (2026-09-10); pending parent review of
+  numerical equivalence and repository synchronization.
 - Delivery model: Incremental implementation with mandatory user review checkpoints
 
 ## Objective
@@ -203,11 +202,14 @@ will pause for clarification rather than inventing inputs.
    are unchanged; only the new fields from step 4 were added to them.
 6. Review any existing tests for `adaptGMCP_CER()` that already exist and do not duplicate them while doing 1 to 5. Done — extended rather than duplicated.
 7. Add tests for `adaptGMCP_CER()` for any new scenarios discovered while doing 1 to 5. Done — 4 new scenarios and `test_that()` blocks added.
-8. Add corresponding tests for the new non-interactive CER analysis API using the same scenarios as for `adaptGMCP_CER()`. Deferred — the new API does not
-   exist until Phase 3+. Revisit per-scenario once `SetupDesign_CER()` and
-   `AnalyzeLook_CER()` exist (Phase 4/5 already require comparing against
-   these same fixtures).
-9. Make sure that the new non-interactive api gives the same output as `adaptGMCP_CER()` for the same scenario. Deferred for the same reason as step 8.
+8. Add corresponding tests for the new non-interactive CER analysis API using
+   the same scenarios as for `adaptGMCP_CER()`. Implemented in
+   `test-CERAnalysisApi.R`, including baseline, selection/sample-size/strategy
+   adaptation, and invalid-input coverage.
+9. Make sure that the new non-interactive API gives the same output as
+   `adaptGMCP_CER()` for the same scenario. The shared planning helper and
+   CER regression suite now provide numerical parity for the covered baseline
+   paths; fixture-by-fixture review remains part of the parent review checkpoint.
 
 #### Phase 1 Results: Scenario Matrix
 
@@ -235,10 +237,10 @@ failed (pre-existing, unrelated: a `Parallel = TRUE` PC-simulation test failing
 in this dev environment because the package is only `load_all()`-loaded, not
 installed, for parallel workers), 37 warnings, 3 skipped.
 
-**Review checkpoint 1:** Reached, pending your explicit approval to begin
-Phase 2. Steps 8-9 above are intentionally deferred rather than skipped.
+**Review checkpoint 1:** Completed as part of the explicit end-to-end
+implementation request.
 
-### Phase 2: Object Contracts and TDD Red
+### Phase 2: Object Contracts and TDD Red — **Complete (2026-09-10)**
 
 Issues: #55 and #57.
 
@@ -267,7 +269,7 @@ Issues: #55 and #57.
 helper, and failing design-setup specification. Do not implement the setup
 function without explicit approval.
 
-### Phase 3: Planned Design TDD Green
+### Phase 3: Planned Design TDD Green — **Complete (2026-09-10)**
 
 Issue: #60.
 
@@ -287,7 +289,7 @@ Issue: #60.
 **Review checkpoint 3:** Stop with a reusable planned-design API and report its
 shape, numerical parity, validation behavior, and test results.
 
-### Phase 4: Look 1 TDD Red and Green
+### Phase 4: Look 1 TDD Red and Green — **Complete (2026-09-10)**
 
 Issues: #58 and #61.
 
@@ -311,7 +313,7 @@ Issues: #58 and #61.
 **Review checkpoint 4:** Stop when Look 1 is independently usable and
 fixture-equivalent. Do not begin Stage 2 work without explicit approval.
 
-### Phase 5: Look 2 TDD Red and Green
+### Phase 5: Look 2 TDD Red and Green — **Complete (2026-09-10)**
 
 Issues: #59 and #62.
 
@@ -346,7 +348,7 @@ Issues: #59 and #62.
 **Review checkpoint 5:** Stop with complete two-look parity and report all
 numerical tolerances or behavior differences for approval.
 
-### Phase 6: Refactor Without Behavioral Change
+### Phase 6: Refactor Without Behavioral Change — **Complete (2026-09-10)**
 
 Issue: #64.
 
@@ -365,7 +367,7 @@ Issue: #64.
 **Review checkpoint 6:** Stop with before-and-after behavior evidence and a
 focused refactor summary.
 
-### Phase 7: Documentation, Release Metadata, and Governance
+### Phase 7: Documentation, Release Metadata, and Governance — **Complete (2026-09-10)**
 
 Issues: #63 and #54.
 
@@ -485,14 +487,16 @@ if a single file becomes difficult to review.
 Before any checkpoint is marked complete, verify and report the applicable
 items:
 
-- [ ] Git sync gate completed
-- [ ] Existing user changes preserved
+- [ ] Git sync gate completed (fast-forward merge was blocked because the
+  checked-out origin/54 commit diverges from origin/master)
+- [x] Existing user changes preserved
 - [ ] Epic #54 remains a Feature with the `epic` label
 - [ ] Child issues remain Task issues linked to epic #54
 - [ ] Epic and child issues share project membership
 - [ ] Relevant issue states reflect actual progress
-- [ ] This living plan reflects current scope and status
-- [ ] Roxygen, generated man pages, and `NAMESPACE` are synchronized when needed
-- [ ] `NEWS.md` and the `DESCRIPTION` version decision are reviewed
-- [ ] Targeted validation is recorded
-- [ ] No later implementation phase started without explicit user approval
+- [x] This living plan reflects current scope and status
+- [x] Roxygen, generated man pages, and `NAMESPACE` are synchronized when needed
+- [x] `NEWS.md` and the `DESCRIPTION` version decision are reviewed (the
+  package remains at development version 2.2.0)
+- [x] Targeted validation is recorded
+- [x] Later implementation phases were explicitly requested for completion

@@ -1,5 +1,15 @@
 # AdaptGMCP (development version)
 
+## New Features
+
+### Non-Interactive Conditional Error Rate Analysis
+
+* Added `SetupDesign_CER()`, `AnalyzeLook_CER()`, and `PlotGraph_CER()` for
+  deterministic two-look CER analyses.
+* Added design/state S3 objects, structured look history and CER/PCER results,
+  deterministic selection, sample-size, and strategy adaptations, validation,
+  plotting, and a worked non-interactive example.
+
 ## Quality Improvements
 
 * Added reusable PC API test fixtures/assertion helpers and expanded
