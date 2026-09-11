@@ -9,6 +9,8 @@
 * Added design/state S3 objects, structured look history and CER/PCER results,
   deterministic selection, sample-size, and strategy adaptations, validation,
   plotting, and a worked non-interactive example.
+* Corrected CER stage-2 cumulative p-value handling and endpoint/hypothesis
+  indexing, and hardened mixed and non-parametric CER planning paths.
 
 ## Quality Improvements
 

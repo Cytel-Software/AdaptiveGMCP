@@ -692,8 +692,10 @@ AnalyzeLook_CER <- function(
     }
     mStage2Allocation[ 2L, names( vNewSample ) ] <- as.numeric( vNewSample )
     vRequiredIndices <- match( vRequiredArms, vArmNames )
-    if( any( mStage2Allocation[ 2L, vRequiredIndices ] <=
-             mStage2Allocation[ 1L, vRequiredIndices ] ) )
+    if( any(
+      as.numeric( unlist( mStage2Allocation[ 2L, vRequiredIndices ] ) ) <=
+        as.numeric( unlist( mStage2Allocation[ 1L, vRequiredIndices ] ) )
+    ) )
     {
       stop( "Stage-2 cumulative sample sizes must exceed Look 1 accrual for continuing arms." )
     }
@@ -748,40 +750,39 @@ AnalyzeLook_CER <- function(
     dAdaptedCovariance <- NULL
   }
   mcpObj$p_raw <- addNAPvalue( p_stage2, design$hypothesis_names )
+  mIncrement <- mcpObj$Stage2AllocSampleSize
+  mIncrement[ 2L, ] <- mIncrement[ 2L, ] - mIncrement[ 1L, ]
+  dInfo <- rep( NA_real_, length( design$hypothesis_names ) )
+  names( dInfo ) <- design$hypothesis_names
+  dCumulative <- rep( NA_real_, length( design$hypothesis_names ) )
+  names( dCumulative ) <- design$hypothesis_names
+  for( strHypothesis in mcpObj$IndexSet )
+  {
+    iHypothesis <- match( strHypothesis, design$hypothesis_names )
+    iRow <- which( design$hypothesis_map$Hypothesis == strHypothesis )
+    iTreatment <- design$hypothesis_map$Treatment[ iRow ]
+    iArm <- c( 1L, iTreatment )
+    dStage1Info <- ( 1 / mIncrement[ 1L, iArm[ 1L ] ] +
+      1 / mIncrement[ 1L, iArm[ 2L ] ] )^(-1)
+    dStage2Info <- ( 1 / mIncrement[ 2L, iArm[ 1L ] ] +
+      1 / mIncrement[ 2L, iArm[ 2L ] ] )^(-1)
+    dInfo[ iHypothesis ] <- dStage1Info / ( dStage1Info + dStage2Info )
+    dCumulative[ iHypothesis ] <- 1 - pnorm(
+      sqrt( dInfo[ iHypothesis ] ) * qnorm( 1 - state$p_stage1[ iHypothesis ] ) +
+        sqrt( 1 - dInfo[ iHypothesis ] ) * qnorm(
+          1 - mcpObj$p_raw[ iHypothesis ]
+        )
+    )
+  }
   lStage2 <- closedTest(
     WH = mcpObj$WH, boundary = mStage2Boundary,
-    pValues = mcpObj$p_raw,
+    pValues = dCumulative,
     Stage1RejStatus = state$current_rejection
   )
   vRejected <- as.logical( unlist( lStage2$PrimaryHypoTest[ 1L, ] ) )
   names( vRejected ) <- design$hypothesis_names
   vDropped <- mcpObj$DroppedFlag
   vActive <- design$hypothesis_names[ !vRejected & !vDropped ]
-  dCumulative <- rep( NA_real_, length( design$hypothesis_names ) )
-  names( dCumulative ) <- design$hypothesis_names
-  if( bAdapted )
-  {
-    mIncrement <- mcpObj$Stage2AllocSampleSize
-    mIncrement[ 2L, ] <- mIncrement[ 2L, ] - mIncrement[ 1L, ]
-    dInfo <- rep( NA_real_, length( design$hypothesis_names ) )
-    names( dInfo ) <- design$hypothesis_names
-    for( strHypothesis in mcpObj$IndexSet )
-    {
-      iHypothesis <- match( strHypothesis, design$hypothesis_names )
-      iRow <- which( design$hypothesis_map$Hypothesis == strHypothesis )
-      iTreatment <- design$hypothesis_map$Treatment[ iRow ]
-      iArm <- c( 1L, iTreatment )
-      dStage1Info <- ( 1 / mIncrement[ 1L, iArm[ 1L ] ] +
-        1 / mIncrement[ 1L, iArm[ 2L ] ] )^(-1)
-      dStage2Info <- ( 1 / mIncrement[ 2L, iArm[ 1L ] ] +
-        1 / mIncrement[ 2L, iArm[ 2L ] ] )^(-1)
-      dInfo[ iHypothesis ] <- dStage1Info / ( dStage1Info + dStage2Info )
-      dCumulative[ iHypothesis ] <- 1 - pnorm(
-        sqrt( dInfo[ iHypothesis ] ) * qnorm( 1 - state$p_stage1[ iHypothesis ] ) +
-          sqrt( 1 - dInfo[ iHypothesis ] ) * qnorm( 1 - mcpObj$p_raw[ iHypothesis ] )
-      )
-    }
-  }
   state$completed_looks <- 2L
   state$active_hypotheses <- vActive
   state$continuing_arms <- sort( unique( c(

@@ -4,8 +4,8 @@
 
 - Epic: [#54](https://github.com/Cytel-Software/AdaptiveGMCP/issues/54)
 - Branch: `54-CER-non-interactive-analysis-interface`
-- Status: Implementation complete (2026-09-10); pending parent review of
-  numerical equivalence and repository synchronization.
+- Status: Implementation complete (2026-09-10); numerical review completed
+  with bug fixes and regression coverage for issues #165-#170.
 - Delivery model: Incremental implementation with mandatory user review checkpoints
 
 ## Objective
