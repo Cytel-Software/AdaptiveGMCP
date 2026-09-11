@@ -693,8 +693,8 @@ AnalyzeLook_CER <- function(
     mStage2Allocation[ 2L, names( vNewSample ) ] <- as.numeric( vNewSample )
     vRequiredIndices <- match( vRequiredArms, vArmNames )
     if( any(
-      as.numeric( mStage2Allocation[ 2L, vRequiredIndices ] ) <=
-        as.numeric( mStage2Allocation[ 1L, vRequiredIndices ] )
+      as.numeric( unlist( mStage2Allocation[ 2L, vRequiredIndices ] ) ) <=
+        as.numeric( unlist( mStage2Allocation[ 1L, vRequiredIndices ] ) )
     ) )
     {
       stop( "Stage-2 cumulative sample sizes must exceed Look 1 accrual for continuing arms." )
