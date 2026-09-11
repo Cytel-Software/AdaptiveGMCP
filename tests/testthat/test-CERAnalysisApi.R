@@ -92,7 +92,30 @@ testthat::test_that( "CER API applies selection, sample size, and strategy updat
   testthat::expect_equal( state2$adapted_sample_allocation[ 2, "Treatment2" ], 87 )
   testthat::expect_equal( state2$completed_looks, 2L )
   testthat::expect_true( is.list( state2$adaptation ) )
-  testthat::expect_true( any( as.logical( unlist( state2$results$stage2$primary_rejection ) ) ) )
+  testthat::expect_equal(
+    state2$cumulative_stage2_pvalues,
+    c(
+      H1 = NA_real_,
+      H2 = 0.0111233933131594,
+      H3 = NA_real_,
+      H4 = 0.0234119137484848
+    ),
+    tolerance = 1e-12
+  )
+  testthat::expect_equal(
+    as.logical( unlist( state2$results$stage2$primary_rejection ) ),
+    c( TRUE, TRUE, FALSE, TRUE )
+  )
+  testthat::expect_equal(
+    state2$adaptation$Stage2AdjBdry[ 3L, ],
+    c(
+      a12_adj = 0,
+      a22_adj = 0.013733642749567,
+      a32_adj = 0,
+      a42_adj = 0.013733642749567
+    ),
+    tolerance = 1e-12
+  )
 } )
 
 testthat::test_that( "CER API supports non-parametric designs", {
@@ -108,8 +131,21 @@ testthat::test_that( "CER API supports non-parametric designs", {
   )
 
   testthat::expect_true( is.list( d$Sigma ) )
-  state <- AnalyzeLook_CER( d, p_raw = c( H1 = 0.1, H2 = 0.2 ) )
-  testthat::expect_s3_class( state, "CERAnalysisState" )
+  state1 <- AnalyzeLook_CER( d, p_raw = c( H1 = 0.03, H2 = 0.2 ) )
+  state2 <- AnalyzeLook_CER(
+    d, state1, p_raw = c( H1 = 0.01, H2 = 0.1 )
+  )
+
+  testthat::expect_s3_class( state2, "CERAnalysisState" )
+  testthat::expect_equal(
+    state2$cumulative_stage2_pvalues,
+    c( H1 = 0.00146542862005128, H2 = 0.0666377148658839 ),
+    tolerance = 1e-12
+  )
+  testthat::expect_equal(
+    as.logical( unlist( state2$results$stage2$primary_rejection ) ),
+    c( TRUE, FALSE )
+  )
 } )
 
 testthat::test_that( "CER API supports binary-first mixed endpoints", {
@@ -126,6 +162,28 @@ testthat::test_that( "CER API supports binary-first mixed endpoints", {
 
   testthat::expect_equal( length( d$Sigma$SigmaZ ), 2L )
   testthat::expect_equal( nrow( d$Sigma$SigmaZ[[ "EP2" ]] ), 4L )
+
+  state1 <- AnalyzeLook_CER(
+    d, p_raw = c( H1 = 0.03, H2 = 0.2, H3 = 0.04, H4 = 0.3 )
+  )
+  state2 <- AnalyzeLook_CER(
+    d, state1, p_raw = c( H1 = 0.01, H2 = 0.1, H3 = 0.02, H4 = 0.2 )
+  )
+
+  testthat::expect_equal(
+    state2$cumulative_stage2_pvalues,
+    c(
+      H1 = 0.00146542862005128,
+      H2 = 0.0666377148658839,
+      H3 = 0.00357108346346435,
+      H4 = 0.167041296151069
+    ),
+    tolerance = 1e-12
+  )
+  testthat::expect_equal(
+    as.logical( unlist( state2$results$stage2$primary_rejection ) ),
+    c( TRUE, FALSE, TRUE, FALSE )
+  )
 } )
 
 testthat::test_that( "CER computes later endpoint covariance rows within group", {

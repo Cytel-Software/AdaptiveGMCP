@@ -240,6 +240,14 @@ installed, for parallel workers), 37 warnings, 3 skipped.
 **Review checkpoint 1:** Completed as part of the explicit end-to-end
 implementation request.
 
+### Issue #163 Coverage Review — **Complete (2026-09-11)**
+
+The non-interactive CER API tests now include numerical two-look fixtures for
+binary endpoints and binary-first mixed endpoints. The multi-endpoint,
+four-hypothesis adaptation fixture also verifies cumulative Stage 2 p-values
+and the recalculated Stage 2 boundary, in addition to selection and adapted
+sample-size assertions. Targeted validation passes with 38 tests.
+
 ### Phase 2: Object Contracts and TDD Red — **Complete (2026-09-10)**
 
 Issues: #55 and #57.
