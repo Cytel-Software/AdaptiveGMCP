@@ -116,7 +116,7 @@ testthat::test_that( "CER API supports binary-first mixed endpoints", {
   d <- SetupDesign_CER(
     nArms = 3, nEps = 2, SampleSize = 300,
     EpType = list( EP1 = "Binary", EP2 = "Continuous" ),
-    sigma = list( EP1 = rep( NA_real_, 3 ), EP2 = rep( 1, 3 ) ),
+    sigma = list( EP1 = NA, EP2 = rep( 1, 3 ) ),
     prop.ctr = list( EP1 = 0.4, EP2 = NA ),
     allocRatio = c( 1, 1, 1 ),
     WI = rep( 0.25, 4 ),
