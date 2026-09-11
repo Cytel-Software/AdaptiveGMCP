@@ -150,7 +150,7 @@ testthat::test_that("Section 2 parallelism: CER matches serial simulation exactl
 testthat::test_that("Section 2 parallelism: CombPValue matches serial simulation exactly", {
   # Parallel workers are separate R sessions that can only find AdaptGMCP if it is installed,
   # which is true on CI but not when running via devtools::load_all() at the terminal.
-  testthat::skip_if_not_installed("AdaptGMCP")
+  testthat::skip_if_not(nzchar(Sys.getenv("CI")), "Requires an installed AdaptGMCP package (parallel workers can't see load_all())")
   withr::local_envvar(c("_R_CHECK_LIMIT_CORES_" = "TRUE"))
 
   lSimArgs <- list(
