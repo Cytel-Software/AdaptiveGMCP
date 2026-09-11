@@ -38,5 +38,8 @@ print.CERDesign <- function( x, ... )
   cat( "\nPlanned cumulative sample allocation:\n" )
   print( x$allocation$cumulative )
   cat( "\n" )
+  cat("Planned stopping boundary:")
+  print(x$planned_boundary$PlanBdryTable$Stage1_Boundary)
+  print(x$planned_boundary$PlanBdryTable$Stage2_Boundary)
   return( invisible( x ) )
 }

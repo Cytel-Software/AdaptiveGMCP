@@ -15,15 +15,22 @@ design <- SetupDesign_CER(
   plotGraphs = FALSE
 )
 
-state <- AnalyzeLook_CER(
+cat("\nDesign:")
+print(design)
+
+look1_analysis <- AnalyzeLook_CER(
   design = design,
   p_raw = c( H1 = .1, H2 = .2 )
 )
 
-state <- AnalyzeLook_CER(
+cat("\nLook 1 output:")
+print(look1_analysis)
+
+look2_analysis <- AnalyzeLook_CER(
   design = design,
-  state = state,
+  state = look1_analysis,
   p_raw = c( H1 = .0001, H2 = .2 )
 )
 
-print( state )
+cat("\nLook 2 output:")
+print(look2_analysis)

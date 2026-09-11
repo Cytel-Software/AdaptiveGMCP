@@ -41,15 +41,22 @@ print.CERAnalysisState <- function( x, ... )
     cat( "- Status: continuing\n" )
   }
 
-  if( x$completed_looks > 0L && !is.null( x$results$stage1 ) )
+  if( x$completed_looks == 1L && !is.null( x$results$stage1 ) )
   {
-    cat( "\nStage 1 primary decisions:\n" )
-    print( x$results$stage1$primary_rejection )
+    cat("\n Stage 1 raw p-values:\n")
+    print(x$p_stage1)
+    cat("\nStage 1 primary decisions:\n")
+    print(x$results$stage1$primary_rejection)
+
+    cat("\nCER/PCER table:")
+    print(x$results$stage1$cer_pcer$table)
   }
   if( x$completed_looks > 1L && !is.null( x$results$stage2 ) )
   {
-    cat( "\nStage 2 primary decisions:\n" )
-    print( x$results$stage2$primary_rejection )
+    cat("\n Stage 2 raw p-values:\n")
+    print(x$incremental_stage2_pvalues)
+    cat("\nStage 2 primary decisions:\n")
+    print(x$results$stage2$primary_rejection)
   }
 
   return( invisible( x ) )

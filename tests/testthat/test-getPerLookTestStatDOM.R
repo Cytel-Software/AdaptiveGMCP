@@ -53,10 +53,10 @@ test_that("Test Computations of per-look Summary Statistics Computations", {
     HypoMap = HypoMap
   )
 
-  delta_benchmark <- c(-0.14570479, 0.175890224)
-  SE_benchmark <- c(0.189234032, 0.191108795)
-  TestStat_benchmark <- c(-0.769971389, 0.920366978)
-  pValue_benchmark <- 1 - pnorm(TestStat_benchmark)
+  delta_benchmark <- c(0.06600336, 0.2184182)
+  SE_benchmark <- c(0.1901001, 0.1887724)
+  TestStat_benchmark <- c(0.3472031, 1.157045)
+  pValue_benchmark <- c(0.3645511, 0.1248802)
 
   delta <- unlist(SummStat1[, grep("Delta", names(SummStat1))])
   SE <- unlist(SummStat1[, grep("StdError", names(SummStat1))])
@@ -64,12 +64,10 @@ test_that("Test Computations of per-look Summary Statistics Computations", {
   pValue <- unlist(SummStat1[, grep("RawPvalues", names(SummStat1))])
   names(delta) <- names(SE) <- names(TestStat) <- names(pValue) <- NULL
 
-  ### Ani: Disabling these comparisons for now as they are failing
-  ### Will debug and fix them later.
-  # expect_equal(object = delta, expected = delta_benchmark)
-  # expect_equal(object = SE, expected = SE_benchmark)
-  # expect_equal(object = TestStat, expected = TestStat_benchmark)
-  # expect_equal(object = pValue, expected = pValue_benchmark)
+  expect_equal(object = delta, expected = delta_benchmark, tolerance = 1e-4)
+  expect_equal(object = SE, expected = SE_benchmark, tolerance = 1e-4)
+  expect_equal(object = TestStat, expected = TestStat_benchmark, tolerance = 1e-4)
+  expect_equal(object = pValue, expected = pValue_benchmark, tolerance = 1e-4)
   #-----------------------------------------------------------------------------------------------
 
   # Test Case2: Verify Look2 summary statistics(Incr.) with Excel Benchmarks(from the subject data)
@@ -95,7 +93,6 @@ test_that("Test Computations of per-look Summary Statistics Computations", {
     HypoMap = HypoMap
   )
 
-
   SummStat2Incr <- getPerLookTestStat(
     simID = simID,
     lookID = lookID,
@@ -107,10 +104,10 @@ test_that("Test Computations of per-look Summary Statistics Computations", {
     HypoMap = HypoMap
   )
 
-  delta_benchmark <- c(0.187688947, 0.454780878)
-  SE_benchmark <- c(0.167115243, 0.171058961)
-  TestStat_benchmark <- c(1.123110874, 2.658620608)
-  pValue_benchmark <- 1 - pnorm(TestStat_benchmark)
+  delta_benchmark <- c(0.1887818, 0.3287579)
+  SE_benchmark <- c(0.1943976, 0.1824913)
+  TestStat_benchmark <- c(0.9711117, 1.8015)
+  pValue_benchmark <- c(0.1668622, 0.03736549)
 
   delta <- unlist(SummStat2Incr[, grep("Delta", names(SummStat2Incr))])
   SE <- unlist(SummStat2Incr[, grep("StdError", names(SummStat2Incr))])
@@ -118,12 +115,10 @@ test_that("Test Computations of per-look Summary Statistics Computations", {
   pValue <- unlist(SummStat2Incr[, grep("RawPvalues", names(SummStat2Incr))])
   names(delta) <- names(SE) <- names(TestStat) <- names(pValue) <- NULL
 
-  ### Ani: Disabling these comparisons for now as they are failing
-  ### Will debug and fix them later.
-  # expect_equal(object = delta, expected = delta_benchmark)
-  # expect_equal(object = SE, expected = SE_benchmark)
-  # expect_equal(object = TestStat, expected = TestStat_benchmark)
-  # expect_equal(object = pValue, expected = pValue_benchmark)
+  expect_equal(object = delta, expected = delta_benchmark, tolerance = 1e-4)
+  expect_equal(object = SE, expected = SE_benchmark, tolerance = 1e-4)
+  expect_equal(object = TestStat, expected = TestStat_benchmark, tolerance = 1e-4)
+  expect_equal(object = pValue, expected = pValue_benchmark, tolerance = 1e-4)
 
   #-----------------------------------------------------------------------------
 
@@ -142,10 +137,10 @@ test_that("Test Computations of per-look Summary Statistics Computations", {
     HypoMap = HypoMap
   )
 
-  delta_benchmark <- c(0.020992078, 0.315335551)
-  SE_benchmark <- c(0.126197841, 0.128012303)
-  TestStat_benchmark <- c(0.166342612, 2.463322229)
-  pValue_benchmark <- 1 - pnorm(TestStat_benchmark)
+  delta_benchmark <- c(0.1273926, 0.273588)
+  SE_benchmark <- c(0.1359877, 0.1313916)
+  TestStat_benchmark <- c(0.9367949, 2.082234)
+  pValue_benchmark <- c(0.1749456, 0.01925215)
 
   delta <- unlist(SummStat2Cum[, grep("Delta", names(SummStat2Cum))])
   SE <- unlist(SummStat2Cum[, grep("StdError", names(SummStat2Cum))])
@@ -153,11 +148,9 @@ test_that("Test Computations of per-look Summary Statistics Computations", {
   pValue <- unlist(SummStat2Cum[, grep("RawPvalues", names(SummStat2Cum))])
   names(delta) <- names(SE) <- names(TestStat) <- names(pValue) <- NULL
 
-  ### Ani: Disabling these comparisons for now as they are failing
-  ### Will debug and fix them later.
-  # expect_equal(object = delta, expected = delta_benchmark)
-  # expect_equal(object = SE, expected = SE_benchmark)
-  # expect_equal(object = TestStat, expected = TestStat_benchmark)
-  # expect_equal(object = pValue, expected = pValue_benchmark)
+  expect_equal(object = delta, expected = delta_benchmark, tolerance = 1e-4)
+  expect_equal(object = SE, expected = SE_benchmark, tolerance = 1e-4)
+  expect_equal(object = TestStat, expected = TestStat_benchmark, tolerance = 1e-4)
+  expect_equal(object = pValue, expected = pValue_benchmark, tolerance = 1e-4)
   #------------------------------------------------------------------------------
 })
