@@ -92,7 +92,7 @@ testthat::test_that( "CER API applies selection, sample size, and strategy updat
   testthat::expect_equal( state2$adapted_sample_allocation[ 2, "Treatment2" ], 87 )
   testthat::expect_equal( state2$completed_looks, 2L )
   testthat::expect_true( is.list( state2$adaptation ) )
-  testthat::expect_true( any( state2$results$stage2$primary_rejection ) )
+  testthat::expect_true( any( as.logical( unlist( state2$results$stage2$primary_rejection ) ) ) )
 } )
 
 testthat::test_that( "CER API supports non-parametric designs", {
