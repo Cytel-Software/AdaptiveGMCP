@@ -1103,8 +1103,8 @@
   # To do a trial run, uncomment this block so that the tests are run with a
   # small number of simulations rather than the number specified in the input
   # file.
-  dfInput$nSimulation <- 10000 #1000 # 5 # 100 #
-  dfInput$nSimulation_Stage2 <- 500 #100# 5 # 50 # 100 #
+  dfInput$nSimulation <- 5 # 10000 #1000 # 100 #
+  dfInput$nSimulation_Stage2 <- 5 # 500 #100# 50 # 100 #
   # dfInput$Parallel <- FALSE
   # dfInput$test.type <- "Parametric"
   # dfInput$SampleSize <- 10000
@@ -1126,7 +1126,7 @@
 
   dfOutput <- simMAMSMEP_Wrapper(InputDF = dfInput %>%
                                    filter(ModelID %in% nModelsToRun),
-                                 sOutPath)
+                                 sOutPath, SaveRawPVals = TRUE)
 
   tElapTime <- Sys.time() - tStartTime
 

@@ -6,12 +6,14 @@
 Ani: Added sOutPath so that output can be written to the CSV file after every scenario
 is simulated rather than at the end of all scenarios.}
 \usage{
-simMAMSMEP_Wrapper(InputDF, sOutPath)
+simMAMSMEP_Wrapper(InputDF, sOutPath, SaveRawPVals = FALSE)
 }
 \arguments{
 \item{InputDF}{R Dataframe: This is the csv/excel input data in the R dataframe format}
 
 \item{sOutPath}{String: File path to save the output csv file}
+
+\item{SaveRawPVals}{Logical: Whether to save the raw p-values to a CSV file. Defaults to FALSE.}
 }
 \description{
 Wrapper function that takes all inputs through a single R dataframe

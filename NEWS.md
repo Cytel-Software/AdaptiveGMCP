@@ -2,6 +2,9 @@
 
 ## New Features
 
+* Added the `SaveRawPVals` option to `simMAMSMEP_Wrapper()` to control whether
+  simulation raw p-values are written to a CSV file.
+
 ### Non-Interactive Conditional Error Rate Analysis
 
 * Added `SetupDesign_CER()`, `AnalyzeLook_CER()`, and `PlotGraph_CER()` for

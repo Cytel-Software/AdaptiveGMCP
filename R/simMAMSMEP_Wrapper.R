@@ -9,11 +9,12 @@
 #' is simulated rather than at the end of all scenarios.
 #' @param InputDF R Dataframe: This is the csv/excel input data in the R dataframe format
 #' @param sOutPath String: File path to save the output csv file
+#' @param SaveRawPVals Logical: Whether to save the raw p-values to a CSV file. Defaults to FALSE.
 #' @example ./internalData/RunBatches12-04-24.R
 #' @importFrom dplyr select mutate relocate rename bind_rows left_join everything
 #' @importFrom tidyr pivot_wider pivot_longer
 #' @export
-simMAMSMEP_Wrapper <- function(InputDF, sOutPath) {
+simMAMSMEP_Wrapper <- function(InputDF, sOutPath, SaveRawPVals = FALSE) {
   # Update the dataframe column names in the following mapping in case
   # the names in the input csv/excel changes
   lOut <- list()
@@ -138,14 +139,13 @@ simMAMSMEP_Wrapper <- function(InputDF, sOutPath) {
   dfOut <- do.call(rbind, lOut)
   dfOut <- dplyr::left_join(dfOut, InputDF, by = "ModelID")
 
-  ## Uncomment this code block to save raw p-values to a CSV file
   # Save combined raw p-values to CSV if we have data
-  # if (nrow(allRawPValues) > 0) {
-  #   timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
-  #   csvFilePath <- paste0("internalData/RawPValues_", timestamp, ".csv")
-  #   write.csv(allRawPValues, file = csvFilePath, row.names = FALSE)
-  #   cat("\nRaw p-values saved to:", csvFilePath, "\n")
-  # }
+  if (SaveRawPVals && nrow(allRawPValues) > 0) {
+    timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
+    csvFilePath <- paste0("internalData/RawPValues_", timestamp, ".csv")
+    write.csv(allRawPValues, file = csvFilePath, row.names = FALSE)
+    cat("\nRaw p-values saved to:", csvFilePath, "\n")
+  }
 
   return(dfOut)
 }
