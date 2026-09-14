@@ -154,6 +154,11 @@ modified_MAMSMEP_sim2 <- function (gmcpSimObj)
       # lRejStatus[[i]] = out[[i]]$SummStatDF
       df <- out[[i]]$SummStatDF
 
+      if (gmcpSimObj$Method == "CER" && isTRUE(gmcpSimObj$SaveCERSimulationTrace) &&
+          !is.null(out[[i]]$cerTrace)) {
+        lCerSimulationTraces[[length(lCerSimulationTraces) + 1L]] <- out[[i]]$cerTrace
+      }
+
       # Skip if dataframe is empty or NULL
       if (is.null(df) || nrow(df) == 0) next
 
@@ -173,11 +178,6 @@ modified_MAMSMEP_sim2 <- function (gmcpSimObj)
       # ArmWiseSummary <- data.table::rbindlist(list(ArmWiseSummary, data.table(out[[i]]$ArmWiseDF)), use.names = TRUE, fill = TRUE)
       PowerTab <- data.table::rbindlist(list(PowerTab, data.table(out[[i]]$powerCountDF)), use.names = TRUE, fill = TRUE)
       # SelectionTab <- data.table::rbindlist(list(SelectionTab, data.table(out[[i]]$SelectionDF)), use.names = TRUE, fill = TRUE)
-
-      if (gmcpSimObj$Method == "CER" && isTRUE(gmcpSimObj$SaveCERSimulationTrace) &&
-          !is.null(out[[i]]$cerTrace)) {
-        lCerSimulationTraces[[length(lCerSimulationTraces) + 1L]] <- out[[i]]$cerTrace
-      }
 
       # Extract raw p-values from SummStatDF
       if (gmcpSimObj$Method == "CER" && is.data.frame(out[[i]]$rawpvalues) &&

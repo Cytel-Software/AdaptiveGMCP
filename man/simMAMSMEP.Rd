@@ -190,7 +190,9 @@ scalar seed used for reproducibility.}
 
 \item{SaveCERSimulationTrace}{Logical scalar. If `TRUE` and `Method = "CER"`,
 stores per-simulation replay traces that can later be written to `.rds`
-fixtures for non-interactive CER regression testing.}
+fixtures for non-interactive CER regression testing. Trace-enabled runs
+execute serially so the complete trace payload is retained in all R
+environments, including development sessions using `load_all()`.}
 
 \item{Parallel}{Logical scalar indicating whether to run simulations in parallel.}
 

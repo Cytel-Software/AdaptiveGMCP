@@ -106,7 +106,9 @@
 #'   `Method = "CombPValue"`. Use `NULL` (default) to disable.
 #' @param SaveCERSimulationTrace Logical scalar. If `TRUE` and `Method = "CER"`,
 #'   stores per-simulation replay traces that can later be written to `.rds`
-#'   fixtures for non-interactive CER regression testing.
+#'   fixtures for non-interactive CER regression testing. Trace-enabled runs
+#'   execute serially so the complete trace payload is retained in all R
+#'   environments, including development sessions using `load_all()`.
 #' @param Parallel Logical scalar indicating whether to run simulations in parallel.
 #' @param Verbose Logical scalar. If `TRUE`, prints additional progress and diagnostic messages.
 #' @example ./internalData/MAMSMEP_Simulation_Example.R
@@ -194,6 +196,11 @@ simMAMSMEP <- function(
   if (!is.null(KeepAssosiatedEps)) {
     warning("'KeepAssosiatedEps' is deprecated; use 'KeepAssociatedHypo' instead.")
     KeepAssociatedHypo <- KeepAssosiatedEps
+  }
+
+  if (isTRUE(SaveCERSimulationTrace) && isTRUE(Parallel)) {
+    warning("Parallel simulation is disabled when SaveCERSimulationTrace = TRUE.")
+    Parallel <- FALSE
   }
 
   # Ani: Applying correction suggested by Pralay when allocation ratio for

@@ -110,7 +110,7 @@ simMAMSMEP_Wrapper <- function(InputDF, sOutPath, SaveRawPVals = FALSE,
         # Add model number column
           modelRawPValues <- as.data.frame(out$rawPValues)
         modelRawPValues$ModelNum <- nModelNum
-        modelRawPValues$ModelID <- InputDF[nModelNum, "ModelID"]
+        modelRawPValues$ModelID <- unlist(InputDF[nModelNum, "ModelID"])
 
         if (!"SimID" %in% names(modelRawPValues)) {
           modelRawPValues$SimID <- NA_integer_

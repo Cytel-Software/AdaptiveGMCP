@@ -437,7 +437,7 @@ testthat::test_that("Section 4 positive contract: wrapper writes CER replay fixt
     SelectEndPoint = NA, SelectionScale = NA, SelectionCriterion = NA,
     SelectionParameter = NA, KeepAssociatedHypo = NA, ImplicitSSR = "None",
     nSimulation = 2, nSimulation_Stage2 = 2, Seed = 1234, SummaryStat = FALSE,
-    plotGraphs = FALSE, Parallel = FALSE
+    plotGraphs = FALSE, Parallel = TRUE
   )
   strFixtureDir <- tempfile("cer-fixtures-")
   dir.create(strFixtureDir)
