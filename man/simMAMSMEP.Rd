@@ -50,6 +50,7 @@ simMAMSMEP(
   SummaryStat = FALSE,
   plotGraphs = TRUE,
   EastSumStat = NULL,
+  SaveCERSimulationTrace = FALSE,
   Parallel = TRUE,
   Verbose = FALSE
 )
@@ -186,6 +187,10 @@ scalar seed used for reproducibility.}
 
 \item{EastSumStat}{East summary statistics input used for single-look designs with
 `Method = "CombPValue"`. Use `NULL` (default) to disable.}
+
+\item{SaveCERSimulationTrace}{Logical scalar. If `TRUE` and `Method = "CER"`,
+stores per-simulation replay traces that can later be written to `.rds`
+fixtures for non-interactive CER regression testing.}
 
 \item{Parallel}{Logical scalar indicating whether to run simulations in parallel.}
 

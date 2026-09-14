@@ -104,6 +104,9 @@
 #' @param plotGraphs Logical scalar. If `TRUE`, plots the graph specified by WI and G.
 #' @param EastSumStat East summary statistics input used for single-look designs with
 #'   `Method = "CombPValue"`. Use `NULL` (default) to disable.
+#' @param SaveCERSimulationTrace Logical scalar. If `TRUE` and `Method = "CER"`,
+#'   stores per-simulation replay traces that can later be written to `.rds`
+#'   fixtures for non-interactive CER regression testing.
 #' @param Parallel Logical scalar indicating whether to run simulations in parallel.
 #' @param Verbose Logical scalar. If `TRUE`, prints additional progress and diagnostic messages.
 #' @example ./internalData/MAMSMEP_Simulation_Example.R
@@ -179,6 +182,7 @@ simMAMSMEP <- function(
     SummaryStat = FALSE,
     plotGraphs = TRUE,
     EastSumStat = NULL,
+    SaveCERSimulationTrace = FALSE,
     Parallel = TRUE,
     Verbose = FALSE) {
 
@@ -284,6 +288,9 @@ simMAMSMEP <- function(
 
     #EastSumStat
     "EastSumStat" = EastSumStat,
+
+    # Optional CER replay tracing
+    "SaveCERSimulationTrace" = SaveCERSimulationTrace,
 
     # number of simulations for stage 2 per stage 1
     "nSimulation_Stage2" = nSimulation_Stage2,

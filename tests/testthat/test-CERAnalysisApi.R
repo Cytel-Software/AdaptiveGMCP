@@ -283,3 +283,62 @@ testthat::test_that( "CER API rejects invalid design and look inputs", {
     "sample allocations"
   )
 } )
+
+testthat::test_that( "CER simulation traces replay through the non-interactive analysis API", {
+  lSimOut <- simMAMSMEP(
+    Method = "CER", alpha = 0.025, SampleSize = 300,
+    TestStatCont = "t-equal", CommonStdDev = TRUE,
+    FWERControl = "CombinationTest",
+    nArms = 3, nEps = 1, lEpType = list( EP1 = "Continuous" ),
+    Arms.Mean = list( EP1 = c( 0, 0, 0 ) ),
+    Arms.std.dev = list( EP1 = c( 1, 1, 1 ) ),
+    Arms.alloc.ratio = c( 1, 1, 1 ), EP.Corr = matrix( 1 ),
+    WI = c( 0.5, 0.5 ),
+    G = matrix( c( 0, 1, 1, 0 ), nrow = 2, byrow = TRUE ),
+    test.type = "Parametric", info_frac = c( 1 / 2, 1 ),
+    typeOfDesign = "asOF", MultipleWinners = TRUE, Selection = FALSE,
+    ImplicitSSR = "None", nSimulation = 1, nSimulation_Stage2 = 1,
+    Seed = 1234, SummaryStat = FALSE, plotGraphs = FALSE,
+    SaveCERSimulationTrace = TRUE, Parallel = FALSE, Verbose = FALSE
+  )
+
+  lTrace <- lSimOut$cerSimulationTraces[[ 1L ]]
+  dDesign <- do.call( SetupDesign_CER, lSimOut$cerTraceDesign )
+  state1 <- AnalyzeLook_CER(
+    design = dDesign,
+    p_raw = lTrace$looks$look1$inputs$p_raw,
+    plotGraphs = FALSE
+  )
+  testthat::expect_equal(
+    state1$results$stage1$primary_rejection,
+    lTrace$looks$look1$outputs$stage1_primary_test,
+    tolerance = 1e-12
+  )
+
+  lLook2Run <- lTrace$looks$look2$stage2_runs[[ 1L ]]
+  state2 <- AnalyzeLook_CER(
+    design = dDesign,
+    state = state1,
+    p_raw = lLook2Run$inputs$p_raw,
+    selection = lLook2Run$inputs$selection,
+    new_sample_size = lLook2Run$inputs$new_sample_size,
+    new_weights = lLook2Run$inputs$new_weights,
+    new_G = lLook2Run$inputs$new_G,
+    plotGraphs = FALSE
+  )
+
+  testthat::expect_equal(
+    state2$cumulative_stage2_pvalues,
+    lLook2Run$outputs$cumulative_stage2_pvalues,
+    tolerance = 1e-12
+  )
+  testthat::expect_equal(
+    state2$current_rejection,
+    lLook2Run$outputs$final_rejection_status
+  )
+  testthat::expect_equal(
+    state2$results$stage2$boundary,
+    lLook2Run$outputs$stage2_boundary,
+    tolerance = 1e-12
+  )
+})

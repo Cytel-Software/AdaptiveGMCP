@@ -10,11 +10,17 @@
 #' @param InputDF R Dataframe: This is the csv/excel input data in the R dataframe format
 #' @param sOutPath String: File path to save the output csv file
 #' @param SaveRawPVals Logical: Whether to save the raw p-values to a CSV file. Defaults to FALSE.
+#' @param SaveCERFixtures Logical. If `TRUE`, writes one replayable CER `.rds`
+#'   file per simulation run.
+#' @param CERFixtureDir Character scalar giving the directory where CER replay
+#'   fixtures should be written when `SaveCERFixtures = TRUE`.
 #' @example ./internalData/RunBatches12-04-24.R
 #' @importFrom dplyr select mutate relocate rename bind_rows left_join everything
 #' @importFrom tidyr pivot_wider pivot_longer
 #' @export
-simMAMSMEP_Wrapper <- function(InputDF, sOutPath, SaveRawPVals = FALSE) {
+simMAMSMEP_Wrapper <- function(InputDF, sOutPath, SaveRawPVals = FALSE,
+                               SaveCERFixtures = FALSE,
+                               CERFixtureDir = "internalData") {
   # Update the dataframe column names in the following mapping in case
   # the names in the input csv/excel changes
   lOut <- list()
@@ -33,7 +39,11 @@ simMAMSMEP_Wrapper <- function(InputDF, sOutPath, SaveRawPVals = FALSE) {
 
     out <- tryCatch(
       {
-        run1TestCase(InputDF = InputDF[nModelNum, ])
+        run1TestCase(
+          InputDF = InputDF[nModelNum, ],
+          SaveCERSimulationTrace = isTRUE(SaveCERFixtures) &&
+            identical(as.character(InputDF[nModelNum, "Method"]), "CER")
+        )
       },
       error = function(err) {
         paste0("Model ", nModelNum, " execution failed.")
@@ -98,24 +108,43 @@ simMAMSMEP_Wrapper <- function(InputDF, sOutPath, SaveRawPVals = FALSE) {
       # Collect raw p-values if they exist
       if (!is.null(out$rawPValues) && is.data.frame(out$rawPValues) && nrow(out$rawPValues) > 0) {
         # Add model number column
-        modelRawPValues <- out$rawPValues
+          modelRawPValues <- as.data.frame(out$rawPValues)
         modelRawPValues$ModelNum <- nModelNum
         modelRawPValues$ModelID <- InputDF[nModelNum, "ModelID"]
 
-        # InputDF[nModelNum, "info_frac"]
-        modelRawPValues$Look <- rep(1:length(eval(
-          parse(text = InputDF[nModelNum, ]$info_frac)
-          )), length.out = nrow(out$rawPValues))
+        if (!"SimID" %in% names(modelRawPValues)) {
+          modelRawPValues$SimID <- NA_integer_
+        }
+        if (!"LookID" %in% names(modelRawPValues)) {
+          modelRawPValues$LookID <- rep(
+            1:length(eval(parse(text = InputDF[nModelNum, ]$info_frac))),
+            length.out = nrow(out$rawPValues)
+          )
+        }
+        if (!"SimID_Stage2" %in% names(modelRawPValues)) {
+          modelRawPValues$SimID_Stage2 <- NA_integer_
+        }
 
-        dfTemp <- modelRawPValues %>% select(-c(ModelNum, ModelID, Look))
-        dfTemp <- cbind(modelRawPValues$ModelNum, modelRawPValues$ModelID,
-                        modelRawPValues$Look, dfTemp)
-        modelRawPValues <- dfTemp %>% rename(ModelNum = V1, ModelID = V2,
-                                             Look = V3)
+        rawPvalCols <- grep("^RawPvalues", names(modelRawPValues), value = TRUE)
+        modelRawPValues <- modelRawPValues[, c(
+          "ModelNum", "ModelID", "SimID", "LookID", "SimID_Stage2",
+          rawPvalCols
+        ), drop = FALSE]
 
         # Append to the combined dataframe
         # allRawPValues <- rbind(allRawPValues, modelRawPValues)
         allRawPValues <- bind_rows(allRawPValues, modelRawPValues)
+      }
+
+      if (isTRUE(SaveCERFixtures) && identical(as.character(InputDF[nModelNum, "Method"]), "CER")) {
+        WriteCerSimulationFixtures(
+          lCerSimulationTraces = out$cerSimulationTraces,
+          lCerTraceDesign = out$cerTraceDesign,
+          modelID = InputDF[nModelNum, "ModelID"],
+          scenario = InputDF[nModelNum, "Scenario"],
+          seed = out$Seed,
+          strOutDir = CERFixtureDir
+        )
       }
 
       passedTxt <- paste0("Model ", nModelNum, " execution completed successfully.")
@@ -151,7 +180,50 @@ simMAMSMEP_Wrapper <- function(InputDF, sOutPath, SaveRawPVals = FALSE) {
 }
 
 
-run1TestCase <- function(InputDF) {
+WriteCerSimulationFixtures <- function(lCerSimulationTraces, lCerTraceDesign,
+                                       modelID, scenario, seed, strOutDir)
+{
+  if (is.null(lCerSimulationTraces) || length(lCerSimulationTraces) == 0L) {
+    stop("CER fixture writing requested, but no CER simulation traces were returned.")
+  }
+
+  if (!dir.exists(strOutDir)) {
+    dir.create(strOutDir, recursive = TRUE)
+  }
+
+  for (lTrace in lCerSimulationTraces) {
+    strFile <- file.path(
+      strOutDir,
+      paste0(
+        "cer_out_", modelID,
+        "_sim_", lTrace$simID,
+        "_seed_", seed,
+        ".rds"
+      )
+    )
+    if (file.exists(strFile)) {
+      stop("CER fixture file already exists: ", strFile)
+    }
+
+    saveRDS(
+      list(
+        method = "CER",
+        model_id = modelID,
+        scenario = scenario,
+        seed = seed,
+        design = lCerTraceDesign,
+        simulation = lTrace
+      ),
+      file = strFile,
+      compress = "xz"
+    )
+  }
+
+  return(invisible(TRUE))
+}
+
+
+run1TestCase <- function(InputDF, SaveCERSimulationTrace = FALSE) {
   # mapping to link simMAMSMEP function arguments with csv columns
   Method <- InputDF$Method
   SampleSize <- InputDF$SampleSize
@@ -209,7 +281,8 @@ run1TestCase <- function(InputDF) {
     SelectionCriterion = SelectionCriterion, SelectionParameter = SelectionParameter, KeepAssociatedHypo = KeepAssociatedHypo,
     ImplicitSSR = ImplicitSSR, nSimulation = nSimulation, Seed = Seed, SummaryStat = SummaryStat,
     Method = Method, plotGraphs = plotGraphs, Parallel = Parallel,CommonStdDev = CommonStdDev,
-    nSimulation_Stage2 = nSimulation_Stage2, Verbose = TRUE
+    nSimulation_Stage2 = nSimulation_Stage2, SaveCERSimulationTrace = SaveCERSimulationTrace,
+    Verbose = TRUE
   )
   out
 }

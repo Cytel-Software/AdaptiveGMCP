@@ -69,6 +69,38 @@ testthat::test_that("Section 1 positive contract: simMAMSMEP runs continuous CER
   ExpectValidSimContract(out = out)
 })
 
+testthat::test_that("Section 1 positive contract: simMAMSMEP returns CER replay traces when requested", {
+  out <- simMAMSMEP(
+    Method = "CER", alpha = 0.025, SampleSize = 300,
+    TestStatCont = "t-equal", CommonStdDev = TRUE, FWERControl = "None",
+    nArms = 3, nEps = 1, lEpType = list(EP1 = "Continuous"),
+    Arms.Mean = list(EP1 = c(0, 0, 0)),
+    Arms.std.dev = list(EP1 = c(1, 1, 1)),
+    Arms.alloc.ratio = c(1, 1, 1), EP.Corr = matrix(1),
+    WI = c(0.5, 0.5),
+    G = matrix(c(0, 1, 1, 0), nrow = 2, byrow = TRUE),
+    test.type = "Parametric", info_frac = c(1 / 2, 1),
+    typeOfDesign = "asOF", MultipleWinners = TRUE, Selection = FALSE,
+    ImplicitSSR = "None", nSimulation = 2, nSimulation_Stage2 = 2,
+    Seed = 1234, SummaryStat = FALSE, plotGraphs = FALSE,
+    SaveCERSimulationTrace = TRUE, Parallel = FALSE, Verbose = FALSE
+  )
+
+  ExpectValidSimContract(out = out)
+  testthat::expect_true(all(c("SimID", "LookID", "SimID_Stage2") %in% names(out$rawPValues)))
+  testthat::expect_length(out$cerSimulationTraces, 2L)
+  testthat::expect_true(is.list(out$cerTraceDesign))
+  testthat::expect_equal(
+    vapply(out$cerSimulationTraces, function(x) x$simID, integer(1)),
+    c(1L, 2L)
+  )
+  testthat::expect_equal(
+    vapply(out$cerSimulationTraces[[1]]$looks$look2$stage2_runs,
+           function(x) x$simID_Stage2, integer(1)),
+    c(1L, 2L)
+  )
+})
+
 testthat::test_that("Section 1 positive contract: simMAMSMEP runs mixed endpoint CombPValue scenario", {
   lEpType <- list(EP1 = "Continuous", EP2 = "Binary")
   Arms.Mean <- list(EP1 = c(0, 0, 0, 0, 0), EP2 = NA)
@@ -387,6 +419,55 @@ testthat::test_that("Section 4 positive contract: wrapper runs continuous CER sc
 
   ExpectValidWrapperOutput(dfOut = dfOut, expectedModelIds = 2)
   testthat::expect_equal(dfOut$Method, "CER")
+})
+
+testthat::test_that("Section 4 positive contract: wrapper writes CER replay fixtures", {
+  dfInput <- MakeWrapperInputDF(
+    ModelID = 2, Scenario = "Continuous CER", Method = "CER",
+    SampleSize = 300, alpha = 0.025, TestStatCont = "t-equal", CommonStdDev = TRUE,
+    TestStatBin = NA, UseCC = FALSE, FWERControl = "None",
+    nArms = 3, nEps = 1, lEpType = "list(EP1 = 'Continuous')",
+    Arms.Mean = "list(EP1 = c(0, 0, 0))",
+    Arms.std.dev = "list(EP1 = c(1, 1, 1))", Arms.Prop = "NA",
+    Arms.alloc.ratio = "c(1, 1, 1)", EP.Corr = "matrix(1)",
+    WI = "c(0.5, 0.5)",
+    G = "matrix(c(0, 1, 1, 0), nrow = 2, byrow = TRUE)",
+    test.type = "Parametric", info_frac = "c(1/2, 1)", typeOfDesign = "asOF",
+    MultipleWinners = TRUE, Selection = FALSE, SelectionLook = NA,
+    SelectEndPoint = NA, SelectionScale = NA, SelectionCriterion = NA,
+    SelectionParameter = NA, KeepAssociatedHypo = NA, ImplicitSSR = "None",
+    nSimulation = 2, nSimulation_Stage2 = 2, Seed = 1234, SummaryStat = FALSE,
+    plotGraphs = FALSE, Parallel = FALSE
+  )
+  strFixtureDir <- tempfile("cer-fixtures-")
+  dir.create(strFixtureDir)
+
+  simMAMSMEP_Wrapper(
+    InputDF = dfInput,
+    sOutPath = tempfile(fileext = ".csv"),
+    SaveCERFixtures = TRUE,
+    CERFixtureDir = strFixtureDir
+  )
+
+  vFiles <- list.files(
+    strFixtureDir,
+    pattern = "^cer_out_2_sim_[12]_seed_1234\\.rds$",
+    full.names = TRUE
+  )
+  testthat::expect_length(vFiles, 2L)
+
+  lFixture <- readRDS(vFiles[[1]])
+  testthat::expect_equal(lFixture$method, "CER")
+  testthat::expect_equal(lFixture$model_id, 2)
+  testthat::expect_equal(lFixture$seed, 1234)
+  testthat::expect_true(is.list(lFixture$design))
+  testthat::expect_true(is.list(lFixture$simulation))
+  testthat::expect_equal(lFixture$simulation$simID, 1L)
+  testthat::expect_equal(
+    vapply(lFixture$simulation$looks$look2$stage2_runs,
+           function(x) x$simID_Stage2, integer(1)),
+    c(1L, 2L)
+  )
 })
 
 testthat::test_that("Section 4 positive contract: wrapper runs mixed endpoint CombPValue scenario", {

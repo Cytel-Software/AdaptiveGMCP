@@ -4,6 +4,9 @@
 
 * Added the `SaveRawPVals` option to `simMAMSMEP_Wrapper()` to control whether
   simulation raw p-values are written to a CSV file.
+* Added opt-in CER replay traces to `simMAMSMEP()` / `simMAMSMEP_Wrapper()` so
+  seeded simulation runs can be saved as `cer_out_<ModelID>_sim_<SimID>_seed_<Seed>.rds`
+  fixtures for non-interactive CER regression testing.
 
 ### Non-Interactive Conditional Error Rate Analysis
 

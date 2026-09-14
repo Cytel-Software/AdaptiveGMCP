@@ -144,6 +144,9 @@ SingleSimCER <- function(simID, gmcpSimObj, preSimObjs) {
   mcpObj <- initialize_mcpObj(gmcpSimObj = gmcpSimObj, preSimObjs = preSimObjs)
   SummStatDF <- mcpObj$SummStatBlank
   ArmWiseDF <- mcpObj$ArmWiseDataBlank
+  dfRawPValues <- CreateCerRawPValueTrace(mcpObj$HypoMap$Hypothesis)
+  lLook1Trace <- NULL
+  lStage2Trace <- list()
   # look-wise test
   while (mcpObj$ContTrial) {
 
@@ -190,6 +193,11 @@ SingleSimCER <- function(simID, gmcpSimObj, preSimObjs) {
         HypoMap = mcpObj$HypoMap,
         Cumulative = FALSE
       )
+      vStage1PValues <- NormalizeCerHypothesisValues(
+        vValues = as.vector(unlist(SummStat_Stage1[, grep("^RawPvalues", names(SummStat_Stage1))])),
+        vAllHypotheses = mcpObj$HypoMap$Hypothesis,
+        vPresentHypotheses = mcpObj$HypoMap$Hypothesis
+      )
       # Storing the first looks incremental data to compute next look cumulative data
       IncrLookSummaryPrev <- currLookDataIncr
       # Perform per look Test
@@ -213,6 +221,24 @@ SingleSimCER <- function(simID, gmcpSimObj, preSimObjs) {
       data.table::setDF(SummStatDF_Stage1)
       mcpObj$SummStatDF <- SummStatDF_Stage1
       mcpObj$rej_flag_Prev <- mcpObj$rej_flag_Curr
+      dfRawPValues <- AppendCerRawPValueTrace(
+        dfTrace = dfRawPValues,
+        simID = simID,
+        lookID = 1L,
+        simIDStage2 = NA_integer_,
+        vPValues = vStage1PValues,
+        vAllHypotheses = mcpObj$HypoMap$Hypothesis,
+        vPresentHypotheses = mcpObj$HypoMap$Hypothesis
+      )
+      if (isTRUE(gmcpSimObj$SaveCERSimulationTrace)) {
+        lLook1Trace <- list(
+          look = 1L,
+          inputs = list(
+            p_raw = vStage1PValues
+          ),
+          outputs = GetCerSimulationLookOutputs(mcpObj = mcpObj)
+        )
+      }
     } else {
       # loop over second stage simulations and save the summary stats for each in a list
       lPowerCountDF <- list()
@@ -289,6 +315,12 @@ SingleSimCER <- function(simID, gmcpSimObj, preSimObjs) {
       }
 
       mcpObj_Stage2 <- mcpObj # This will only be run at the end of stage 1. To be used for all stage 2 sims
+      vSelectedHypotheses <- mcpObj_Stage2$SelectedIndex
+      if (length(vSelectedHypotheses) == 0) {
+        vSelectedHypotheses <- NULL
+      }
+      vStage2SampleSize <- GetCerReplayStage2SampleSize(mcpObj_Stage2)
+      vLook2Hypotheses <- mcpObj_Stage2$IndexSet
       # We allow the user to perform multiple stage 2 simulations for each stage 1 simulation.
       # This is especially useful in case of large problems, i.e. designs with large number of arms and
       # multiple endpoints. In such cases if we run say 10k simulations for stage 1 and only 1 simulation
@@ -364,6 +396,11 @@ SingleSimCER <- function(simID, gmcpSimObj, preSimObjs) {
           # Stage-2 raw p-values(Incr.)
           pValIncrCurr <- as.vector(unlist(SummStat[, grep("RawPvalues", names(SummStat))]))
           mcpObj$rawpvalues <- list("stage1" = pValIncrPrev, "stage2" = pValIncrCurr)
+          vStage2InputPValues <- NormalizeCerHypothesisValues(
+            vValues = pValIncrCurr,
+            vAllHypotheses = mcpObj$HypoMap$Hypothesis,
+            vPresentHypotheses = vLook2Hypotheses
+          )
 
           # cumulative stage 2 p-values
           adapted_teststat_stage2 <- sqrt(v_adapted_info_fraction)*qnorm(1 - pValIncrPrev) +
@@ -433,6 +470,25 @@ SingleSimCER <- function(simID, gmcpSimObj, preSimObjs) {
             HypoMap = mcpObj$HypoMap,
             Cumulative = TRUE # Calculate cumulative stage 2 stat
           )
+          if (isTRUE(gmcpSimObj$SaveCERSimulationTrace)) {
+            SummStatStage2Input <- getPerLookTestStat(
+              simID = simID,
+              lookID = mcpObj$CurrentLook,
+              TestStatCont = mcpObj$TestStatCont,
+              TestStatBin = mcpObj$TestStatBin,
+              Arms.std.dev = mcpObj$Arms.std.dev,
+              IncrLookSummary = currLookDataIncr,
+              HypoMap = mcpObj$HypoMap,
+              Cumulative = FALSE
+            )
+            vStage2InputPValues <- NormalizeCerHypothesisValues(
+              vValues = as.vector(unlist(SummStatStage2Input[, grep("RawPvalues", names(SummStatStage2Input))])),
+              vAllHypotheses = mcpObj$HypoMap$Hypothesis,
+              vPresentHypotheses = vLook2Hypotheses
+            )
+          } else {
+            vStage2InputPValues <- NULL
+          }
 
           # Stage-1 raw p-values(Incr.)
           pValIncrPrev <- as.vector(unlist(mcpObj$SummStatDF[
@@ -500,6 +556,37 @@ SingleSimCER <- function(simID, gmcpSimObj, preSimObjs) {
         data.table::setDF(SummStatDF)
         mcpObj$SummStatDF <- SummStatDF
         mcpObj$ArmDataDF <- ArmWiseDF
+
+        vStage2OutputPValues <- NormalizeCerHypothesisValues(
+          vValues = as.vector(unlist(SummStat[, grep("RawPvalues", names(SummStat))])),
+          vAllHypotheses = mcpObj$HypoMap$Hypothesis,
+          vPresentHypotheses = vLook2Hypotheses
+        )
+        dfRawPValues <- AppendCerRawPValueTrace(
+          dfTrace = dfRawPValues,
+          simID = simID,
+          lookID = 2L,
+          simIDStage2 = as.integer(nSim_Stage2),
+          vPValues = vStage2OutputPValues,
+          vAllHypotheses = mcpObj$HypoMap$Hypothesis,
+          vPresentHypotheses = vLook2Hypotheses
+        )
+        if (isTRUE(gmcpSimObj$SaveCERSimulationTrace)) {
+          lStage2Trace[[nSim_Stage2]] <- list(
+            simID_Stage2 = as.integer(nSim_Stage2),
+            inputs = list(
+              p_raw = vStage2InputPValues[vLook2Hypotheses],
+              selection = vSelectedHypotheses,
+              new_sample_size = vStage2SampleSize,
+              new_weights = NULL,
+              new_G = NULL
+            ),
+            outputs = GetCerSimulationLookOutputs(
+              mcpObj = mcpObj,
+              vCumulativeStage2PValues = vStage2OutputPValues
+            )
+          )
+        }
 
         mcpObj$rej_flag_Prev <- mcpObj$rej_flag_Curr
         # Power Table
@@ -572,14 +659,209 @@ SingleSimCER <- function(simID, gmcpSimObj, preSimObjs) {
       "SelectedHypothesis" = mcpObj$SelectedIndex
     )
   }
+  lCerTrace <- NULL
+  if (isTRUE(gmcpSimObj$SaveCERSimulationTrace)) {
+    lCerTrace <- BuildCerSimulationTrace(
+      simID = simID,
+      lLook1Trace = lLook1Trace,
+      lStage2Trace = lStage2Trace
+    )
+  }
   list(
     "SummStatDF" = SummStatDF,
     "ArmWiseDF" = mcpObj$ArmDataDF,
     "powerCountDF" = powerCountDF,
     # "EfficacyTable" = EffCountDF,
     "SelectionDF" = SelectionDF,
-    "rawpvalues" = mcpObj$rawpvalues
+    "rawpvalues" = dfRawPValues,
+    "cerTrace" = lCerTrace
   )
+}
+
+
+# Create an empty CER raw p-value trace table ----
+CreateCerRawPValueTrace <- function(vHypotheses)
+{
+  dfTrace <- data.frame(
+    SimID = integer(0),
+    LookID = integer(0),
+    SimID_Stage2 = integer(0),
+    matrix(nrow = 0, ncol = length(vHypotheses)),
+    check.names = FALSE
+  )
+  names(dfTrace) <- c("SimID", "LookID", "SimID_Stage2",
+                      paste0("RawPvalues", seq_along(vHypotheses)))
+
+  return(dfTrace)
+}
+
+
+# Align CER hypothesis-level values with the full hypothesis set ----
+NormalizeCerHypothesisValues <- function(vValues, vAllHypotheses, vPresentHypotheses = NULL)
+{
+  vAligned <- stats::setNames(rep(NA_real_, length(vAllHypotheses)), vAllHypotheses)
+
+  if (is.null(vValues)) {
+    return(vAligned)
+  }
+
+  vFlat <- unlist(vValues, use.names = TRUE)
+  if (length(vFlat) == 0) {
+    return(vAligned)
+  }
+
+  if (!is.null(names(vFlat)) && all(nzchar(names(vFlat))) &&
+      all(names(vFlat) %in% vAllHypotheses)) {
+    vAligned[names(vFlat)] <- as.numeric(vFlat)
+    return(vAligned)
+  }
+
+  if (length(vFlat) == length(vAllHypotheses)) {
+    vAligned[] <- as.numeric(vFlat)
+    return(vAligned)
+  }
+
+  if (!is.null(vPresentHypotheses) && length(vFlat) == length(vPresentHypotheses)) {
+    vAligned[vPresentHypotheses] <- as.numeric(vFlat)
+    return(vAligned)
+  }
+
+  stop("Unable to align CER hypothesis-level values with hypothesis names.")
+}
+
+
+# Append one CER raw p-value trace row ----
+AppendCerRawPValueTrace <- function(dfTrace, simID, lookID, simIDStage2,
+                                    vPValues, vAllHypotheses,
+                                    vPresentHypotheses = NULL)
+{
+  vAligned <- NormalizeCerHypothesisValues(
+    vValues = vPValues,
+    vAllHypotheses = vAllHypotheses,
+    vPresentHypotheses = vPresentHypotheses
+  )
+  dfRow <- as.data.frame(as.list(vAligned), check.names = FALSE)
+  names(dfRow) <- paste0("RawPvalues", seq_along(vAllHypotheses))
+  dfRow$SimID_Stage2 <- simIDStage2
+  dfRow$LookID <- as.integer(lookID)
+  dfRow$SimID <- as.integer(simID)
+  dfRow <- dfRow[, c("SimID", "LookID", "SimID_Stage2",
+                     paste0("RawPvalues", seq_along(vAllHypotheses)))]
+
+  return(data.table::rbindlist(list(dfTrace, dfRow), fill = TRUE))
+}
+
+
+# Extract the CER look-wise outputs needed for replay testing ----
+GetCerSimulationLookOutputs <- function(mcpObj, vCumulativeStage2PValues = NULL)
+{
+  vStage1Boundary <- NA
+  vStage2Boundary <- NA
+  vAdjustedBoundary <- NA
+  vAdaptedCovariance <- NA
+
+  if (is.list(mcpObj$Stage1Obj) && is.list(mcpObj$Stage1Obj$plan_Bdry)) {
+    if (!is.null(mcpObj$Stage1Obj$plan_Bdry$Stage1Bdry)) {
+      vStage1Boundary <- mcpObj$Stage1Obj$plan_Bdry$Stage1Bdry
+    }
+    if (!is.null(mcpObj$Stage1Obj$plan_Bdry$Stage2Bdry)) {
+      vStage2Boundary <- mcpObj$Stage1Obj$plan_Bdry$Stage2Bdry
+    }
+  }
+
+  if (is.list(mcpObj$AdaptObj) && !is.null(mcpObj$AdaptObj$Stage2AdjBdry)) {
+    vAdjustedBoundary <- mcpObj$AdaptObj$Stage2AdjBdry
+  }
+
+  if (is.list(mcpObj$AdaptObj) && !is.null(mcpObj$AdaptObj$Stage2Sigma)) {
+    vAdaptedCovariance <- mcpObj$AdaptObj$Stage2Sigma
+  }
+
+  return(list(
+    stage1_boundary = vStage1Boundary,
+    stage2_boundary = vStage2Boundary,
+    cumulative_stage2_pvalues = vCumulativeStage2PValues,
+    adjusted_boundary = vAdjustedBoundary,
+    final_rejection_status = mcpObj$rej_flag_Curr,
+    stage1_intersect_test = mcpObj$Stage1Obj$Stage1Analysis$IntersectHypoTest,
+    stage1_primary_test = mcpObj$Stage1Obj$Stage1Analysis$PrimaryHypoTest,
+    active_hypotheses = mcpObj$IndexSet,
+    selected_hypotheses = mcpObj$SelectedIndex,
+    dropped_flag = mcpObj$DroppedFlag,
+    planned_sample_allocation = mcpObj$AllocSampleSize,
+    adapted_sample_allocation = mcpObj$Stage2AllocSampleSize,
+    adapted_covariance = vAdaptedCovariance,
+    structured_cer_pcer = mcpObj$CERTab
+  ))
+}
+
+
+# Extract only the stage-2 sample sizes that must be replayed ----
+GetCerReplayStage2SampleSize <- function(mcpObj)
+{
+  if (is.null(mcpObj$Stage2AllocSampleSize) || is.null(mcpObj$AllocSampleSize)) {
+    return(NULL)
+  }
+
+  vCurrent <- as.numeric(mcpObj$Stage2AllocSampleSize[2, ])
+  names(vCurrent) <- colnames(mcpObj$Stage2AllocSampleSize)
+  vPlanned <- as.numeric(mcpObj$AllocSampleSize[2, ])
+  names(vPlanned) <- colnames(mcpObj$AllocSampleSize)
+  vFiniteNames <- names(vCurrent)[!is.na(vCurrent)]
+
+  if (length(vFiniteNames) == 0) {
+    return(NULL)
+  }
+
+  if (all(vCurrent[vFiniteNames] == vPlanned[vFiniteNames])) {
+    return(NULL)
+  }
+
+  return(vCurrent[vFiniteNames])
+}
+
+
+# Build the per-simulation CER replay trace object ----
+BuildCerSimulationTrace <- function(simID, lLook1Trace, lStage2Trace)
+{
+  return(list(
+    simID = as.integer(simID),
+    stopped_after_look1 = length(lStage2Trace) == 0L,
+    looks = list(
+      look1 = lLook1Trace,
+      look2 = list(
+        stage2_runs = lStage2Trace
+      )
+    )
+  ))
+}
+
+
+# Build the design payload needed to replay a CER trace ----
+BuildCerSimulationReplayDesign <- function(gmcpSimObj)
+{
+  vEndpointNames <- names(gmcpSimObj$lEpType)
+
+  return(list(
+    nArms = gmcpSimObj$nArms,
+    nEps = gmcpSimObj$nEps,
+    SampleSize = gmcpSimObj$Max_SS,
+    EpType = gmcpSimObj$lEpType,
+    sigma = gmcpSimObj$Arms.std.dev[vEndpointNames],
+    CommonStdDev = gmcpSimObj$CommonStdDev,
+    prop.ctr = gmcpSimObj$prop.ctr[vEndpointNames],
+    allocRatio = gmcpSimObj$Arms.alloc.ratio,
+    WI = gmcpSimObj$IntialWeights,
+    G = gmcpSimObj$G,
+    test.type = gmcpSimObj$test.type,
+    alpha = gmcpSimObj$alpha,
+    info_frac = gmcpSimObj$InfoFrac,
+    typeOfDesign = gmcpSimObj$typeOfDesign,
+    deltaWT = gmcpSimObj$deltaWT,
+    deltaPT1 = gmcpSimObj$deltaPT1,
+    gammaA = gmcpSimObj$gammaA,
+    userAlphaSpending = gmcpSimObj$userAlphaSpending
+  ))
 }
 
 

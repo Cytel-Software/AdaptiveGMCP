@@ -13,6 +13,16 @@
 Add a deterministic, non-interactive API for the Conditional Error Rate (CER)
 method while preserving the calculations and ordering of `adaptGMCP_CER()`.
 
+## Follow-Up: Simulation Replay Fixtures
+
+The next CER follow-up extends the simulation workflow so selected
+`simMAMSMEP()` runs can emit replayable `.rds` fixtures for regression testing
+of `SetupDesign_CER()` and `AnalyzeLook_CER()`. The fixture workflow preserves
+`SimID`, `LookID`, and `SimID_Stage2`, stores look-2 incremental p-values as
+analysis inputs, and records the expected CER-transformed outputs for replay.
+The detailed implementation plan lives in
+`docs/simulation_analysis_regression_plan.md`.
+
 The API will separate the immutable planned trial design from the evolving
 analysis state:
 

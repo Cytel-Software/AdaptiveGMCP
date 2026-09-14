@@ -45,8 +45,8 @@ modified_MAMSMEP_sim2 <- function (gmcpSimObj)
   data.table::setnames(PowerTab, powersName)
 
   # Table for storing raw p-values from each simulation
-  tabRawPVals <- data.table(matrix(nrow = 0, ncol = gmcpSimObj$nHypothesis))
-  data.table::setnames(tabRawPVals, paste0("RawPvalues", 1:gmcpSimObj$nHypothesis))
+  tabRawPVals <- data.table()
+  lCerSimulationTraces <- list()
 
   if(gmcpSimObj$Verbose) {
     cat("Starting simulations...\n")
@@ -174,14 +174,31 @@ modified_MAMSMEP_sim2 <- function (gmcpSimObj)
       PowerTab <- data.table::rbindlist(list(PowerTab, data.table(out[[i]]$powerCountDF)), use.names = TRUE, fill = TRUE)
       # SelectionTab <- data.table::rbindlist(list(SelectionTab, data.table(out[[i]]$SelectionDF)), use.names = TRUE, fill = TRUE)
 
+      if (gmcpSimObj$Method == "CER" && isTRUE(gmcpSimObj$SaveCERSimulationTrace) &&
+          !is.null(out[[i]]$cerTrace)) {
+        lCerSimulationTraces[[length(lCerSimulationTraces) + 1L]] <- out[[i]]$cerTrace
+      }
+
       # Extract raw p-values from SummStatDF
-      if (!is.null(df) && nrow(df) > 0) {
+      if (gmcpSimObj$Method == "CER" && is.data.frame(out[[i]]$rawpvalues) &&
+          nrow(out[[i]]$rawpvalues) > 0) {
+        tabRawPVals <- data.table::rbindlist(
+          list(tabRawPVals, data.table(out[[i]]$rawpvalues)),
+          use.names = TRUE,
+          fill = TRUE
+        )
+      } else if (!is.null(df) && nrow(df) > 0) {
         # Get columns containing raw p-values (RawPvalues1, RawPvalues2, etc.)
         rawPvalCols <- grep("^RawPvalues", names(df), value = TRUE)
 
         if (length(rawPvalCols) > 0) {
           # Extract just the raw p-value columns
-          rawPvalsDf <- df[, rawPvalCols, drop = FALSE]
+          idCols <- intersect(c("SimID", "LookID", "SimID_Stage2"), names(df))
+          rawPvalsDf <- df[, c(idCols, rawPvalCols), drop = FALSE]
+          if (!"SimID_Stage2" %in% names(rawPvalsDf)) {
+            rawPvalsDf$SimID_Stage2 <- NA_integer_
+          }
+          rawPvalsDf <- rawPvalsDf[, c("SimID", "LookID", "SimID_Stage2", rawPvalCols), drop = FALSE]
 
           # # Rename columns to match H1, H2, etc. format
           # colnames(rawPvalsDf) <- paste0("H", 1:gmcpSimObj$nHypothesis)
@@ -261,6 +278,10 @@ modified_MAMSMEP_sim2 <- function (gmcpSimObj)
   elapsedTime <- Sys.time() - starttime
   elapsedTime_postProc <- Sys.time() - startTime_postproc
   gmcpSimObj$SummaryStat <- FALSE
+  lCerTraceDesign <- NULL
+  if (gmcpSimObj$Method == "CER" && isTRUE(gmcpSimObj$SaveCERSimulationTrace)) {
+    lCerTraceDesign <- BuildCerSimulationReplayDesign(gmcpSimObj)
+  }
   # Detailed output preparation
   detailOutput <- if (gmcpSimObj$Method == "CER") {
     ifElse(gmcpSimObj$SummaryStat,
@@ -280,7 +301,9 @@ modified_MAMSMEP_sim2 <- function (gmcpSimObj)
              elapsedTime_postProc = elapsedTime_postProc,
              power_raw = PowerTab,
              stagewiseRejections = dfStagewiseRejections,
-             rawPValues = tabRawPVals
+             rawPValues = tabRawPVals,
+             cerSimulationTraces = lCerSimulationTraces,
+             cerTraceDesign = lCerTraceDesign
            ),
            list(
              PlanSampleSizeCum = preSimObjs$planSS$CumulativeSamples,
@@ -296,7 +319,9 @@ modified_MAMSMEP_sim2 <- function (gmcpSimObj)
              elapsedTime_postProc = elapsedTime_postProc,
              power_raw = PowerTab,
              stagewiseRejections = dfStagewiseRejections,
-             rawPValues = tabRawPVals
+             rawPValues = tabRawPVals,
+             cerSimulationTraces = lCerSimulationTraces,
+             cerTraceDesign = lCerTraceDesign
            )
     )
   } else {
