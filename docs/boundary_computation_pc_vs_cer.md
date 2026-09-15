@@ -34,7 +34,8 @@ Key code:
 
 - `R/pValueAdaptGMCP_Analysis.R`: boundary built from `rpact` before `test.type`
   is inspected; stored in `bdryTab`.
-- `R/PcAnalysisApi.R`: same `stageLevels` boundary recomputed per look.
+- `R/PcAnalysisApi.R`: same precomputed `stageLevels` boundary carried in the
+  analysis state and indexed by look; it is not recomputed during PC analysis.
 - `R/pValueAdaptGmcpHelper.R`: adjusted p-values compared to `CutOff`.
 
 ## `adaptGMCP_CER()` (conditional error rate)
