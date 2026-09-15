@@ -28,7 +28,7 @@ reinstall <- function() {
 
   # Install package
   message("Installing package...")
-  devtools::install(upgrade = "never")
+  devtools::install(upgrade = FALSE)
   message("✓ Package installed successfully!\n")
 
   message("To load the package, run: load_pkg()")
@@ -197,7 +197,7 @@ quick_reinstall <- function() {
   if ("AdaptGMCP" %in% rownames(installed.packages())) {
     remove.packages("AdaptGMCP", lib = .libPaths()[1])
   }
-  devtools::install(upgrade = "never")
+  devtools::install(upgrade = FALSE)
   devtools::load_all()
   message("✓ Done! Package reinstalled and loaded.")
 }
