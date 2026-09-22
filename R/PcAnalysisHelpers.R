@@ -107,17 +107,20 @@ applySelection <- function(mcpObj, selected_hyps, look) {
   if (!is.character(selected_hyps)) stop("selection must be a character vector")
   selected_hyps <- unique(selected_hyps)
 
-  if (!all(selected_hyps %in% mcpObj$IndexSet)) {
+  if (length(selected_hyps) == 0) stop("selection must retain at least one hypothesis")
+
+  if (!all(selected_hyps %in% mcpObj$HypoMap$Hypothesis)) {
     stop(
-      "selection must be a subset of current IndexSet. Current IndexSet: ",
-      toString(mcpObj$IndexSet)
+      "selection must be a subset of available hypotheses. Available hypotheses: ",
+      toString(mcpObj$HypoMap$Hypothesis)
     )
   }
 
-  if (length(selected_hyps) == 0) stop("selection must retain at least one hypothesis")
-
   mcpObj$SelectionLook <- c(mcpObj$SelectionLook, as.integer(look))
   mcpObj$SelectedIndex <- selected_hyps
+
+  # At this point, the index set of the MCP object is updated to reflect the selected hypotheses.
+  mcpObj$IndexSet <- mcpObj$SelectedIndex
 
   active_names <- names(mcpObj$DroppedFlag)
   for (nm in active_names) {

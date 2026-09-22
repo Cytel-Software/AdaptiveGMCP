@@ -265,9 +265,10 @@
 
 .cer_validate_stage2_pvalues <- function( p_raw, active_hypotheses, initial_hypotheses )
 {
-  if( !is.numeric( p_raw ) || is.null( names( p_raw ) ) ||
-      anyNA( p_raw ) || any( !is.finite( p_raw ) ) ||
-      any( p_raw < 0 | p_raw > 1 ) )
+    p_non_missing <- p_raw[ !is.na( p_raw ) ]
+    if( !is.numeric( p_raw ) || is.null( names( p_raw ) ) ||
+      all( is.na( p_raw ) ) || !all( is.finite( p_non_missing ) ) ||
+      !all( p_non_missing >= 0 & p_non_missing <= 1 ) )
   {
     stop( "p_raw must be a named numeric vector with values in [0, 1]." )
   }
@@ -562,6 +563,7 @@ AnalyzeLook_CER <- function(
   }
   if( is.null( state ) )
   {
+    # Look 1 analysis computation
     if( !is.null( look ) && ( length( look ) != 1L || look != 1L ) )
     {
       stop( "look must be 1 when state is NULL." )
@@ -610,6 +612,7 @@ AnalyzeLook_CER <- function(
     return( state )
   }
 
+  # Look 2 analysis computation follows
   if( !inherits( state, "CERAnalysisState" ) )
   {
     stop( "state must be NULL or a CERAnalysisState object." )
@@ -650,6 +653,7 @@ AnalyzeLook_CER <- function(
       )
       return( state )
     }
+
     mcpObj <- applySelection( mcpObj, selected_hyps = selection, look = 2L )
   }
 
@@ -706,11 +710,29 @@ AnalyzeLook_CER <- function(
     state$completion_reason <- "all_hypotheses_dropped"
     return( state )
   }
+  vRequiredArms <- c(
+    "Control",
+    paste0(
+      "Treatment",
+      design$hypothesis_map$Treatment[
+        design$hypothesis_map$Hypothesis %in% mcpObj$IndexSet
+      ] - 1L
+    )
+  )
+  if( bHasSelection || bHasSampleAdaptation )
+  {
+    mStage2Allocation[ 2L, setdiff( colnames( mStage2Allocation ), vRequiredArms ) ] <- NA_real_
+  }
   mcpObj$Stage2AllocSampleSize <- mStage2Allocation
-  mcpObj$Stage2allocRatio <- as.numeric( mStage2Allocation[ 2L, ] /
-    mStage2Allocation[ 2L, 1L ] )
+  mStage2Increment <- mStage2Allocation
+  mStage2Increment[ 2L, ] <- mStage2Increment[ 2L, ] -
+    mStage2Increment[ 1L, ]
+  mcpObj$Stage2allocRatio <- as.numeric( mStage2Increment[ 2L, ] /
+    mStage2Increment[ 2L, 1L ] )
   names( mcpObj$Stage2allocRatio ) <- names( design$allocRatio )
-  if( any( !is.finite( mcpObj$Stage2allocRatio ) | mcpObj$Stage2allocRatio <= 0 ) )
+  vRequiredRatio <- match( vRequiredArms, names( mcpObj$Stage2allocRatio ) )
+  if( any( !is.finite( mcpObj$Stage2allocRatio[ vRequiredRatio ] ) |
+           mcpObj$Stage2allocRatio[ vRequiredRatio ] <= 0 ) )
   {
     stop( "Stage-2 sample sizes must produce positive allocation ratios." )
   }

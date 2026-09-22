@@ -106,6 +106,9 @@
 #'   `Method = "CombPValue"`. Use `NULL` (default) to disable.
 #' @param Parallel Logical scalar indicating whether to run simulations in parallel.
 #' @param Verbose Logical scalar. If `TRUE`, prints additional progress and diagnostic messages.
+#' @param ModelID Optional model identifier stored with the simulation object. Defaults to `NA`.
+#' @param DumpSimOutToRDS Logical scalar reserved for controlling whether simulation output is
+#'   dumped to an RDS file. Defaults to `FALSE`.
 #' @example ./internalData/MAMSMEP_Simulation_Example.R
 #' @export
 simMAMSMEP <- function(
@@ -180,7 +183,9 @@ simMAMSMEP <- function(
     plotGraphs = TRUE,
     EastSumStat = NULL,
     Parallel = TRUE,
-    Verbose = FALSE) {
+    Verbose = FALSE,
+    ModelID = NA,
+    DumpSimOutToRDS = FALSE) {
 
   # Handle deprecated parameter aliases (renamed to fix typos)
   if (!is.null(SelectionParmeter)) {
@@ -292,7 +297,13 @@ simMAMSMEP <- function(
     "mvtnorm_algo" = mvtnorm_algo,
 
     # Parameter added to enable debugging
-    "Debug" = FALSE
+    "Debug" = FALSE,
+    "ModelID" = ModelID,
+    "DumpSimOutToRDS" = if (nSimulation == 1 && nSimulation_Stage2 == 1) {
+      DumpSimOutToRDS
+    } else {
+      FALSE
+    }
   )
 
   logs <- valInpsimMAMSMEP(inps = gmcpSimObj)

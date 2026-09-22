@@ -13,7 +13,7 @@
 #' @importFrom dplyr select mutate relocate rename bind_rows left_join everything
 #' @importFrom tidyr pivot_wider pivot_longer
 #' @export
-simMAMSMEP_Wrapper <- function(InputDF, sOutPath) {
+simMAMSMEP_Wrapper <- function(InputDF, sOutPath, DumpSimOutToRDS = FALSE) {
   # Update the dataframe column names in the following mapping in case
   # the names in the input csv/excel changes
   lOut <- list()
@@ -32,7 +32,8 @@ simMAMSMEP_Wrapper <- function(InputDF, sOutPath) {
 
     out <- tryCatch(
       {
-        run1TestCase(InputDF = InputDF[nModelNum, ])
+        run1TestCase(InputDF = InputDF[nModelNum, ], ModelID = InputDF[nModelNum, "ModelID"], 
+                      DumpSimOutToRDS = DumpSimOutToRDS)
       },
       error = function(err) {
         paste0("Model ", nModelNum, " execution failed.")
@@ -151,7 +152,7 @@ simMAMSMEP_Wrapper <- function(InputDF, sOutPath) {
 }
 
 
-run1TestCase <- function(InputDF) {
+run1TestCase <- function(InputDF, ModelID = NA, DumpSimOutToRDS = FALSE) {
   # mapping to link simMAMSMEP function arguments with csv columns
   Method <- InputDF$Method
   SampleSize <- InputDF$SampleSize
@@ -209,7 +210,7 @@ run1TestCase <- function(InputDF) {
     SelectionCriterion = SelectionCriterion, SelectionParameter = SelectionParameter, KeepAssociatedHypo = KeepAssociatedHypo,
     ImplicitSSR = ImplicitSSR, nSimulation = nSimulation, Seed = Seed, SummaryStat = SummaryStat,
     Method = Method, plotGraphs = plotGraphs, Parallel = Parallel,CommonStdDev = CommonStdDev,
-    nSimulation_Stage2 = nSimulation_Stage2, Verbose = TRUE
+    nSimulation_Stage2 = nSimulation_Stage2, Verbose = TRUE, ModelID = ModelID, DumpSimOutToRDS = DumpSimOutToRDS
   )
   out
 }
