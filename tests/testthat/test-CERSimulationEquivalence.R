@@ -152,6 +152,7 @@ RunCerSimulationEquivalence <- function(fixture_path, input_data)
     sim_out$IncrRawPVals$stage2,
     hypotheses = stage2_hypotheses
   )
+  stage2_intersection_weights <- cer_state$WH
   stage2_arguments <- list(
     design = design,
     state = cer_state,
@@ -169,7 +170,23 @@ RunCerSimulationEquivalence <- function(fixture_path, input_data)
   expected_stage2_boundary <- if (adapted) {
     sim_out$AdjStage2Bdry
   } else {
-    sim_out$PlannedStage2Bdry
+    stage2_intersection_keys <- apply(
+      stage2_intersection_weights[, design$hypothesis_names, drop = FALSE],
+      1L,
+      paste0,
+      collapse = ""
+    )
+    planned_intersection_keys <- apply(
+      design$intersection_weights[, design$hypothesis_names, drop = FALSE],
+      1L,
+      paste0,
+      collapse = ""
+    )
+    sim_out$PlannedStage2Bdry[
+      match(stage2_intersection_keys, planned_intersection_keys),
+      ,
+      drop = FALSE
+    ]
   }
   testthat::expect_equal(
     cer_state$stage2_boundary,
@@ -200,47 +217,47 @@ testthat::skip_if(
 input_path <- testthat::test_path("sim-anal-equiv-fixtures", "Mixed-2OrMoreEPs.csv")
 input_data <- utils::read.csv(input_path, stringsAsFactors = FALSE, check.names = FALSE)
 
-# testthat::test_that("CER simulation equivalence for model 3", {
-#   RunCerSimulationEquivalence(
-#     file.path(fixture_dir, "SimOutDump_3_1_20260918_160548.rds"),
-#     input_data
-#   )
-# })
+testthat::test_that("CER simulation equivalence for model 3", {
+  RunCerSimulationEquivalence(
+    file.path(fixture_dir, "SimOutDump_3_1_20260918_160548.rds"),
+    input_data
+  )
+})
 
-# testthat::test_that("CER simulation equivalence for model 6", {
-#   RunCerSimulationEquivalence(
-#     file.path(fixture_dir, "SimOutDump_6_1_20260918_160549.rds"),
-#     input_data
-#   )
-# })
+testthat::test_that("CER simulation equivalence for model 6", {
+  RunCerSimulationEquivalence(
+    file.path(fixture_dir, "SimOutDump_6_1_20260918_160549.rds"),
+    input_data
+  )
+})
 
-# testthat::test_that("CER simulation equivalence for model 8", {
-#   RunCerSimulationEquivalence(
-#     file.path(fixture_dir, "SimOutDump_8_1_20260918_160549.rds"),
-#     input_data
-#   )
-# })
+testthat::test_that("CER simulation equivalence for model 8", {
+  RunCerSimulationEquivalence(
+    file.path(fixture_dir, "SimOutDump_8_1_20260918_160549.rds"),
+    input_data
+  )
+})
 
-# testthat::test_that("CER simulation equivalence for model 13", {
-#   RunCerSimulationEquivalence(
-#     file.path(fixture_dir, "SimOutDump_13_1_20260918_160549.rds"),
-#     input_data
-#   )
-# })
+testthat::test_that("CER simulation equivalence for model 13", {
+  RunCerSimulationEquivalence(
+    file.path(fixture_dir, "SimOutDump_13_1_20260918_160549.rds"),
+    input_data
+  )
+})
 
-# testthat::test_that("CER simulation equivalence for model 23", {
-#   RunCerSimulationEquivalence(
-#     file.path(fixture_dir, "SimOutDump_23_1_20260918_160733.rds"),
-#     input_data
-#   )
-# })
+testthat::test_that("CER simulation equivalence for model 23", {
+  RunCerSimulationEquivalence(
+    file.path(fixture_dir, "SimOutDump_23_1_20260918_160733.rds"),
+    input_data
+  )
+})
 
-# testthat::test_that("CER simulation equivalence for model 37", {
-#   RunCerSimulationEquivalence(
-#     file.path(fixture_dir, "SimOutDump_37_1_20260918_160830.rds"),
-#     input_data
-#   )
-# })
+testthat::test_that("CER simulation equivalence for model 37", {
+  RunCerSimulationEquivalence(
+    file.path(fixture_dir, "SimOutDump_37_1_20260918_160830.rds"),
+    input_data
+  )
+})
 
 testthat::test_that("CER simulation equivalence for model 39", {
   RunCerSimulationEquivalence(
@@ -249,114 +266,114 @@ testthat::test_that("CER simulation equivalence for model 39", {
   )
 })
 
-# testthat::test_that("CER simulation equivalence for model 51", {
-#   RunCerSimulationEquivalence(
-#     file.path(fixture_dir, "SimOutDump_51_1_20260918_161248.rds"),
-#     input_data
-#   )
-# })
+testthat::test_that("CER simulation equivalence for model 51", {
+  RunCerSimulationEquivalence(
+    file.path(fixture_dir, "SimOutDump_51_1_20260918_161248.rds"),
+    input_data
+  )
+})
 
-# testthat::test_that("CER simulation equivalence for model 65", {
-#   RunCerSimulationEquivalence(
-#     file.path(fixture_dir, "SimOutDump_65_1_20260918_161716.rds"),
-#     input_data
-#   )
-# })
+testthat::test_that("CER simulation equivalence for model 65", {
+  RunCerSimulationEquivalence(
+    file.path(fixture_dir, "SimOutDump_65_1_20260918_161716.rds"),
+    input_data
+  )
+})
 
-# testthat::test_that("CER simulation equivalence for model 108", {
-#   RunCerSimulationEquivalence(
-#     file.path(fixture_dir, "SimOutDump_108_1_20260918_162136.rds"),
-#     input_data
-#   )
-# })
+testthat::test_that("CER simulation equivalence for model 108", {
+  RunCerSimulationEquivalence(
+    file.path(fixture_dir, "SimOutDump_108_1_20260918_162136.rds"),
+    input_data
+  )
+})
 
-# testthat::test_that("CER simulation equivalence for model 113", {
-#   RunCerSimulationEquivalence(
-#     file.path(fixture_dir, "SimOutDump_113_1_20260918_162609.rds"),
-#     input_data
-#   )
-# })
+testthat::test_that("CER simulation equivalence for model 113", {
+  RunCerSimulationEquivalence(
+    file.path(fixture_dir, "SimOutDump_113_1_20260918_162609.rds"),
+    input_data
+  )
+})
 
-# testthat::test_that("CER simulation equivalence for model 118", {
-#   RunCerSimulationEquivalence(
-#     file.path(fixture_dir, "SimOutDump_118_1_20260918_163033.rds"),
-#     input_data
-#   )
-# })
+testthat::test_that("CER simulation equivalence for model 118", {
+  RunCerSimulationEquivalence(
+    file.path(fixture_dir, "SimOutDump_118_1_20260918_163033.rds"),
+    input_data
+  )
+})
 
-# testthat::test_that("CER simulation equivalence for model 123", {
-#   RunCerSimulationEquivalence(
-#     file.path(fixture_dir, "SimOutDump_123_1_20260918_163515.rds"),
-#     input_data
-#   )
-# })
+testthat::test_that("CER simulation equivalence for model 123", {
+  RunCerSimulationEquivalence(
+    file.path(fixture_dir, "SimOutDump_123_1_20260918_163515.rds"),
+    input_data
+  )
+})
 
-# testthat::test_that("CER simulation equivalence for model 127", {
-#   RunCerSimulationEquivalence(
-#     file.path(fixture_dir, "SimOutDump_127_1_20260918_163927.rds"),
-#     input_data
-#   )
-# })
+testthat::test_that("CER simulation equivalence for model 127", {
+  RunCerSimulationEquivalence(
+    file.path(fixture_dir, "SimOutDump_127_1_20260918_163927.rds"),
+    input_data
+  )
+})
 
-# testthat::test_that("CER simulation equivalence for model 130", {
-#   RunCerSimulationEquivalence(
-#     file.path(fixture_dir, "SimOutDump_130_1_20260918_164343.rds"),
-#     input_data
-#   )
-# })
+testthat::test_that("CER simulation equivalence for model 130", {
+  RunCerSimulationEquivalence(
+    file.path(fixture_dir, "SimOutDump_130_1_20260918_164343.rds"),
+    input_data
+  )
+})
 
-# testthat::test_that("CER simulation equivalence for model 133", {
-#   RunCerSimulationEquivalence(
-#     file.path(fixture_dir, "SimOutDump_133_1_20260918_164814.rds"),
-#     input_data
-#   )
-# })
+testthat::test_that("CER simulation equivalence for model 133", {
+  RunCerSimulationEquivalence(
+    file.path(fixture_dir, "SimOutDump_133_1_20260918_164814.rds"),
+    input_data
+  )
+})
 
-# testthat::test_that("CER simulation equivalence for model 136", {
-#   RunCerSimulationEquivalence(
-#     file.path(fixture_dir, "SimOutDump_136_1_20260918_165233.rds"),
-#     input_data
-#   )
-# })
+testthat::test_that("CER simulation equivalence for model 136", {
+  RunCerSimulationEquivalence(
+    file.path(fixture_dir, "SimOutDump_136_1_20260918_165233.rds"),
+    input_data
+  )
+})
 
-# testthat::test_that("CER simulation equivalence for model 148", {
-#   RunCerSimulationEquivalence(
-#     file.path(fixture_dir, "SimOutDump_148_1_20260918_165705.rds"),
-#     input_data
-#   )
-# })
+testthat::test_that("CER simulation equivalence for model 148", {
+  RunCerSimulationEquivalence(
+    file.path(fixture_dir, "SimOutDump_148_1_20260918_165705.rds"),
+    input_data
+  )
+})
 
-# testthat::test_that("CER simulation equivalence for model 152", {
-#   RunCerSimulationEquivalence(
-#     file.path(fixture_dir, "SimOutDump_152_1_20260918_170111.rds"),
-#     input_data
-#   )
-# })
+testthat::test_that("CER simulation equivalence for model 152", {
+  RunCerSimulationEquivalence(
+    file.path(fixture_dir, "SimOutDump_152_1_20260918_170111.rds"),
+    input_data
+  )
+})
 
-# testthat::test_that("CER simulation equivalence for model 155", {
-#   RunCerSimulationEquivalence(
-#     file.path(fixture_dir, "SimOutDump_155_1_20260918_170438.rds"),
-#     input_data
-#   )
-# })
+testthat::test_that("CER simulation equivalence for model 155", {
+  RunCerSimulationEquivalence(
+    file.path(fixture_dir, "SimOutDump_155_1_20260918_170438.rds"),
+    input_data
+  )
+})
 
-# testthat::test_that("CER simulation equivalence for model 157", {
-#   RunCerSimulationEquivalence(
-#     file.path(fixture_dir, "SimOutDump_157_1_20260918_170847.rds"),
-#     input_data
-#   )
-# })
+testthat::test_that("CER simulation equivalence for model 157", {
+  RunCerSimulationEquivalence(
+    file.path(fixture_dir, "SimOutDump_157_1_20260918_170847.rds"),
+    input_data
+  )
+})
 
-# testthat::test_that("CER simulation equivalence for model 160", {
-#   RunCerSimulationEquivalence(
-#     file.path(fixture_dir, "SimOutDump_160_1_20260918_171319.rds"),
-#     input_data
-#   )
-# })
+testthat::test_that("CER simulation equivalence for model 160", {
+  RunCerSimulationEquivalence(
+    file.path(fixture_dir, "SimOutDump_160_1_20260918_171319.rds"),
+    input_data
+  )
+})
 
-# testthat::test_that("CER simulation equivalence for model 163", {
-#   RunCerSimulationEquivalence(
-#     file.path(fixture_dir, "SimOutDump_163_1_20260918_171733.rds"),
-#     input_data
-#   )
-# })
+testthat::test_that("CER simulation equivalence for model 163", {
+  RunCerSimulationEquivalence(
+    file.path(fixture_dir, "SimOutDump_163_1_20260918_171733.rds"),
+    input_data
+  )
+})
