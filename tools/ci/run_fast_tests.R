@@ -5,7 +5,8 @@
 exhaustive_tests <- c(
   "test-overall_powers_df_snapshot_CER.R",
   "test-overall_powers_df_snapshot_pvaluecomb.R",
-  "test-overall_powers_df_snapshot_pvaluecomb_5arm2ep.R"
+  "test-overall_powers_df_snapshot_pvaluecomb_5arm2ep.R",
+  "test-CERSimulationEquivalence.R"
 )
 
 all_tests <- list.files(file.path("tests", "testthat"), pattern = "^test-.*\\.R$", full.names = FALSE)

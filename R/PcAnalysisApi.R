@@ -161,6 +161,10 @@ SetupAnalysis_PC <- function(
   if (any(diff(planned_info_frac) <= 0)) stop("planned_info_frac must be strictly increasing")
 
   GlobalIndexSet <- paste0("H", seq_len(d))
+  HypoMap <- data.frame(
+    Hypothesis = GlobalIndexSet,
+    row.names = NULL
+  )
 
   # mvtnorm algorithm
   mvtnorm_algo <- chooseMVTAlgo(d)
@@ -225,6 +229,7 @@ SetupAnalysis_PC <- function(
     "CurrentLook" = 0L,
     "IntialWeights" = WI,
     "IntialHypothesis" = GlobalIndexSet,
+    "HypoMap" = HypoMap,
     "test.type" = test.type,
     "IndexSet" = GlobalIndexSet,
     "p_raw" = NA,

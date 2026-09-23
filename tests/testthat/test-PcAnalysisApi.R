@@ -134,6 +134,11 @@ testthat::test_that("Test 2: PC analysis API scaffolds (strategy modification)",
     MultipleWinners = FALSE
   )
 
+  testthat::expect_identical(
+    state$mcpObj$HypoMap,
+    data.frame(Hypothesis = paste0("H", 1:4))
+  )
+
   # Look 1
   state <- AnalyzeLook_PC_TestWrapper(
     state,
@@ -2366,7 +2371,6 @@ testthat::test_that("AnalyzeLook_PC output validation", {
     state <- SetupAnalysis_PC(WI = c(1/2,1/2,0,0), G = G, test.type = "Partly-Parametric",
                 alpha = 0.025, planned_info_frac = c(0.5,0.7,1), typeOfDesign = "asOF",
                 plotGraphs = FALSE)
-    state <- AddPcHypoMap(state)
 
     # print("Initial design:")
     # print(state)
