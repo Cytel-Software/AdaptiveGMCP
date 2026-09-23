@@ -1974,7 +1974,7 @@ testthat::test_that("AnalyzeLook_PC: selection validity at look > 1", {
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
       selection = c("H1", "H5"), plotGraphs = FALSE
     ),
-    regexp = "subset of current IndexSet"
+    regexp = "subset of available hypotheses"
   )
 
   # Empty selection vector
@@ -2366,6 +2366,7 @@ testthat::test_that("AnalyzeLook_PC output validation", {
     state <- SetupAnalysis_PC(WI = c(1/2,1/2,0,0), G = G, test.type = "Partly-Parametric",
                 alpha = 0.025, planned_info_frac = c(0.5,0.7,1), typeOfDesign = "asOF",
                 plotGraphs = FALSE)
+    state <- AddPcHypoMap(state)
 
     # print("Initial design:")
     # print(state)

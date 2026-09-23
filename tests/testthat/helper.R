@@ -27,8 +27,22 @@ CompareImportantMcpMembers <- function( actMcp, expMcp, dTolerance = 1e-6 )
 
 # Calls AnalyzeLook_PC() via do.call() so validation/error tests can pass malformed
 # arguments (e.g. non-numeric `look`) without tripping R's own argument matching first.
+AddPcHypoMap <- function( state )
+{
+  if( inherits( state, "PCAnalysisState" ) && is.null( state$mcpObj$HypoMap ) )
+  {
+    state$mcpObj$HypoMap <- data.frame(
+      Hypothesis = state$mcpObj$IntialHypothesis,
+      row.names = NULL
+    )
+  }
+
+  return( state )
+}
+
 AnalyzeLook_PC_TestWrapper <- function( state, ... )
 {
+  state <- AddPcHypoMap( state )
   lArgs <- list( ... )
   lArgs$state <- state
   return( do.call( AnalyzeLook_PC, lArgs ) )
