@@ -213,6 +213,13 @@ SingleSimCER <- function(simID, gmcpSimObj, preSimObjs) {
       data.table::setDF(SummStatDF_Stage1)
       mcpObj$SummStatDF <- SummStatDF_Stage1
       mcpObj$rej_flag_Prev <- mcpObj$rej_flag_Curr
+
+      # Stage-1 raw p-values(Incr.)
+      pValIncrPrev <- as.vector(unlist(
+        mcpObj$SummStatDF[mcpObj$SummStatDF$LookID == 1, 
+        grep("RawPvalues", names(mcpObj$SummStatDF))]
+        ))
+      mcpObj$rawpvalues <- list("stage1" = pValIncrPrev)
     } else {
       # loop over second stage simulations and save the summary stats for each in a list
       lPowerCountDF <- list()
@@ -572,6 +579,25 @@ SingleSimCER <- function(simID, gmcpSimObj, preSimObjs) {
       "SelectedHypothesis" = mcpObj$SelectedIndex
     )
   }
+
+  if(gmcpSimObj$DumpSimOutToRDS) {
+    # # Dump select simulation output to an RDS file
+    # lSimOutDump <- list(
+    #   "PlannedStage1Bdry" = mcpObj$plan_Bdry$Stage1Bdry,
+    #   "PlannedStage2Bdry" = mcpObj$plan_Bdry$Stage2Bdry,
+    #   "IncrRawPVals" = mcpObj$rawpvalues,
+    #   "SummStatDF" = mcpObj$SummStatDF,
+    #   "AdaptStage2" = if(is.null(mcpObj$AdaptStage2)) NA else mcpObj$AdaptStage2,
+    #   "SelectedIndex" = if(is.null(mcpObj$SelectedIndex)) NA else mcpObj$SelectedIndex,
+    #   "AdjStage2Bdry" = if(!is.null(mcpObj$AdaptStage2) && mcpObj$AdaptStage2) mcpObj$AdaptObj$Stage2AdjBdry else NA,
+    #   "CER_PCER" = if(!is.null(mcpObj$AdaptStage2) && mcpObj$AdaptStage2) mcpObj$AdaptObj$Stage2Tables$Stage2_Test_Procedure else NA,
+    #   "Stage2SampleSize" = if(!is.null(mcpObj$AdaptStage2) && mcpObj$AdaptStage2) mcpObj$Stage2AllocSampleSize else NA
+    # )
+
+    # timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
+    # saveRDS(lSimOutDump, file = paste0("SimOutDump_", gmcpSimObj$ModelID, "_", simID, "_", timestamp, ".rds"))
+  }
+
   list(
     "SummStatDF" = SummStatDF,
     "ArmWiseDF" = mcpObj$ArmDataDF,

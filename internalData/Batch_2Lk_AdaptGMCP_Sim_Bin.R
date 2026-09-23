@@ -1088,14 +1088,16 @@
 
   # sOutFilePrefix <- "Out_CER_Bin_1ep3arms"
   sOutFilePrefix <- "Out_Mixed-2OrMoreEPs"
-  # sOutFilePrefix <- "Out_CER_Cont_1ep3arms"
+  # sOutFilePrefix <- "Out_CER_Cont_1ep5arms"
   sOutPath <- "internalData/"
 
   # nModelsToRun <- dfInput$ModelID # Run all models
   # nModelsToRun <- c(108, 109, 110, 111, 116, 117, 118, 119, 120, 121, 122, 123,
   #                  124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135,
   #                  136, 137, 138, 139)
-  nModelsToRun <- c(26, 27)
+  # nModelsToRun <- c(3, 6, 8, 13, 23, 37, 39, 51, 65, 148, 152,
+  #                  108, 113, 118, 123, 127, 130, 133, 136, 155, 157, 160, 163)
+  nModelsToRun <- 39
   # nModelsToRun <- c(138, 137, 136, 134, 132, 130, 128, 127, 125, 139, 123, 121,
   #                  118, 117, 114, 111, 108)
 
@@ -1103,9 +1105,9 @@
   # To do a trial run, uncomment this block so that the tests are run with a
   # small number of simulations rather than the number specified in the input
   # file.
-  dfInput$nSimulation <- 10000 #1000 # 5 # 100 #
-  dfInput$nSimulation_Stage2 <- 500 #100# 5 # 50 # 100 #
-  # dfInput$Parallel <- FALSE
+  dfInput$nSimulation <- 1 # 10000 #1000 # 5 # 100 #
+  dfInput$nSimulation_Stage2 <- 1 # 500 #100# 5 # 50 # 100 #
+  dfInput$Parallel <- FALSE
   # dfInput$test.type <- "Parametric"
   # dfInput$SampleSize <- 10000
 
@@ -1126,7 +1128,7 @@
 
   dfOutput <- simMAMSMEP_Wrapper(InputDF = dfInput %>%
                                    filter(ModelID %in% nModelsToRun),
-                                 sOutPath)
+                                 sOutPath, DumpSimOutToRDS = TRUE)
 
   tElapTime <- Sys.time() - tStartTime
 

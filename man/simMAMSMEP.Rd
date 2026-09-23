@@ -51,7 +51,9 @@ simMAMSMEP(
   plotGraphs = TRUE,
   EastSumStat = NULL,
   Parallel = TRUE,
-  Verbose = FALSE
+  Verbose = FALSE,
+  ModelID = NA,
+  DumpSimOutToRDS = FALSE
 )
 }
 \arguments{
@@ -190,6 +192,11 @@ scalar seed used for reproducibility.}
 \item{Parallel}{Logical scalar indicating whether to run simulations in parallel.}
 
 \item{Verbose}{Logical scalar. If `TRUE`, prints additional progress and diagnostic messages.}
+
+\item{ModelID}{Optional model identifier stored with the simulation object. Defaults to `NA`.}
+
+\item{DumpSimOutToRDS}{Logical scalar reserved for controlling whether simulation output is
+dumped to an RDS file. Defaults to `FALSE`.}
 }
 \description{
 Function to simulate multi-arm, multi-stage, multi-endpoint trials using either 

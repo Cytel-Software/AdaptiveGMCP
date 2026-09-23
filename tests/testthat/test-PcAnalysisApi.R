@@ -134,6 +134,11 @@ testthat::test_that("Test 2: PC analysis API scaffolds (strategy modification)",
     MultipleWinners = FALSE
   )
 
+  testthat::expect_identical(
+    state$mcpObj$HypoMap,
+    data.frame(Hypothesis = paste0("H", 1:4))
+  )
+
   # Look 1
   state <- AnalyzeLook_PC_TestWrapper(
     state,
@@ -1974,7 +1979,7 @@ testthat::test_that("AnalyzeLook_PC: selection validity at look > 1", {
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
       selection = c("H1", "H5"), plotGraphs = FALSE
     ),
-    regexp = "subset of current IndexSet"
+    regexp = "subset of available hypotheses"
   )
 
   # Empty selection vector

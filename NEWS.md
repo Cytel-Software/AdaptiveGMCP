@@ -2,6 +2,20 @@
 
 ## New Features
 
+* Added fixture-driven CER simulation/API equivalence coverage using incremental
+  stage-wise raw p-values, selection, and adapted sample-size inputs.
+
+## Corrections
+
+* CER adapted-boundary analysis now derives stage-2 allocation ratios from
+  incremental stage-2 accrual, matching the simulation workflow.
+
+* `SetupAnalysis_PC()` now initializes the hypothesis map used to validate
+  interim hypothesis selection.
+
+* Added optional `ModelID` and `DumpSimOutToRDS` parameters to `simMAMSMEP()`;
+  both values are retained in the simulation object for downstream output handling.
+
 ### Non-Interactive Conditional Error Rate Analysis
 
 * Added `SetupDesign_CER()`, `AnalyzeLook_CER()`, and `PlotGraph_CER()` for
