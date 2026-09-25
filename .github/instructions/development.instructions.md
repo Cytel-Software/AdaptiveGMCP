@@ -1,17 +1,17 @@
 ---
-description: This file describes the good development practices to be followed in the AdaptiveGMCP project, going beyond the R coding conventions described in other files.
+description: Required commenting standards when creating or modifying R source and test code.
+applyTo: "**/*.R"
 ---
 
 # Good development practices
 
 ## Write good code comments
 
-- Use comments to explain the purpose and logic of your code.
-- Avoid obvious comments that do not add value.
-- Keep comments up-to-date with code changes.
-- Use consistent style and formatting for comments throughout the project.
-- Every new function written must have a clear and concise header comments describing the purpose, inputs, and outputs of the function.
-- Inline comments should be used to describe important steps, assumptions, constraints, and decisions within the function body.
-- Avoid over-commenting trivial code that is self-explanatory.
-- Do not duplicate comments.
-- Write brief but clear and to-the-point comments.
+- Every newly created function MUST have a header describing its purpose,
+  parameters, and return value. This includes exported functions, internal
+  helpers, nested functions, callbacks, and test helpers.
+- Add brief inline comments before non-obvious algorithmic steps, assumptions,
+  transformations, or domain decisions.
+- Do not comment trivial assignments or restate the code.
+- When substantially modifying an undocumented function, add the required
+  header as part of the change.
