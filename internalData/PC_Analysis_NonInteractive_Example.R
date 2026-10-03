@@ -114,7 +114,7 @@ state2_s2 <- AnalyzeLook_PC(
   selection     = c("H1"),
   plotGraphs    = plotGraphs2
 )
-print("SCENARIO (2) - Pre-specified stopping boundaries:")
+print("SCENARIO (2) - Analysis output:")
 print(state2_s2)
 ###################################################################################
 
