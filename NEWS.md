@@ -7,6 +7,11 @@
 
 ## Corrections
 
+* Improved `print.PCAnalysisState()` output so setup states show the design
+  boundary and inverse-normal weights, while analyzed states show only the
+  current look's adjusted p-values, combined p-values when applicable, and
+  primary-hypothesis rejection statuses.
+
 * CER adapted-boundary analysis now derives stage-2 allocation ratios from
   incremental stage-2 accrual, matching the simulation workflow.
 

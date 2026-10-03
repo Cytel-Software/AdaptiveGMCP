@@ -61,7 +61,7 @@ state_ex1 <- AnalyzeLook_PC(
 )
 
 print("EXAMPLE 1 - Look-1 analysis output")
-print(state_ex1$mcpObj)
+print(state_ex1)
 
 state_ex1 <- AnalyzeLook_PC(
   state = state_ex1,
@@ -71,8 +71,7 @@ state_ex1 <- AnalyzeLook_PC(
 )
 
 print("EXAMPLE 1 - Look-2 analysis output")
-print(state_ex1$mcpObj)
-print(state_ex1$completion_reason)
+print(state_ex1)
 
 #===================================================================================================
 # EXAMPLE 2 - Select a surviving treatment arm
@@ -128,7 +127,7 @@ state_ex2 <- AnalyzeLook_PC(
 )
 
 print("EXAMPLE 2 - Look-1 analysis output")
-print(state_ex2$mcpObj)
+print(state_ex2)
 
 state_ex2 <- AnalyzeLook_PC(
   state = state_ex2,
@@ -139,8 +138,7 @@ state_ex2 <- AnalyzeLook_PC(
 )
 
 print("EXAMPLE 2 - Look-2 analysis output")
-print(state_ex2$mcpObj)
-print(state_ex2$completion_reason)
+print(state_ex2)
 
 #===================================================================================================
 # EXAMPLE 3 - Select hypotheses and change the graph
@@ -188,7 +186,7 @@ state_ex3 <- AnalyzeLook_PC(
 )
 
 print("EXAMPLE 3 - Look-1 analysis output")
-print(state_ex3$mcpObj)
+print(state_ex3)
 
 # Setting up new weights and transition matrix for look 2
 new_w_ex3 <- c(H1 = 0.5, H2 = 0.25, H3 = 0.25)
@@ -223,5 +221,4 @@ state_ex3 <- AnalyzeLook_PC(
 )
 
 print("EXAMPLE 3 - analysis output for look 2")
-print(state_ex3$mcpObj)
-print(state_ex3$completion_reason)
+print(state_ex3)

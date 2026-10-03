@@ -99,6 +99,37 @@ testthat::test_that("Test 1: PC analysis API scaffolds", {
   testthat::expect_no_error(print(state))
 })
 
+testthat::test_that("print.PCAnalysisState reports setup and current-look results", {
+  state <- pc_fixture_2h(planned_info_frac = c(0.5, 1.0))
+
+  setup_output <- capture.output(print(state))
+  testthat::expect_true(any(grepl("Design Boundary:", setup_output, fixed = TRUE)))
+  testthat::expect_true(any(grepl("Inverse Normal Weights:", setup_output, fixed = TRUE)))
+  testthat::expect_true(any(grepl("No look-wise analysis has been performed yet.", setup_output, fixed = TRUE)))
+  testthat::expect_false(any(grepl("Adj P-values", setup_output, fixed = TRUE)))
+
+  state <- AnalyzeLook_PC_TestWrapper(
+    state,
+    p_raw = c(H1 = 0.10, H2 = 0.20),
+    plotGraphs = FALSE
+  )
+  look_one_output <- capture.output(print(state))
+  testthat::expect_true(any(grepl("Adj P-values for the intersection hypotheses at Look: 1", look_one_output, fixed = TRUE)))
+  testthat::expect_true(any(grepl("Final rejection status of primary hypotheses at Look: 1", look_one_output, fixed = TRUE)))
+  testthat::expect_false(any(grepl("Combined P-values", look_one_output, fixed = TRUE)))
+  testthat::expect_false(any(grepl("Analysis results for Look", look_one_output, fixed = TRUE)))
+  testthat::expect_false(any(grepl("Design Boundary:", look_one_output, fixed = TRUE)))
+
+  state <- AnalyzeLook_PC_TestWrapper(
+    state,
+    p_raw = c(H1 = 0.08, H2 = 0.12),
+    plotGraphs = FALSE
+  )
+  look_two_output <- capture.output(print(state))
+  testthat::expect_true(any(grepl("Combined P-values for the intersection hypotheses at Look: 2", look_two_output, fixed = TRUE)))
+  testthat::expect_true(any(grepl("Final rejection status of primary hypotheses at Look: 2", look_two_output, fixed = TRUE)))
+})
+
 ############
 # Test2 # COMPLETED
 testthat::test_that("Test 2: PC analysis API scaffolds (strategy modification)", {
@@ -350,8 +381,7 @@ testthat::test_that("AnalyzeLook_PC: look argument validation and error handling
 testthat::test_that("AnalyzeLook_PC: structural invariants hold across looks", {
   wi <- c(0.5, 0.5)
   g <- matrix(c(0, 1, 1, 0), byrow = TRUE, nrow = 2)
-  corr <- matrix(c(1, 0.5, 0.5, 1), byrow = TRUE, nrow = 2)
-
+  
   state <- SetupAnalysis_PC(
     WI = wi,
     G = g,

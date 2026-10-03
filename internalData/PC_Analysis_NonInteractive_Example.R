@@ -45,19 +45,6 @@ Correlation2 <- matrix(c(
 
 plotGraphs2 <- TRUE
 
-# adaptGMCP_PC(
-#   WI = WI2,
-#   G = G2,
-#   test.type = test.type2,
-#   alpha = alpha2,
-#   info_frac = info_frac2,
-#   typeOfDesign = typeOfDesign2,
-#   Correlation = Correlation2,
-#   Selection = T,
-#   UpdateStrategy = T,
-#   plotGraphs = plotGraphs2
-# )
-
 #--------------Setup Analysis------------------------
 state2 <- SetupAnalysis_PC(
   WI            = WI2,
@@ -71,35 +58,35 @@ state2 <- SetupAnalysis_PC(
 
 # Computed stopping boundaries from the planned design
 print("EXAMPLE 2 - Computed stopping boundaries after SetupAnalysis_PC():")
-print(state2$mcpObj$bdryTab)
+print(state2)
 
-# #===================================================================================
-# # SCENARIO (1): H1 is rejected at look 1 (its stopping boundary is crossed)
-# #===================================================================================
-# state2_s1 <- state2
+#===================================================================================
+# SCENARIO (1): H1 is rejected at look 1 (its stopping boundary is crossed)
+#===================================================================================
+state2_s1 <- state2
 
-# #--------------Look 1 Analysis-----------------------
-# # p1 is far below the look-1 efficacy boundary, so H1 is rejected.
-# state2_s1 <- AnalyzeLook_PC(
-#   state2_s1,
-#   look          = 1,
-#   p_raw         = c(H1 = 0.00001, H2 = 0.40),
-#   Correlation   = Correlation2,
-#   plotGraphs    = plotGraphs2
-# )
-# print("SCENARIO (1) - State after look 1 (expect H1 rejected):")
-# print(state2_s1)
+#--------------Look 1 Analysis-----------------------
+# p1 is far below the look-1 efficacy boundary, so H1 is rejected.
+state2_s1 <- AnalyzeLook_PC(
+  state2_s1,
+  look          = 1,
+  p_raw         = c(H1 = 0.00001, H2 = 0.40),
+  Correlation   = Correlation2,
+  plotGraphs    = plotGraphs2
+)
+print("SCENARIO (1) - State after look 1 (expect H1 rejected):")
+print(state2_s1)
 
-# #--------------Look 2 Analysis-----------------------
-# # H1 has been rejected, so only H2 remains active; supply p_raw for H2 only.
-# state2_s1 <- AnalyzeLook_PC(
-#   state2_s1,
-#   look          = 2,
-#   p_raw         = c(H2 = 0.20),
-#   plotGraphs    = plotGraphs2
-# )
-# print("SCENARIO (1) - Pre-specified stopping boundaries:")
-# print(state2_s1$mcpObj$bdryTab)
+#--------------Look 2 Analysis-----------------------
+# H1 has been rejected, so only H2 remains active; supply p_raw for H2 only.
+state2_s1 <- AnalyzeLook_PC(
+  state2_s1,
+  look          = 2,
+  p_raw         = c(H2 = 0.20),
+  plotGraphs    = plotGraphs2
+)
+print("SCENARIO (1) - Pre-specified stopping boundaries:")
+print(state2_s1)
 
 #===================================================================================
 # SCENARIO (2): No rejection at look 1; H2 dropped at look 2 (2-arm stage 2)
@@ -127,8 +114,8 @@ state2_s2 <- AnalyzeLook_PC(
   selection     = c("H1"),
   plotGraphs    = plotGraphs2
 )
-print("SCENARIO (2) - Pre-specified stopping boundaries:")
-print(state2_s2$mcpObj$bdryTab)
+print("SCENARIO (2) - Analysis output:")
+print(state2_s2)
 ###################################################################################
 
 ###################################################################################

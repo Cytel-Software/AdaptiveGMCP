@@ -41,47 +41,49 @@ print.PCAnalysisState <- function(x, ...) {
     stop("Invalid PCAnalysisState object")
   }
 
-  cat("\n")
-  cat("PCAnalysisState\n")
-  cat("- Looks completed:", x$completed_looks, "of", x$mcpObj$LastLook, "\n")
-  if (isTRUE(x$trial_completed)) {
-    status_msg <- if (is.null(x$completion_reason)) {
-      "TRIAL CONCLUDED"
-    } else {
-      switch(x$completion_reason,
-        "final_look" = "TRIAL CONCLUDED (final look reached)",
-        "early_stop_efficacy" = "TRIAL CONCLUDED (early stopping - efficacy criterion met)",
-        "all_hypotheses_dropped" = "TRIAL CONCLUDED (all hypotheses dropped)",
-        "TRIAL CONCLUDED"
-      )
-    }
-    cat("- Status:", status_msg, "\n")
-  }
-  cat("\n")
-
-  cat("Design Boundary:\n")
-  bdry <- x$mcpObj$bdryTab
-  colnames(bdry) <- c(
-    "Look", "InfoFrac", "Alpha(Incr.)",
-    "Boundary(Z)", "Boundary(P-Value)"
-  )
-  print(knitr::kable(bdry, align = "c"))
-  cat("\n")
-
-  cat("Inverse Normal Weights:\n")
-  print(knitr::kable(x$mcpObj$InvNormWeights, align = "c"))
-  cat("\n")
-
   if (x$completed_looks == 0) {
+    cat("Design Boundary:")
+    bdry <- x$mcpObj$bdryTab
+    colnames(bdry) <- c(
+      "Look", "InfoFrac", "Alpha(Incr.)",
+      "Boundary(Z)", "Boundary(P-Value)"
+    )
+    print(knitr::kable(bdry, align = "c"))
+    cat("\n")
+
+    cat("Inverse Normal Weights:")
+    print(knitr::kable(x$mcpObj$InvNormWeights, align = "c"))
+    cat("\n")
+
     cat("No look-wise analysis has been performed yet.\n\n")
     return(invisible(x))
   }
 
-  for (k in seq_len(x$completed_looks)) {
-    snap <- x$look_history[[k]]
-    if (is.null(snap) || is.null(snap$mcpObj)) next
-    ShowResults(snap$mcpObj)
+  mcpObj <- x$mcpObj
+  cat("Adj P-values for the intersection hypotheses at Look:", mcpObj$CurrentLook)
+  print(mcpObj$AdjPValueTable)
+  cat("\n")
+
+  if (mcpObj$CurrentLook > 1) {
+    cat("Combined P-values for the intersection hypotheses at Look:", mcpObj$CurrentLook)
+    print(mcpObj$CombinedPValuesTable)
+    cat("\n")
   }
+
+  cat("Final rejection status of primary hypotheses at Look:", mcpObj$CurrentLook)
+  status <- sapply(
+    mcpObj$rej_flag_Curr,
+    ifelse,
+    yes = "Rejected",
+    no = "Not_Rejected"
+  )
+  rej_df <- data.frame(
+    "Hypothesis" = names(status),
+    "Status" = status,
+    row.names = NULL
+  )
+  print(knitr::kable(rej_df, align = "c"))
+  cat("\n")
 
   return(invisible(x))
 }
