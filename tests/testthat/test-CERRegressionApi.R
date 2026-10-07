@@ -430,6 +430,101 @@ CaptureCerRegressionOutputsForTest <- function( lScenario )
   return( eCaptured$lLooks )
 }
 
+#' Extract fixture-compatible outputs from a non-interactive CER analysis state
+#'
+#' @param lState A `CERAnalysisState` returned by `AnalyzeLook_CER()`.
+#' @return A named list matching the legacy CER regression fixture structure.
+ExtractCerRegressionState <- function( lState )
+{
+  mAdjustedBoundary <- NA
+  if( is.list( lState$adaptation ) &&
+      !is.null( lState$adaptation$Stage2AdjBdry ) )
+  {
+    mAdjustedBoundary <- lState$adaptation$Stage2AdjBdry
+  }
+
+  mAdaptedCovariance <- NA
+  if( !is.null( lState$adapted_covariance ) )
+  {
+    mAdaptedCovariance <- lState$adapted_covariance
+  }
+
+  vCumulativeStage2PValues <- NA
+  if( !is.null( lState$cumulative_stage2_pvalues ) )
+  {
+    vCumulativeStage2PValues <- lState$cumulative_stage2_pvalues
+  }
+
+  return( list(
+    stage1_boundary = lState$results$stage1$planned_boundary$Stage1Bdry,
+    stage2_boundary = lState$results$stage1$planned_boundary$Stage2Bdry,
+    cumulative_stage2_pvalues = vCumulativeStage2PValues,
+    adjusted_boundary = mAdjustedBoundary,
+    final_rejection_status = lState$current_rejection,
+    stage1_intersect_test = lState$results$stage1$intersection_rejection,
+    stage1_primary_test = lState$results$stage1$primary_rejection,
+    active_hypotheses = lState$active_hypotheses,
+    selected_hypotheses = lState$selected_hypotheses,
+    dropped_flag = lState$dropped_hypotheses,
+    planned_sample_allocation = lState$planned_sample_allocation,
+    adapted_sample_allocation = lState$adapted_sample_allocation,
+    adapted_covariance = mAdaptedCovariance,
+    structured_cer_pcer = lState$results$stage1$cer_pcer
+  ) )
+}
+
+#' Run a CER regression scenario through the non-interactive analysis API
+#'
+#' @param lScenario A scenario returned by `BuildCerRegressionScenarios()`.
+#' @return A named list of fixture-compatible outputs for each completed look.
+CaptureNonInteractiveCerRegressionOutputs <- function( lScenario )
+{
+  lDesign <- SetupDesign_CER(
+    nArms = lScenario$nArms,
+    nEps = lScenario$nEps,
+    SampleSize = lScenario$sampleSize,
+    EpType = lScenario$epType,
+    sigma = lScenario$sigma,
+    CommonStdDev = lScenario$CommonStdDev,
+    prop.ctr = lScenario$prop.ctr,
+    allocRatio = lScenario$allocRatio,
+    WI = lScenario$WI,
+    G = lScenario$G,
+    test.type = lScenario$testType,
+    alpha = lScenario$alpha,
+    info_frac = lScenario$infoFrac,
+    typeOfDesign = lScenario$typeOfDesign,
+    plotGraphs = FALSE
+  )
+  lState <- NULL
+  lLooks <- list()
+
+  for( iLook in seq_along( lScenario$lookInputs ) )
+  {
+    lLookInput <- lScenario$lookInputs[[ iLook ]]
+    lArguments <- list(
+      design = lDesign,
+      state = lState,
+      p_raw = lLookInput$p_raw,
+      look = iLook,
+      selection = lLookInput$selection,
+      stage2_cumulative_sample_size =
+        lLookInput$stage2_cumulative_sample_size,
+      strategy_update = lLookInput$strategy_update,
+      plotGraphs = FALSE
+    )
+    lState <- do.call( AnalyzeLook_CER, lArguments )
+    lLooks[[ as.character( iLook ) ]] <- ExtractCerRegressionState( lState )
+
+    if( isTRUE( lState$trial_completed ) )
+    {
+      break
+    }
+  }
+
+  return( lLooks )
+}
+
 LoadCerRegressionFixtures <- function( strRowId )
 {
   vFiles <- Sys.glob( testthat::test_path( paste0( strRowId, ".regression.l*.rds" ) ) )
@@ -443,22 +538,72 @@ LoadCerRegressionFixtures <- function( strRowId )
   return( stats::setNames( lapply( vFiles, readRDS ), vLooks ) )
 }
 
-ExpectCerRegressionLookEqual <- function( lActual, lExpected )
+#' Compare one CER regression result with its legacy fixture
+#'
+#' @param lActual Actual fixture-compatible result.
+#' @param lExpected Expected legacy fixture result.
+#' @param strContext Optional scenario and look context for failure diagnostics.
+#' @return The testthat expectations, invisibly.
+ExpectCerRegressionLookEqual <- function(
+    lActual, lExpected, strContext = NULL )
 {
-  testthat::expect_equal( lActual$stage1_boundary, lExpected$stage1_boundary, tolerance = 1e-8 )
-  testthat::expect_equal( lActual$stage2_boundary, lExpected$stage2_boundary, tolerance = 1e-8 )
-  testthat::expect_equal( lActual$cumulative_stage2_pvalues, lExpected$cumulative_stage2_pvalues, tolerance = 1e-8 )
-  testthat::expect_equal( lActual$adjusted_boundary, lExpected$adjusted_boundary, tolerance = 1e-8 )
-  testthat::expect_equal( lActual$final_rejection_status, lExpected$final_rejection_status )
-  testthat::expect_equal( lActual$stage1_intersect_test, lExpected$stage1_intersect_test, tolerance = 1e-8 )
-  testthat::expect_equal( lActual$stage1_primary_test, lExpected$stage1_primary_test, tolerance = 1e-8 )
-  testthat::expect_equal( lActual$active_hypotheses, lExpected$active_hypotheses )
-  testthat::expect_equal( lActual$selected_hypotheses, lExpected$selected_hypotheses )
-  testthat::expect_equal( lActual$dropped_flag, lExpected$dropped_flag )
-  testthat::expect_equal( lActual$planned_sample_allocation, lExpected$planned_sample_allocation, tolerance = 1e-8 )
-  testthat::expect_equal( lActual$adapted_sample_allocation, lExpected$adapted_sample_allocation, tolerance = 1e-8 )
-  testthat::expect_equal( lActual$adapted_covariance, lExpected$adapted_covariance, tolerance = 1e-8 )
-  testthat::expect_equal( lActual$structured_cer_pcer, lExpected$structured_cer_pcer, tolerance = 1e-8 )
+  testthat::expect_equal(
+    lActual$stage1_boundary, lExpected$stage1_boundary,
+    tolerance = 1e-8, info = strContext
+  )
+  testthat::expect_equal(
+    lActual$stage2_boundary, lExpected$stage2_boundary,
+    tolerance = 1e-8, info = strContext
+  )
+  testthat::expect_equal(
+    lActual$cumulative_stage2_pvalues,
+    lExpected$cumulative_stage2_pvalues,
+    tolerance = 1e-8, info = strContext
+  )
+  testthat::expect_equal(
+    lActual$adjusted_boundary, lExpected$adjusted_boundary,
+    tolerance = 1e-8, info = strContext
+  )
+  testthat::expect_equal(
+    lActual$final_rejection_status, lExpected$final_rejection_status,
+    info = strContext
+  )
+  testthat::expect_equal(
+    lActual$stage1_intersect_test, lExpected$stage1_intersect_test,
+    tolerance = 1e-8, info = strContext
+  )
+  testthat::expect_equal(
+    lActual$stage1_primary_test, lExpected$stage1_primary_test,
+    tolerance = 1e-8, info = strContext
+  )
+  testthat::expect_equal(
+    lActual$active_hypotheses, lExpected$active_hypotheses,
+    info = strContext
+  )
+  testthat::expect_equal(
+    lActual$selected_hypotheses, lExpected$selected_hypotheses,
+    info = strContext
+  )
+  testthat::expect_equal(
+    lActual$dropped_flag, lExpected$dropped_flag,
+    info = strContext
+  )
+  testthat::expect_equal(
+    lActual$planned_sample_allocation, lExpected$planned_sample_allocation,
+    tolerance = 1e-8, info = strContext
+  )
+  testthat::expect_equal(
+    lActual$adapted_sample_allocation, lExpected$adapted_sample_allocation,
+    tolerance = 1e-8, info = strContext
+  )
+  testthat::expect_equal(
+    lActual$adapted_covariance, lExpected$adapted_covariance,
+    tolerance = 1e-8, info = strContext
+  )
+  testthat::expect_equal(
+    lActual$structured_cer_pcer, lExpected$structured_cer_pcer,
+    tolerance = 1e-8, info = strContext
+  )
 }
 
 lCerScenarios <- BuildCerRegressionScenarios()
@@ -582,3 +727,32 @@ testthat::test_that( "CER-AdaptExample2-01 matches fixture outputs", {
     ExpectCerRegressionLookEqual( lActual[[ strLook ]], lExpected[[ strLook ]] )
   }
 } )
+
+for( strScenarioId in names( lCerScenarios ) )
+{
+  testthat::test_that(
+    paste0( strScenarioId, " non-interactive API matches legacy fixture outputs" ),
+    {
+      lActual <- CaptureNonInteractiveCerRegressionOutputs(
+        lCerScenarios[[ strScenarioId ]]
+      )
+      lExpected <- LoadCerRegressionFixtures( strScenarioId )
+      strScenarioContext <- paste0( "scenario ", strScenarioId )
+
+      testthat::expect_equal(
+        names( lActual ),
+        names( lExpected ),
+        info = strScenarioContext
+      )
+
+      for( strLook in names( lExpected ) )
+      {
+        ExpectCerRegressionLookEqual(
+          lActual[[ strLook ]],
+          lExpected[[ strLook ]],
+          paste0( strScenarioContext, ", look ", strLook )
+        )
+      }
+    }
+  )
+}
