@@ -281,60 +281,6 @@ BuildCerRegressionScenarios <- function()
   ) )
 }
 
-ExtractCerRegressionLook <- function( mcpObj )
-{
-  mStage1Boundary <- NA
-  mStage2Boundary <- NA
-  vCumulativeStage2PValues <- NA
-  mAdjustedBoundary <- NA
-
-  if( is.list( mcpObj$Stage1Obj ) && is.list( mcpObj$Stage1Obj$plan_Bdry ) )
-  {
-    if( !is.null( mcpObj$Stage1Obj$plan_Bdry$Stage1Bdry ) )
-    {
-      mStage1Boundary <- mcpObj$Stage1Obj$plan_Bdry$Stage1Bdry
-    }
-
-    if( !is.null( mcpObj$Stage1Obj$plan_Bdry$Stage2Bdry ) )
-    {
-      mStage2Boundary <- mcpObj$Stage1Obj$plan_Bdry$Stage2Bdry
-    }
-  }
-
-  if( is.list( mcpObj$AdaptObj ) && !is.null( mcpObj$AdaptObj$Stage2AdjBdry ) )
-  {
-    mAdjustedBoundary <- mcpObj$AdaptObj$Stage2AdjBdry
-  }
-
-  if( !is.null( mcpObj$Stage2CumPValues ) )
-  {
-    vCumulativeStage2PValues <- mcpObj$Stage2CumPValues
-  }
-
-  mAdaptedCovariance <- NA
-  if( is.list( mcpObj$AdaptObj ) && !is.null( mcpObj$AdaptObj$Stage2Sigma ) )
-  {
-    mAdaptedCovariance <- mcpObj$AdaptObj$Stage2Sigma
-  }
-
-  return( list(
-    stage1_boundary = mStage1Boundary,
-    stage2_boundary = mStage2Boundary,
-    cumulative_stage2_pvalues = vCumulativeStage2PValues,
-    adjusted_boundary = mAdjustedBoundary,
-    final_rejection_status = mcpObj$rej_flag_Curr,
-    stage1_intersect_test = mcpObj$Stage1Obj$Stage1Analysis$IntersectHypoTest,
-    stage1_primary_test = mcpObj$Stage1Obj$Stage1Analysis$PrimaryHypoTest,
-    active_hypotheses = mcpObj$IndexSet,
-    selected_hypotheses = mcpObj$SelectedIndex,
-    dropped_flag = mcpObj$DroppedFlag,
-    planned_sample_allocation = mcpObj$AllocSampleSize,
-    adapted_sample_allocation = mcpObj$Stage2AllocSampleSize,
-    adapted_covariance = mAdaptedCovariance,
-    structured_cer_pcer = mcpObj$CERTab
-  ) )
-}
-
 LoadCerRegressionFixtures <- function( strRowId )
 {
   vFiles <- Sys.glob( testthat::test_path( paste0( strRowId, ".regression.l*.rds" ) ) )
