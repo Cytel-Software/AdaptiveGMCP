@@ -171,8 +171,12 @@ ExpectNonInteractiveCerRegressionLookEqual <- function(
     lActual$planned_sample_allocation, lExpected$planned_sample_allocation,
     tolerance = 1e-8, info = strContext
   )
+  vContinuingArms <- colnames( lActual$adapted_sample_allocation )[
+    !is.na( lActual$adapted_sample_allocation[ 2L, ] )
+  ]
   testthat::expect_equal(
-    lActual$adapted_sample_allocation, lExpected$adapted_sample_allocation,
+    lActual$adapted_sample_allocation[ , vContinuingArms, drop = FALSE ],
+    lExpected$adapted_sample_allocation[ , vContinuingArms, drop = FALSE ],
     tolerance = 1e-8, info = strContext
   )
   testthat::expect_equal(

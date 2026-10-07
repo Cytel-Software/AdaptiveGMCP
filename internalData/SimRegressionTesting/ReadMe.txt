@@ -22,3 +22,6 @@ Use this as baseline simulation output for regression testing of PC and CER simu
 "Out_Mixed-2OrMoreEPs_15Sep26-Sim1=50, Sim2=25, all models.csv"
 Result: All output matched perfectly with the baseline. The only differences between the two CSV files are in the "HoursTaken" column, which is expected.
 
+IMPORTANT: this test purposely makes use of a limited number of simulations. In the past, we have executed these
+test cases with much larger number of simulations like 20000 on the HPC machine. However, that takes a very long time
+to complete. So, as a part of regression testing, we have fixed much smaller number of simulations above.
