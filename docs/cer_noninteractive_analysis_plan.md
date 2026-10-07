@@ -204,16 +204,21 @@ will pause for clarification rather than inventing inputs.
 7. Add tests for `adaptGMCP_CER()` for any new scenarios discovered while doing 1 to 5. Done — 4 new scenarios and `test_that()` blocks added.
 8. Add corresponding tests for the new non-interactive CER analysis API using
    the same scenarios as for `adaptGMCP_CER()`. Done in issue #190 by running
-   all 10 shared scenarios through `SetupDesign_CER()` and `AnalyzeLook_CER()`.
+   all 10 shared scenarios through `SetupDesign_CER()` and `AnalyzeLook_CER()`
+   in a dedicated test file.
 9. Make sure that the new non-interactive API gives the same output as
    `adaptGMCP_CER()` for the same scenario. Done using the existing per-look
-   legacy fixtures and shared numerical assertions, including selection,
+   legacy fixtures and API-specific numerical assertions, including selection,
    sample-size adaptation, strategy adaptation, and Stage 1-only paths.
+   The assertions compare only equivalent outputs when the APIs intentionally
+   represent unavailable arms or unadapted Stage 2 artifacts differently.
 
 #### Phase 1 Results: Scenario Matrix
 
-All 10 scenarios live in `internalData/GenerateCERRegressionFixtures.R` and
-`tests/testthat/test-CERRegressionApi.R`.
+All 10 scenarios live in `internalData/GenerateCERRegressionFixtures.R`, with
+shared helpers in `tests/testthat/helper-CERRegressionApi.R`, legacy tests in
+`tests/testthat/test-CERRegressionApi.R`, and non-interactive tests in
+`tests/testthat/test-CERNonInteractiveApi.R`.
 
 | rowId | Source | Notes |
 |---|---|---|

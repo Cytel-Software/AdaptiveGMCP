@@ -14,8 +14,8 @@
 
 * CER adapted-boundary analysis now derives stage-2 allocation ratios from
   incremental stage-2 accrual, matching the simulation workflow.
-* CER stage-2 analysis now preserves planned cumulative allocation values for
-  arms without continuing hypotheses, matching the legacy analysis output.
+* CER stage-2 analysis marks arms without continuing hypotheses unavailable
+  after selection or sample-size adaptation, preserving simulation compatibility.
 
 * `SetupAnalysis_PC()` now initializes the hypothesis map used to validate
   interim hypothesis selection.
