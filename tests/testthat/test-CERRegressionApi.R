@@ -455,21 +455,37 @@ ExtractCerRegressionState <- function( lState )
     vCumulativeStage2PValues <- lState$cumulative_stage2_pvalues
   }
 
+  lFinalRejectionStatus <- lState$results$stage1$primary_rejection
+  vActiveHypotheses <- lState$active_hypotheses
+  if( lState$completed_looks == 2L )
+  {
+    lFinalRejectionStatus <- lState$results$stage2$primary_rejection
+    vActiveHypotheses <- names( lState$incremental_stage2_pvalues )[
+      !is.na( lState$incremental_stage2_pvalues )
+    ]
+  }
+
+  vSelectedHypotheses <- lState$selected_hypotheses
+  if( length( vSelectedHypotheses ) == 0L )
+  {
+    vSelectedHypotheses <- NULL
+  }
+
   return( list(
     stage1_boundary = lState$results$stage1$planned_boundary$Stage1Bdry,
     stage2_boundary = lState$results$stage1$planned_boundary$Stage2Bdry,
     cumulative_stage2_pvalues = vCumulativeStage2PValues,
     adjusted_boundary = mAdjustedBoundary,
-    final_rejection_status = lState$current_rejection,
+    final_rejection_status = lFinalRejectionStatus,
     stage1_intersect_test = lState$results$stage1$intersection_rejection,
     stage1_primary_test = lState$results$stage1$primary_rejection,
-    active_hypotheses = lState$active_hypotheses,
-    selected_hypotheses = lState$selected_hypotheses,
+    active_hypotheses = vActiveHypotheses,
+    selected_hypotheses = vSelectedHypotheses,
     dropped_flag = lState$dropped_hypotheses,
     planned_sample_allocation = lState$planned_sample_allocation,
     adapted_sample_allocation = lState$adapted_sample_allocation,
     adapted_covariance = mAdaptedCovariance,
-    structured_cer_pcer = lState$results$stage1$cer_pcer
+    structured_cer_pcer = lState$results$stage1$cer_pcer$table
   ) )
 }
 
@@ -513,7 +529,18 @@ CaptureNonInteractiveCerRegressionOutputs <- function( lScenario )
       strategy_update = lLookInput$strategy_update,
       plotGraphs = FALSE
     )
-    lState <- do.call( AnalyzeLook_CER, lArguments )
+    lState <- try( do.call( AnalyzeLook_CER, lArguments ), silent = TRUE )
+    if( inherits( lState, "try-error" ) )
+    {
+      stop(
+        paste0(
+          "Non-interactive CER regression scenario ", lScenario$rowId,
+          " failed at look ", iLook, ": ",
+          conditionMessage( attr( lState, "condition" ) )
+        ),
+        call. = FALSE
+      )
+    }
     lLooks[[ as.character( iLook ) ]] <- ExtractCerRegressionState( lState )
 
     if( isTRUE( lState$trial_completed ) )

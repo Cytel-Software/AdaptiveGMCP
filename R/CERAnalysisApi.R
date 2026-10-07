@@ -719,10 +719,6 @@ AnalyzeLook_CER <- function(
       ] - 1L
     )
   )
-  if( bHasSelection || bHasSampleAdaptation )
-  {
-    mStage2Allocation[ 2L, setdiff( colnames( mStage2Allocation ), vRequiredArms ) ] <- NA_real_
-  }
   mcpObj$Stage2AllocSampleSize <- mStage2Allocation
   mStage2Increment <- mStage2Allocation
   mStage2Increment[ 2L, ] <- mStage2Increment[ 2L, ] -

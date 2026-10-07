@@ -14,6 +14,8 @@
 
 * CER adapted-boundary analysis now derives stage-2 allocation ratios from
   incremental stage-2 accrual, matching the simulation workflow.
+* CER stage-2 analysis now preserves planned cumulative allocation values for
+  arms without continuing hypotheses, matching the legacy analysis output.
 
 * `SetupAnalysis_PC()` now initializes the hypothesis map used to validate
   interim hypothesis selection.
@@ -33,6 +35,9 @@
 
 ## Quality Improvements
 
+* Added fixture-driven numerical equivalence tests between `adaptGMCP_CER()`
+  and the non-interactive `SetupDesign_CER()`/`AnalyzeLook_CER()` workflow
+  across all shared CER regression scenarios.
 * Added reusable PC API test fixtures/assertion helpers and expanded
   `SetupAnalysis_PC()`/`AnalyzeLook_PC()`/`PlotAnalysisGraph()` test coverage:
   state-transition and completion-semantics tests (`completion_reason`,

@@ -177,7 +177,7 @@ will pause for clarification rather than inventing inputs.
    baseline: `devtools::test(filter = 'CER')` → 75 passed, 0 failed.
 3. Keep this document updated as the living scope and progress ledger. Ongoing.
 
-### Phase 1: Equivalence Baseline and Scenario Coverage — **Steps 1-7 complete (2026-09-10); steps 8-9 deferred**
+### Phase 1: Equivalence Baseline and Scenario Coverage — **Complete (2026-10-07)**
 
 1. Inventory every active `adaptGMCP_CER()` call. Done.
 2. Convert each console workflow into a complete deterministic scenario. Done —
@@ -203,13 +203,12 @@ will pause for clarification rather than inventing inputs.
 6. Review any existing tests for `adaptGMCP_CER()` that already exist and do not duplicate them while doing 1 to 5. Done — extended rather than duplicated.
 7. Add tests for `adaptGMCP_CER()` for any new scenarios discovered while doing 1 to 5. Done — 4 new scenarios and `test_that()` blocks added.
 8. Add corresponding tests for the new non-interactive CER analysis API using
-   the same scenarios as for `adaptGMCP_CER()`. Implemented in
-   `test-CERAnalysisApi.R`, including baseline, selection/sample-size/strategy
-   adaptation, and invalid-input coverage.
+   the same scenarios as for `adaptGMCP_CER()`. Done in issue #190 by running
+   all 10 shared scenarios through `SetupDesign_CER()` and `AnalyzeLook_CER()`.
 9. Make sure that the new non-interactive API gives the same output as
-   `adaptGMCP_CER()` for the same scenario. The shared planning helper and
-   CER regression suite now provide numerical parity for the covered baseline
-   paths; fixture-by-fixture review remains part of the parent review checkpoint.
+   `adaptGMCP_CER()` for the same scenario. Done using the existing per-look
+   legacy fixtures and shared numerical assertions, including selection,
+   sample-size adaptation, strategy adaptation, and Stage 1-only paths.
 
 #### Phase 1 Results: Scenario Matrix
 
