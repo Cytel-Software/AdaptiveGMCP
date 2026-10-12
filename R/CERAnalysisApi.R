@@ -516,6 +516,7 @@ SetupDesign_CER <- function(
     planned_covariance = dSigma,
     plan_boundary = lPlanBoundary,
     planned_boundary = lPlanBoundary,
+    lPlanned = lPlanned,
     mvtnorm_algo = mvtnorm_algo,
     plot_text = getPlotText( mHypoMap )
   ) )
@@ -585,7 +586,8 @@ AnalyzeLook_CER <- function(
       Stage1Pvalues = mcpObj$p_raw, HypoMap = design$hypothesis_map,
       CommonStdDev = design$CommonStdDev, WH = design$intersection_weights,
       mvtnorm_algo = design$mvtnorm_algo,
-      userAlphaSpending = design$userAlphaSpending
+      userAlphaSpending = design$userAlphaSpending,
+      lPlannedDesign = design$lPlanned
     )
     mcpObj$Stage1Obj <- lStage1$Stage1Obj
     mcpObj$AllocSampleSize <- lStage1$Stage1Obj$AllocSampleSize

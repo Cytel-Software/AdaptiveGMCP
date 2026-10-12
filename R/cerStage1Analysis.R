@@ -38,18 +38,25 @@ ComputeCERPlannedDesign <- function(
 PerformStage1Test <- function(nArms, nEps, EpType, nLooks, nHypothesis, 
     sigma, prop.ctr, allocRatio, SampleSize, alpha, info_frac, typeOfDesign, 
     deltaWT, deltaPT1, gammaA, des.type, test.type, Stage1Pvalues, HypoMap,
-    CommonStdDev, WH, mvtnorm_algo, userAlphaSpending = NULL) {
-  lPlanned <- ComputeCERPlannedDesign(
-    nEps = nEps, nLooks = nLooks, nHypothesis = nHypothesis,
-    EpType = EpType, sigma = sigma, prop.ctr = prop.ctr,
-    allocRatio = allocRatio, SampleSize = SampleSize, alpha = alpha,
-    info_frac = info_frac, typeOfDesign = typeOfDesign, deltaWT = deltaWT,
-    deltaPT1 = deltaPT1, gammaA = gammaA,
-    userAlphaSpending = userAlphaSpending, test.type = test.type,
-    HypoMap = HypoMap, CommonStdDev = CommonStdDev, WH = WH,
-    mvtnorm_algo = mvtnorm_algo,
-    compute_covariance = test.type %in% c( "Partly-Parametric", "Parametric" )
-  )
+    CommonStdDev, WH, mvtnorm_algo, userAlphaSpending = NULL,
+    lPlannedDesign = NULL) {
+  if( is.null( lPlannedDesign ) )
+  {
+    lPlanned <- ComputeCERPlannedDesign(
+      nEps = nEps, nLooks = nLooks, nHypothesis = nHypothesis,
+      EpType = EpType, sigma = sigma, prop.ctr = prop.ctr,
+      allocRatio = allocRatio, SampleSize = SampleSize, alpha = alpha,
+      info_frac = info_frac, typeOfDesign = typeOfDesign, deltaWT = deltaWT,
+      deltaPT1 = deltaPT1, gammaA = gammaA,
+      userAlphaSpending = userAlphaSpending, test.type = test.type,
+      HypoMap = HypoMap, CommonStdDev = CommonStdDev, WH = WH,
+      mvtnorm_algo = mvtnorm_algo,
+      compute_covariance = test.type %in% c( "Partly-Parametric", "Parametric" )
+    )
+  } else
+  {
+    lPlanned <- lPlannedDesign
+  }
   SS_alloc <- lPlanned$allocation
   SS_Cum <- SS_alloc$CumulativeSamples
   Sigma <- lPlanned$Sigma
