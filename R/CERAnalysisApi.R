@@ -545,7 +545,6 @@ SetupDesign_CER <- function(
 #' @param look Optional look number, which must match the next look.
 #' @param selection Hypotheses retained for look 2.
 #' @param new_sample_size Cumulative stage-2 sample sizes, named by arm.
-#' @param stage2_cumulative_sample_size Alias for `new_sample_size`.
 #' @param new_weights New weights for the continuing hypotheses.
 #' @param new_G New transition matrix for the continuing hypotheses.
 #' @param strategy_update Optional list containing `new_weights` and `new_G`.
@@ -554,7 +553,7 @@ SetupDesign_CER <- function(
 #' @export
 AnalyzeLook_CER <- function(
     design, state = NULL, p_raw, look = NULL, selection = NULL,
-    new_sample_size = NULL, stage2_cumulative_sample_size = NULL,
+  new_sample_size = NULL,
     new_weights = NULL, new_G = NULL, strategy_update = NULL,
     plotGraphs = FALSE )
 {
@@ -659,15 +658,8 @@ AnalyzeLook_CER <- function(
     mcpObj <- applySelection( mcpObj, selected_hyps = selection, look = 2L )
   }
 
-  bHasSampleAdaptation <- !is.null( new_sample_size ) ||
-    !is.null( stage2_cumulative_sample_size )
-  if( bHasSampleAdaptation &&
-      !is.null( new_sample_size ) && !is.null( stage2_cumulative_sample_size ) )
-  {
-    stop( "Specify only one of new_sample_size and stage2_cumulative_sample_size." )
-  }
+  bHasSampleAdaptation <- !is.null( new_sample_size )
   vNewSample <- new_sample_size
-  if( is.null( vNewSample ) ) vNewSample <- stage2_cumulative_sample_size
   mStage2Allocation <- design$allocation$cumulative
   if( bHasSampleAdaptation )
   {

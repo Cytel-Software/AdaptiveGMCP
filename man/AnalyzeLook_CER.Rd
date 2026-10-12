@@ -11,7 +11,6 @@ AnalyzeLook_CER(
   look = NULL,
   selection = NULL,
   new_sample_size = NULL,
-  stage2_cumulative_sample_size = NULL,
   new_weights = NULL,
   new_G = NULL,
   strategy_update = NULL,
@@ -30,8 +29,6 @@ AnalyzeLook_CER(
 \item{selection}{Hypotheses retained for look 2.}
 
 \item{new_sample_size}{Cumulative stage-2 sample sizes, named by arm.}
-
-\item{stage2_cumulative_sample_size}{Alias for `new_sample_size`.}
 
 \item{new_weights}{New weights for the continuing hypotheses.}
 
