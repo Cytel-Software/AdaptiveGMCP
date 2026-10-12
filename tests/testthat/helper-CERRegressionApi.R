@@ -75,7 +75,7 @@ BuildCerRegressionScenarios <- function()
       list( p_raw = c( H1 = 0.0001, H2 = 0.2 ) ),
       list(
         p_raw = c( H2 = 0.01 ),
-        stage2_cumulative_sample_size = c( Control = 125, Treatment1 = 125, Treatment2 = 125 )
+        new_sample_size = c( Control = 125, Treatment1 = 125, Treatment2 = 125 )
       )
     )
   )
@@ -177,7 +177,7 @@ BuildCerRegressionScenarios <- function()
       list(
         p_raw = c( H2 = 0.0299, H4 = 0.0586 ),
         selection = c( "H2", "H4" ),
-        stage2_cumulative_sample_size = c( Control = 88, Treatment2 = 87 ),
+        new_sample_size = c( Control = 88, Treatment2 = 87 ),
         strategy_update = list(
           new_weights = c( H2 = 0.5, H4 = 0.5 ),
           new_G = matrix( c( 0, 1, 1, 0 ), nrow = 2, byrow = TRUE )

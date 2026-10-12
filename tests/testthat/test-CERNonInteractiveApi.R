@@ -94,8 +94,7 @@ CaptureNonInteractiveCerRegressionOutputs <- function( lScenario )
       p_raw = lLookInput$p_raw,
       look = iLook,
       selection = lLookInput$selection,
-      stage2_cumulative_sample_size =
-        lLookInput$stage2_cumulative_sample_size,
+      new_sample_size = lLookInput$new_sample_size,
       strategy_update = lLookInput$strategy_update,
       plotGraphs = FALSE
     )

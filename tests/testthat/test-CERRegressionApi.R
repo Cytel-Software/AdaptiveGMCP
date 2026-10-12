@@ -126,7 +126,7 @@ CaptureCerRegressionOutputsForTest <- function( lScenario )
     do_ModifyStage2Sample = function( allocRatio, ArmsPresent, AllocSampleSize )
     {
       nNextLook <- as.integer( length( eCaptured$lLooks ) + 1L )
-      vStage2SampleSize <- lScenario$lookInputs[[ nNextLook ]]$stage2_cumulative_sample_size
+      vStage2SampleSize <- lScenario$lookInputs[[ nNextLook ]]$new_sample_size
 
       if( is.null( vStage2SampleSize ) )
       {

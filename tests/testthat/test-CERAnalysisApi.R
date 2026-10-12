@@ -303,6 +303,9 @@ testthat::test_that( "CER API rejects invalid design and look inputs", {
                                           Treatment2 = 1 ) ),
     "Look 1"
   )
+  testthat::expect_false(
+    "stage2_cumulative_sample_size" %in% names( formals( AnalyzeLook_CER ) )
+  )
   state$planned_sample_allocation <- state$planned_sample_allocation[ , -1L,
                                                                        drop = FALSE ]
   testthat::expect_error(

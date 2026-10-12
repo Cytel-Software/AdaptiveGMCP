@@ -7,6 +7,10 @@
 
 ## Corrections
 
+* Removed the duplicate `stage2_cumulative_sample_size` argument from
+  `AnalyzeLook_CER()`; cumulative Look 2 sample-size adaptations now use
+  `new_sample_size` exclusively.
+
 * Non-interactive CER Look 1 analysis now reuses the planned design computed by
   `SetupDesign_CER()` instead of recalculating it; the legacy interactive CER
   API retains its existing planning behavior.

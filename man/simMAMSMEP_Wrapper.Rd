@@ -6,7 +6,7 @@
 Ani: Added sOutPath so that output can be written to the CSV file after every scenario
 is simulated rather than at the end of all scenarios.}
 \usage{
-simMAMSMEP_Wrapper(InputDF, sOutPath)
+simMAMSMEP_Wrapper(InputDF, sOutPath, DumpSimOutToRDS = FALSE)
 }
 \arguments{
 \item{InputDF}{R Dataframe: This is the csv/excel input data in the R dataframe format}
