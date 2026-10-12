@@ -7,6 +7,10 @@
 
 ## Corrections
 
+* Non-interactive CER Look 1 analysis now reuses the planned design computed by
+  `SetupDesign_CER()` instead of recalculating it; the legacy interactive CER
+  API retains its existing planning behavior.
+
 * Improved `print.PCAnalysisState()` output so setup states show the design
   boundary and inverse-normal weights, while analyzed states show only the
   current look's adjusted p-values, combined p-values when applicable, and

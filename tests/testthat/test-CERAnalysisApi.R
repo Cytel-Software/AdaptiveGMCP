@@ -21,8 +21,35 @@ testthat::test_that( "SetupDesign_CER creates a design-only object", {
 
   testthat::expect_s3_class( d, "CERDesign" )
   testthat::expect_equal( dim( d$plan_boundary$Stage1Bdry ), c( 3L, 2L ) )
+  testthat::expect_identical( d$lPlanned$plan_boundary, d$plan_boundary )
   testthat::expect_false( "completed_looks" %in% names( d ) )
   testthat::expect_false( "p_raw" %in% names( d ) )
+} )
+
+testthat::test_that( "CER Look 1 reuses the planned design", {
+  d <- SetupDesign_CER(
+    nArms = 3,
+    nEps = 1,
+    SampleSize = 300,
+    EpType = list( EP1 = "Continuous" ),
+    sigma = list( EP1 = c( 1, 1, 1 ) ),
+    CommonStdDev = TRUE,
+    prop.ctr = list( EP1 = NA ),
+    allocRatio = c( 1, 1, 1 ),
+    WI = c( 0.5, 0.5 ),
+    G = matrix( c( 0, 1, 1, 0 ), nrow = 2, byrow = TRUE ),
+    test.type = "Parametric"
+  )
+
+  state <- testthat::with_mocked_bindings(
+    AnalyzeLook_CER( d, p_raw = c( H1 = 0.1, H2 = 0.2 ) ),
+    ComputeCERPlannedDesign = function( ... )
+    {
+      stop( "ComputeCERPlannedDesign should not be called for a CERDesign." )
+    }
+  )
+
+  testthat::expect_s3_class( state, "CERAnalysisState" )
 } )
 
 testthat::test_that( "CER API advances two looks without console input", {
