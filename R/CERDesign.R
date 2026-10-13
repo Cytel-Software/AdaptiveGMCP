@@ -4,6 +4,8 @@
 #
 # --------------------------------------------------------------------------------------------------
 
+# Construct a CERDesign object from normalized planning `fields`.
+# Return the same list with the class attribute used by the S3 print method.
 new_cer_design <- function(fields)
 {
   if( !is.list( fields ) )
@@ -35,6 +37,8 @@ print.CERDesign <- function( x, ... )
   cat( "- Looks:", length( x$info_frac ), "\n" )
   cat( "- Test:", x$test.type, "\n" )
   cat( "- Alpha:", x$alpha, "\n" )
+  # The allocation and boundary tables summarize the quantities that were
+  # fixed during planning and are not changed by later analysis state.
   cat( "\nPlanned cumulative sample allocation:\n" )
   print( x$allocation$cumulative )
   cat( "\n" )
