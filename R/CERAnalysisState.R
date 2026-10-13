@@ -4,6 +4,8 @@
 #
 # --------------------------------------------------------------------------------------------------
 
+# Construct a CERAnalysisState object from the validated list of `fields`.
+# Return the same list with the class attribute used by the S3 print method.
 new_cer_analysis_state <- function( fields )
 {
   if( !is.list( fields ) )
@@ -43,6 +45,8 @@ print.CERAnalysisState <- function( x, ... )
 
   if( x$completed_looks == 1L && !is.null( x$results$stage1 ) )
   {
+    # Look 1 exposes the raw p-values and the structured CER/PCER summary
+    # that informs any subsequent adaptation.
     cat("\n Stage 1 raw p-values:\n")
     print(x$p_stage1)
     cat("\nStage 1 primary decisions:\n")
@@ -53,6 +57,8 @@ print.CERAnalysisState <- function( x, ... )
   }
   if( x$completed_looks > 1L && !is.null( x$results$stage2 ) )
   {
+    # At the final look, report the incremental p-values supplied for stage 2
+    # and the resulting primary decisions.
     cat("\n Stage 2 raw p-values:\n")
     print(x$incremental_stage2_pvalues)
     cat("\nStage 2 primary decisions:\n")

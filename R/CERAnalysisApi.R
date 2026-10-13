@@ -4,6 +4,9 @@
 #
 # --------------------------------------------------------------------------------------------------
 
+# Validate one integer-valued scalar used by the public CER API.
+# Parameters are the value, its argument name for error reporting, and its
+# inclusive lower bound. Return the validated value as an integer.
 .cer_validate_scalar_integer <- function( x, arg_name, minimum )
 {
   if( length( x ) != 1L || !is.numeric( x ) || is.na( x ) ||
@@ -14,6 +17,11 @@
   return( as.integer( x ) )
 }
 
+# Validate the complete set of inputs required to construct a CER design.
+# Parameters are the design dimensions, endpoint inputs, graph inputs, testing
+# settings, information fractions, spending settings, and optional user
+# spending vector. Return invisibly after checking all domains and restrictions
+# so downstream planning helpers can assume consistent inputs.
 .cer_validate_design_inputs <- function(
     nArms, nEps, SampleSize, EpType, sigma, CommonStdDev, prop.ctr, allocRatio,
     WI, G, test.type, alpha, info_frac, typeOfDesign,
@@ -48,6 +56,8 @@
   {
     stop( "CommonStdDev must be a single logical value." )
   }
+  # Endpoint-specific checks differ because continuous endpoints use sigma,
+  # whereas binary endpoints use the control response proportion.
   for( iEndpoint in seq_len( nEps ) )
   {
     if( EpType[[ iEndpoint ]] == "Continuous" )
@@ -138,6 +148,9 @@
   return( invisible( TRUE ) )
 }
 
+# Build the legacy MCP-shaped list consumed by the existing CER analysis
+# helpers from `design`, an immutable CERDesign object. Return the initialized
+# mutable analysis list.
 .cer_plan_mcp <- function( design )
 {
   vHypotheses <- design$hypothesis_names
@@ -184,6 +197,9 @@
   ) )
 }
 
+# Reconstruct the MCP-shaped analysis object from `design` and persisted
+# `state`, so look-2 helpers receive the same fields that were available at
+# look 1. Return the reconstructed mutable analysis list.
 .cer_state_mcp <- function( design, state )
 {
   mcpObj <- .cer_plan_mcp( design )
@@ -215,12 +231,16 @@
   return( mcpObj )
 }
 
+# Match current intersection weights `wh` to corresponding rows in planned
+# weights `planned_wh` and `boundary`, preserving current intersection order.
+# Return the selected boundary rows.
 .cer_map_boundary_rows <- function( wh, planned_wh, boundary )
 {
   if( nrow( wh ) == 0L )
   {
     return( boundary[ numeric( 0 ), , drop = FALSE ] )
   }
+  # Encode each intersection by its hypothesis indicator pattern for matching.
   vCurrent <- apply( wh[ , grep( "^H", names( wh ) ), drop = FALSE ], 1L,
     paste0, collapse = "" )
   vPlanned <- apply( planned_wh[ , grep( "^H", names( planned_wh ) ), drop = FALSE ],
@@ -233,6 +253,9 @@
   return( boundary[ vIndex, , drop = FALSE ] )
 }
 
+# Calculate structured CER/PCER results for `design` using surviving
+# intersections `wh`, stage-1 p-values `p_stage1`, and planned `boundary`.
+# Return the structured CER/PCER result or an empty result when none remain.
 .cer_structured_cer <- function( design, wh, p_stage1, boundary )
 {
   if( nrow( wh ) == 0L )
@@ -263,6 +286,9 @@
   ) )
 }
 
+# Validate and order look-2 incremental p-values `p_raw` for the
+# `active_hypotheses`, using `initial_hypotheses` as the accepted full set.
+# Return p-values ordered by the active hypotheses.
 .cer_validate_stage2_pvalues <- function( p_raw, active_hypotheses, initial_hypotheses )
 {
     p_non_missing <- p_raw[ !is.na( p_raw ) ]
@@ -292,6 +318,8 @@
   )
 }
 
+# Confirm that persisted `state` is compatible with `design` before applying
+# look-2 decisions. Return invisibly after all compatibility checks pass.
 .cer_validate_state_compatibility <- function( design, state )
 {
   if( !identical( names( state$current_rejection ), design$hypothesis_names ) ||
@@ -323,6 +351,9 @@
   return( invisible( TRUE ) )
 }
 
+# Convert `design`, the look-1 MCP object `mcpObj`, stage-1 result `stage1`,
+# and structured CER result `cer_result` into the public state object used to
+# continue the trial. Return a CERAnalysisState with its look-1 history.
 .cer_new_state <- function( design, mcpObj, stage1, cer_result )
 {
   lPrimary <- stage1$Stage1Obj$Stage1Analysis$PrimaryHypoTest
@@ -335,6 +366,8 @@
   mcpObj$rej_flag_Curr <- vRejected
   mcpObj$IndexSet <- vActive
 
+  # Keep both the current analysis fields and user-facing results so later
+  # calls can resume without recomputing look 1.
   state <- list(
     completed_looks = 1L,
     active_hypotheses = vActive,
@@ -454,6 +487,8 @@ SetupDesign_CER <- function(
     userAlphaSpending = userAlphaSpending
   )
 
+  # Normalize names and derive the hypothesis map before calling the shared
+  # planning routines.
   nArms <- as.integer( nArms )
   nEps <- as.integer( nEps )
   nHypothesis <- nEps * ( nArms - 1L )
@@ -480,6 +515,8 @@ SetupDesign_CER <- function(
   dSigma <- lPlanned$Sigma
   lPlanBoundary <- lPlanned$plan_boundary
 
+  # Store both normalized inputs and derived planning objects in one immutable
+  # container used by both analysis looks.
   design <- new_cer_design( list(
     nArms = nArms,
     nEps = nEps,
@@ -523,6 +560,7 @@ SetupDesign_CER <- function(
 
   if( isTRUE( plotGraphs ) )
   {
+    # Plotting is opt-in so design construction remains non-interactive.
     plotGraph(
       HypothesisName = vHypotheses, w = WI, G = G,
       activeStatus = rep( TRUE, nHypothesis ),
@@ -563,7 +601,7 @@ AnalyzeLook_CER <- function(
   }
   if( is.null( state ) )
   {
-    # Look 1 analysis computation
+    # Look 1 computes the planned stage-1 test and initializes resumable state.
     if( !is.null( look ) && ( length( look ) != 1L || look != 1L ) )
     {
       stop( "look must be 1 when state is NULL." )
@@ -595,6 +633,8 @@ AnalyzeLook_CER <- function(
     names( vRejected ) <- design$hypothesis_names
     if( any( vRejected ) )
     {
+      # Remove intersections that depend only on hypotheses already rejected
+      # before calculating the structured CER summary.
       mcpObj$WH <- mcpObj$WH[
         rowSums( mcpObj$WH[ names( vRejected )[ vRejected ] ], na.rm = TRUE ) == 0,
         , drop = FALSE
@@ -613,7 +653,7 @@ AnalyzeLook_CER <- function(
     return( state )
   }
 
-  # Look 2 analysis computation follows
+  # Look 2 resumes the saved state and applies optional adaptations in order.
   if( !inherits( state, "CERAnalysisState" ) )
   {
     stop( "state must be NULL or a CERAnalysisState object." )
@@ -655,6 +695,8 @@ AnalyzeLook_CER <- function(
       return( state )
     }
 
+    # Selection changes the active hypothesis set before sample-size or graph
+    # adaptation is evaluated.
     mcpObj <- applySelection( mcpObj, selected_hyps = selection, look = 2L )
   }
 
@@ -669,6 +711,8 @@ AnalyzeLook_CER <- function(
     {
       stop( "new_sample_size must be a named finite positive numeric vector." )
     }
+    # Derive incremental stage-2 allocation ratios from cumulative sample sizes;
+    # the CER adaptation routines require positive ratios for every continuing arm.
     vArmNames <- colnames( mStage2Allocation )
     if( any( !names( vNewSample ) %in% vArmNames ) ||
         anyDuplicated( names( vNewSample ) ) )
@@ -752,6 +796,8 @@ AnalyzeLook_CER <- function(
   bAdapted <- bHasSelection || bHasSampleAdaptation || bHasStrategyAdaptation
   if( bAdapted )
   {
+    # Recalibrate boundaries and covariance only when a look-2 adaptation
+    # changes the originally planned information structure.
     mcpObj$AdaptObj <- adaptBdryCER(
       mcpObj = mcpObj, mvtnorm_algo = design$mvtnorm_algo
     )
@@ -783,6 +829,8 @@ AnalyzeLook_CER <- function(
     dStage2Info <- ( 1 / mIncrement[ 2L, iArm[ 1L ] ] +
       1 / mIncrement[ 2L, iArm[ 2L ] ] )^(-1)
     dInfo[ iHypothesis ] <- dStage1Info / ( dStage1Info + dStage2Info )
+    # Combine independent stage-wise z statistics into a cumulative p-value
+    # using the information fraction implied by the two-stage allocation.
     dCumulative[ iHypothesis ] <- 1 - pnorm(
       sqrt( dInfo[ iHypothesis ] ) * qnorm( 1 - state$p_stage1[ iHypothesis ] ) +
         sqrt( 1 - dInfo[ iHypothesis ] ) * qnorm(
@@ -799,6 +847,8 @@ AnalyzeLook_CER <- function(
   names( vRejected ) <- design$hypothesis_names
   vDropped <- mcpObj$DroppedFlag
   vActive <- design$hypothesis_names[ !vRejected & !vDropped ]
+  # Persist decisions, adaptations, and derived results so the returned state
+  # remains inspectable even though look 2 is the final formal look.
   state$completed_looks <- 2L
   state$active_hypotheses <- vActive
   state$continuing_arms <- sort( unique( c(
