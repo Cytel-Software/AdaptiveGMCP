@@ -28,9 +28,6 @@
 * `SetupAnalysis_PC()` now initializes the hypothesis map used to validate
   interim hypothesis selection.
 
-* Added optional `ModelID` and `DumpSimOutToRDS` parameters to `simMAMSMEP()`;
-  both values are retained in the simulation object for downstream output handling.
-
 ### Non-Interactive Conditional Error Rate Analysis
 
 * Added `SetupDesign_CER()`, `AnalyzeLook_CER()`, and `PlotGraph_CER()` for

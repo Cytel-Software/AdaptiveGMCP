@@ -106,9 +106,6 @@
 #'   `Method = "CombPValue"`. Use `NULL` (default) to disable.
 #' @param Parallel Logical scalar indicating whether to run simulations in parallel.
 #' @param Verbose Logical scalar. If `TRUE`, prints additional progress and diagnostic messages.
-#' @param ModelID Optional model identifier stored with the simulation object. Defaults to `NA`.
-#' @param DumpSimOutToRDS Logical scalar reserved for controlling whether simulation output is
-#'   dumped to an RDS file. Defaults to `FALSE`.
 #' @example ./internalData/MAMSMEP_Simulation_Example.R
 #' @export
 simMAMSMEP <- function(
@@ -183,9 +180,16 @@ simMAMSMEP <- function(
     plotGraphs = TRUE,
     EastSumStat = NULL,
     Parallel = TRUE,
-    Verbose = FALSE,
-    ModelID = NA,
-    DumpSimOutToRDS = FALSE) {
+    Verbose = FALSE
+    # Uncomment these two parameters if individual simulation output
+    # needs to be dumped to RDS files say for the purpose of 
+    # testing the analysis API against individual simulation runs.
+    # Pass `DumpSimOutToRDS = TRUE` to enable this.
+    # ModelID comes from simMAMSMEP_Wrapper().
+    # , ModelID = NA
+    # ModelID Optional model identifier stored with the simulation object. Defaults to `NA`.
+    # , DumpSimOutToRDS = FALSE 
+    ) {
 
   # Handle deprecated parameter aliases (renamed to fix typos)
   if (!is.null(SelectionParmeter)) {
@@ -297,13 +301,16 @@ simMAMSMEP <- function(
     "mvtnorm_algo" = mvtnorm_algo,
 
     # Parameter added to enable debugging
-    "Debug" = FALSE,
-    "ModelID" = ModelID,
-    "DumpSimOutToRDS" = if (nSimulation == 1 && nSimulation_Stage2 == 1) {
-      DumpSimOutToRDS
-    } else {
-      FALSE
-    }
+    "Debug" = FALSE
+    
+    # Uncomment the following lines if you want to enable dumping simulation
+    # output to RDS files.
+    # , "ModelID" = ModelID
+    # , "DumpSimOutToRDS" = if (nSimulation == 1 && nSimulation_Stage2 == 1) {
+    #   DumpSimOutToRDS
+    # } else {
+    #   FALSE
+    # }
   )
 
   logs <- valInpsimMAMSMEP(inps = gmcpSimObj)

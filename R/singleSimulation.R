@@ -580,7 +580,11 @@ SingleSimCER <- function(simID, gmcpSimObj, preSimObjs) {
     )
   }
 
-  if(gmcpSimObj$DumpSimOutToRDS) {
+  # This code is used for dumping select simulation output to an RDS file.
+  # Such RDS files are used for testing the analysis API against individual simulation runs.
+  # Some such files have already been created and used in tests implemented in tests/testthat/test-CERSimulationEquivalence.R.
+  # Uncomment this code if you want to create more such RDS files.
+  # if(gmcpSimObj$DumpSimOutToRDS) {
     # # Dump select simulation output to an RDS file
     # lSimOutDump <- list(
     #   "PlannedStage1Bdry" = mcpObj$plan_Bdry$Stage1Bdry,
@@ -596,7 +600,7 @@ SingleSimCER <- function(simID, gmcpSimObj, preSimObjs) {
 
     # timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
     # saveRDS(lSimOutDump, file = paste0("SimOutDump_", gmcpSimObj$ModelID, "_", simID, "_", timestamp, ".rds"))
-  }
+  # }
 
   list(
     "SummStatDF" = SummStatDF,

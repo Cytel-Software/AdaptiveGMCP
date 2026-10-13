@@ -13,7 +13,11 @@
 #' @importFrom dplyr select mutate relocate rename bind_rows left_join everything
 #' @importFrom tidyr pivot_wider pivot_longer
 #' @export
-simMAMSMEP_Wrapper <- function(InputDF, sOutPath, DumpSimOutToRDS = FALSE) {
+simMAMSMEP_Wrapper <- function(InputDF, sOutPath
+                               # Uncomment the following line if you want to enable 
+                               # dumping simulation output to RDS files.
+                               # , DumpSimOutToRDS = FALSE
+) {
   # Update the dataframe column names in the following mapping in case
   # the names in the input csv/excel changes
   lOut <- list()
@@ -32,8 +36,11 @@ simMAMSMEP_Wrapper <- function(InputDF, sOutPath, DumpSimOutToRDS = FALSE) {
 
     out <- tryCatch(
       {
-        run1TestCase(InputDF = InputDF[nModelNum, ], ModelID = InputDF[nModelNum, "ModelID"], 
-                      DumpSimOutToRDS = DumpSimOutToRDS)
+        run1TestCase(InputDF = InputDF[nModelNum, ], ModelID = InputDF[nModelNum, "ModelID"]
+                     # Uncomment the following line if you want to enable 
+                     # dumping simulation output to RDS files.
+                     # , DumpSimOutToRDS = DumpSimOutToRDS
+                     )
       },
       error = function(err) {
         paste0("Model ", nModelNum, " execution failed.")
@@ -152,7 +159,11 @@ simMAMSMEP_Wrapper <- function(InputDF, sOutPath, DumpSimOutToRDS = FALSE) {
 }
 
 
-run1TestCase <- function(InputDF, ModelID = NA, DumpSimOutToRDS = FALSE) {
+run1TestCase <- function(InputDF, ModelID = NA
+                        # Uncomment the following line if you want to enable
+                        # dumping simulation output to RDS files.
+                        # , DumpSimOutToRDS = FALSE
+) {
   # mapping to link simMAMSMEP function arguments with csv columns
   Method <- InputDF$Method
   SampleSize <- InputDF$SampleSize
@@ -210,7 +221,10 @@ run1TestCase <- function(InputDF, ModelID = NA, DumpSimOutToRDS = FALSE) {
     SelectionCriterion = SelectionCriterion, SelectionParameter = SelectionParameter, KeepAssociatedHypo = KeepAssociatedHypo,
     ImplicitSSR = ImplicitSSR, nSimulation = nSimulation, Seed = Seed, SummaryStat = SummaryStat,
     Method = Method, plotGraphs = plotGraphs, Parallel = Parallel,CommonStdDev = CommonStdDev,
-    nSimulation_Stage2 = nSimulation_Stage2, Verbose = TRUE, ModelID = ModelID, DumpSimOutToRDS = DumpSimOutToRDS
+    nSimulation_Stage2 = nSimulation_Stage2, Verbose = TRUE
+    # Uncomment the following lines if you want to enable dumping simulation output to RDS files.
+    #, ModelID = ModelID
+    #, DumpSimOutToRDS = DumpSimOutToRDS
   )
   out
 }

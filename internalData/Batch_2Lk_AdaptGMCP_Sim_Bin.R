@@ -1128,7 +1128,11 @@
 
   dfOutput <- simMAMSMEP_Wrapper(InputDF = dfInput %>%
                                    filter(ModelID %in% nModelsToRun),
-                                 sOutPath, DumpSimOutToRDS = TRUE)
+                                 sOutPath = sOutPath
+                                 # Uncomment the following line if you want to dump
+                                 # simulation output to RDS files.
+                                 # , DumpSimOutToRDS = TRUE
+                                 )
 
   tElapTime <- Sys.time() - tStartTime
 
