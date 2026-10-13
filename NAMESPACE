@@ -19,30 +19,40 @@ export(genPowerTablePlots)
 export(plotGraph)
 export(simMAMSMEP)
 export(simMAMSMEP_Wrapper)
-importFrom(data.table,":=")
-importFrom(data.table,.N)
-importFrom(data.table,.SD)
-importFrom(data.table,data.table)
-importFrom(data.table,setDT)
-importFrom(data.table,setorder)
-importFrom(dplyr,"%>%")
-importFrom(dplyr,bind_rows)
-importFrom(dplyr,everything)
-importFrom(dplyr,left_join)
-importFrom(dplyr,mutate)
-importFrom(dplyr,relocate)
-importFrom(dplyr,rename)
-importFrom(dplyr,select)
+importFrom(data.table,
+  ":=",
+  .N,
+  .SD,
+  data.table,
+  setDT,
+  setorder
+)
+importFrom(dplyr,
+  "%>%",
+  bind_rows,
+  everything,
+  left_join,
+  mutate,
+  relocate,
+  rename,
+  select
+)
 importFrom(pbapply,pblapply)
-importFrom(stats,na.omit)
-importFrom(stats,pnorm)
-importFrom(stats,pt)
-importFrom(stats,qnorm)
-importFrom(stats,reshape)
-importFrom(stats,sd)
-importFrom(stats,uniroot)
-importFrom(tidyr,pivot_longer)
-importFrom(tidyr,pivot_wider)
-importFrom(utils,capture.output)
-importFrom(utils,str)
-importFrom(utils,write.table)
+importFrom(stats,
+  na.omit,
+  pnorm,
+  pt,
+  qnorm,
+  reshape,
+  sd,
+  uniroot
+)
+importFrom(tidyr,
+  pivot_longer,
+  pivot_wider
+)
+importFrom(utils,
+  capture.output,
+  str,
+  write.table
+)
