@@ -26,6 +26,10 @@ testthat::test_that( "SetupDesign_CER creates a design-only object", {
   testthat::expect_false( "p_raw" %in% names( d ) )
 } )
 
+testthat::test_that( "AnalyzeLook_CER exposes direct strategy adaptation arguments", {
+  testthat::expect_false( "strategy_update" %in% names( formals( AnalyzeLook_CER ) ) )
+})
+
 testthat::test_that( "CER Look 1 reuses the planned design", {
   d <- SetupDesign_CER(
     nArms = 3,

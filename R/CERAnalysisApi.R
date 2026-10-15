@@ -585,14 +585,12 @@ SetupDesign_CER <- function(
 #' @param new_sample_size Cumulative stage-2 sample sizes, named by arm.
 #' @param new_weights New weights for the continuing hypotheses.
 #' @param new_G New transition matrix for the continuing hypotheses.
-#' @param strategy_update Optional list containing `new_weights` and `new_G`.
 #' @param plotGraphs If `TRUE`, plot the graph after analysis.
 #' @return A `CERAnalysisState` object.
 #' @export
 AnalyzeLook_CER <- function(
     design, state = NULL, p_raw, look = NULL, selection = NULL,
-  new_sample_size = NULL,
-    new_weights = NULL, new_G = NULL, strategy_update = NULL,
+    new_sample_size = NULL, new_weights = NULL, new_G = NULL,
     plotGraphs = FALSE )
 {
   if( !inherits( design, "CERDesign" ) )
@@ -775,12 +773,6 @@ AnalyzeLook_CER <- function(
     stop( "Stage-2 sample sizes must produce positive allocation ratios." )
   }
 
-  if( !is.null( strategy_update ) )
-  {
-    if( !is.list( strategy_update ) ) stop( "strategy_update must be a list." )
-    if( !is.null( strategy_update$new_weights ) ) new_weights <- strategy_update$new_weights
-    if( !is.null( strategy_update$new_G ) ) new_G <- strategy_update$new_G
-  }
   bHasStrategyAdaptation <- !is.null( new_weights ) || !is.null( new_G )
   if( bHasStrategyAdaptation )
   {

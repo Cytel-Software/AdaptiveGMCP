@@ -178,10 +178,8 @@ BuildCerRegressionScenarios <- function()
         p_raw = c( H2 = 0.0299, H4 = 0.0586 ),
         selection = c( "H2", "H4" ),
         new_sample_size = c( Control = 88, Treatment2 = 87 ),
-        strategy_update = list(
-          new_weights = c( H2 = 0.5, H4 = 0.5 ),
-          new_G = matrix( c( 0, 1, 1, 0 ), nrow = 2, byrow = TRUE )
-        )
+        new_weights = c( H2 = 0.5, H4 = 0.5 ),
+        new_G = matrix( c( 0, 1, 1, 0 ), nrow = 2, byrow = TRUE )
       )
     )
   )
@@ -210,10 +208,8 @@ BuildCerRegressionScenarios <- function()
       list( p_raw = c( H1 = 0.00045, H2 = 0.0952, H3 = 0.0225, H4 = 0.1104 ) ),
       list(
         p_raw = c( H2 = 0.0299, H3 = 0.0225, H4 = 0.0586 ),
-        strategy_update = list(
-          new_weights = c( H2 = 0.5, H3 = 0.25, H4 = 0.25 ),
-          new_G = matrix( c( 0, 1/3, 2/3, 1, 0, 0, 1/2, 1/2, 0 ), nrow = 3, byrow = TRUE )
-        )
+        new_weights = c( H2 = 0.5, H3 = 0.25, H4 = 0.25 ),
+        new_G = matrix( c( 0, 1/3, 2/3, 1, 0, 0, 1/2, 1/2, 0 ), nrow = 3, byrow = TRUE )
       )
     )
   )

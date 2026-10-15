@@ -13,7 +13,6 @@ AnalyzeLook_CER(
   new_sample_size = NULL,
   new_weights = NULL,
   new_G = NULL,
-  strategy_update = NULL,
   plotGraphs = FALSE
 )
 }
@@ -33,8 +32,6 @@ AnalyzeLook_CER(
 \item{new_weights}{New weights for the continuing hypotheses.}
 
 \item{new_G}{New transition matrix for the continuing hypotheses.}
-
-\item{strategy_update}{Optional list containing `new_weights` and `new_G`.}
 
 \item{plotGraphs}{If `TRUE`, plot the graph after analysis.}
 }
