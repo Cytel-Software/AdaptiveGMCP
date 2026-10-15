@@ -95,7 +95,8 @@ CaptureNonInteractiveCerRegressionOutputs <- function( lScenario )
       look = iLook,
       selection = lLookInput$selection,
       new_sample_size = lLookInput$new_sample_size,
-      strategy_update = lLookInput$strategy_update,
+      new_weights = lLookInput$new_weights,
+      new_G = lLookInput$new_G,
       plotGraphs = FALSE
     )
     lState <- try( do.call( AnalyzeLook_CER, lArguments ), silent = TRUE )

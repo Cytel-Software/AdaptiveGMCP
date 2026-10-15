@@ -30,12 +30,16 @@ state <- AnalyzeLook_CER(
   state = state,
   p_raw = look2_pvalues,
   selection = ...,
-  new_sample_size = ...
+  new_sample_size = ...,
+  new_weights = ...,
+  new_G = ...
 )
 ```
 
 The new API is restricted to two-look CER trials. It must not prompt for input,
 depend on hidden session state, or require console output for downstream use.
+Strategy adaptations are supplied directly through `new_weights` and `new_G`;
+there is no nested strategy-update argument.
 
 ## Architecture
 

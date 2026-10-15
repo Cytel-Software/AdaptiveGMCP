@@ -114,13 +114,14 @@ CaptureCerRegressionOutputsForTest <- function( lScenario )
       nNextLook <- as.integer( length( eCaptured$lLooks ) + 1L )
       if( nNextLook > nPlannedLooks ) return( mcpObj )
 
-      lStrategyUpdate <- lScenario$lookInputs[[ nNextLook ]]$strategy_update
-      if( is.null( lStrategyUpdate ) ) return( mcpObj )
+      vNewWeights <- lScenario$lookInputs[[ nNextLook ]]$new_weights
+      mNewG <- lScenario$lookInputs[[ nNextLook ]]$new_G
+      if( is.null( vNewWeights ) && is.null( mNewG ) ) return( mcpObj )
 
       return( applyStrategyUpdate(
         mcpObj,
-        new_weights = lStrategyUpdate$new_weights,
-        new_G = lStrategyUpdate$new_G
+        new_weights = vNewWeights,
+        new_G = mNewG
       ) )
     },
     do_ModifyStage2Sample = function( allocRatio, ArmsPresent, AllocSampleSize )
