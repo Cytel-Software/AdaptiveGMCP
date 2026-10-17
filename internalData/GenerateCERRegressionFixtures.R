@@ -165,7 +165,7 @@ CaptureCERRegressionOutputs <- function( lScenario )
       }
 
       mNewAllocSampleSize <- AllocSampleSize
-      mNewAllocSampleSize[ 2, names( vStage2SampleSize ) ] <- as.numeric( vStage2SampleSize )
+      mNewAllocSampleSize[ 2, ArmsPresent ] <- as.numeric( vStage2SampleSize )
 
       return( list(
         newAllocSampleSize = mNewAllocSampleSize,
