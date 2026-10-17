@@ -75,7 +75,7 @@ BuildCerRegressionScenarios <- function()
       list( p_raw = c( H1 = 0.0001, H2 = 0.2 ) ),
       list(
         p_raw = c( H2 = 0.01 ),
-        new_sample_size = c( Control = 125, Treatment1 = 125, Treatment2 = 125 )
+        new_sample_size = c( Control = 125, Treatment2 = 125 )
       )
     )
   )

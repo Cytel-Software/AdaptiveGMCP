@@ -26,6 +26,25 @@ testthat::test_that( "SetupDesign_CER creates a design-only object", {
   testthat::expect_false( "p_raw" %in% names( d ) )
 } )
 
+testthat::test_that( "SetupDesign_CER names arm-specific endpoint inputs", {
+  d <- SetupDesign_CER(
+    nArms = 3,
+    nEps = 1,
+    SampleSize = 300,
+    EpType = list( EP1 = "Continuous" ),
+    sigma = list( EP1 = c( 1, 1.1, 1.2 ) ),
+    prop.ctr = list( EP1 = NA ),
+    allocRatio = c( 1, 2, 3 ),
+    WI = c( .5, .5 ),
+    G = matrix( c( 0, 1, 1, 0 ), nrow = 2, byrow = TRUE ),
+    test.type = "Parametric"
+  )
+
+  vArmNames <- c( "Control", "Treatment1", "Treatment2" )
+  testthat::expect_named( d$allocRatio, vArmNames )
+  testthat::expect_named( d$sigma$EP1, vArmNames )
+} )
+
 testthat::test_that( "AnalyzeLook_CER exposes direct strategy adaptation arguments", {
   testthat::expect_false( "strategy_update" %in% names( formals( AnalyzeLook_CER ) ) )
 })
@@ -110,10 +129,18 @@ testthat::test_that( "CER API applies selection, sample size, and strategy updat
   state1 <- AnalyzeLook_CER(
     d, p_raw = c( H1 = .00045, H2 = .0952, H3 = .0225, H4 = .1104 )
   )
+  testthat::expect_error(
+    AnalyzeLook_CER(
+      d, state1, p_raw = c( H2 = .0299, H4 = .0586 ),
+      selection = c( "H2", "H4" ),
+      new_sample_size = c( 88, 87, 86 )
+    ),
+    "exactly one sample size"
+  )
   state2 <- AnalyzeLook_CER(
     d, state1, p_raw = c( H2 = .0299, H4 = .0586 ),
     selection = c( "H2", "H4" ),
-    new_sample_size = c( Control = 88, Treatment2 = 87 ),
+    new_sample_size = c( ignored1 = 88, ignored2 = 87 ),
     new_weights = c( H2 = .5, H4 = .5 ),
     new_G = matrix( c( 0, 1, 1, 0 ), nrow = 2, byrow = TRUE )
   )
@@ -146,6 +173,54 @@ testthat::test_that( "CER API applies selection, sample size, and strategy updat
       a42_adj = 0.013733642749567
     ),
     tolerance = 1e-12
+  )
+} )
+
+testthat::test_that( "CER API ignores sample-size adaptation names", {
+  d <- SetupDesign_CER(
+    nArms = 3,
+    nEps = 1,
+    SampleSize = 300,
+    EpType = list( EP1 = "Continuous" ),
+    sigma = list( EP1 = c( 1, 1, 1 ) ),
+    CommonStdDev = TRUE,
+    prop.ctr = list( EP1 = NA ),
+    allocRatio = c( 1, 1, 1 ),
+    WI = c( .5, .5 ),
+    G = matrix( c( 0, 1, 1, 0 ), nrow = 2, byrow = TRUE ),
+    test.type = "Parametric"
+  )
+  state1 <- AnalyzeLook_CER( d, p_raw = c( H1 = .1, H2 = .2 ) )
+  state2Unnamed <- AnalyzeLook_CER(
+    d, state1, p_raw = c( H1 = .01, H2 = .02 ),
+    new_sample_size = c( 175, 180, 185 )
+  )
+  state2Named <- AnalyzeLook_CER(
+    d, state1, p_raw = c( H1 = .01, H2 = .02 ),
+    new_sample_size = c( Treatment2 = 175, Control = 180, Treatment1 = 185 )
+  )
+
+  testthat::expect_equal(
+    unlist( state2Unnamed$adapted_sample_allocation[ 2L, ] ),
+    c( Control = 175, Treatment1 = 180, Treatment2 = 185 )
+  )
+  testthat::expect_equal(
+    state2Named$adapted_sample_allocation,
+    state2Unnamed$adapted_sample_allocation
+  )
+  testthat::expect_error(
+    AnalyzeLook_CER(
+      d, state1, p_raw = c( H1 = .01, H2 = .02 ),
+      new_sample_size = c( 175, 175 )
+    ),
+    "exactly one sample size"
+  )
+  testthat::expect_error(
+    AnalyzeLook_CER(
+      d, state1, p_raw = c( H1 = .01, H2 = .02 ),
+      new_sample_size = c( 175, 175, 175, 175 )
+    ),
+    "exactly one sample size"
   )
 } )
 
