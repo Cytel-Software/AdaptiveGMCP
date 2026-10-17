@@ -27,7 +27,10 @@ AnalyzeLook_CER(
 
 \item{selection}{Hypotheses retained for look 2.}
 
-\item{new_sample_size}{Cumulative stage-2 sample sizes, named by arm.}
+\item{new_sample_size}{Cumulative stage-2 sample sizes in control followed
+by unique continuing-treatment arm order. Names are ignored. The vector
+must contain exactly one value for the control and each unique treatment
+arm represented by the continuing hypotheses.}
 
 \item{new_weights}{New weights for the continuing hypotheses.}
 

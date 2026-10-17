@@ -88,9 +88,7 @@ print(look1_analysis)
 
 look2_analysis <- AnalyzeLook_CER(
   design, state = look1_analysis,
-  new_sample_size = c(
-    Control = 125, Treatment1 = 125, Treatment2 = 125
-  ),
+  new_sample_size = c( 125, 125 ),
   p_raw = c( H1 = NA, H2 = 0.01 )
 )
 
@@ -152,7 +150,7 @@ print(look1_analysis)
 
 look2_analysis <- AnalyzeLook_CER( design, state = look1_analysis,
   selection = c( "H2", "H4" ),
-  new_sample_size = c( Control = 88, Treatment2 = 87 ),
+  new_sample_size = c( 88, 87 ),
   new_weights = c( H2 = .5, H4 = .5 ),
   new_G = matrix( c( 0, 1, 1, 0 ), 2, 2, byrow = TRUE ),
   p_raw = c( H1 = NA, H2 = .0299, H3 = NA, H4 = .0586 )

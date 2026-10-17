@@ -37,11 +37,10 @@
     stop( "SampleSize must be a single finite positive number." )
   }
   if( !is.list( EpType ) || length( EpType ) != nEps ||
-      is.null( names( EpType ) ) ||
       any( !unlist( lapply( EpType, function( x ) length( x ) == 1L &&
         x %in% c( "Continuous", "Binary" ) ) ) ) )
   {
-    stop( "EpType must be a named list of Continuous or Binary endpoints." )
+    stop( "EpType must be a list of Continuous or Binary endpoints." )
   }
   if( !is.list( sigma ) || length( sigma ) != nEps )
   {
@@ -168,7 +167,6 @@
     CommonStdDev = design$CommonStdDev,
     prop.ctr = design$prop.ctr,
     allocRatio = design$allocRatio,
-    Stage2allocRatio = design$allocRatio,
     p_raw = rep( NA_real_, dHypotheses ),
     p_raw_stage1 = rep( NA_real_, dHypotheses ),
     WH_Prev = design$intersection_weights,
@@ -256,7 +254,7 @@
 # Calculate structured CER/PCER results for `design` using surviving
 # intersections `wh`, stage-1 p-values `p_stage1`, and planned `boundary`.
 # Return the structured CER/PCER result or an empty result when none remain.
-.cer_structured_cer <- function( design, wh, p_stage1, boundary )
+.cer_structured_cer <- function( design, wh, p_stage1)
 {
   if( nrow( wh ) == 0L )
   {
@@ -436,11 +434,14 @@
 #' @param nArms Number of arms including control.
 #' @param nEps Number of endpoints.
 #' @param SampleSize Planned total sample size.
-#' @param EpType Named endpoint-type list containing `"Continuous"` or `"Binary"`.
-#' @param sigma Endpoint-specific arm standard deviations.
+#' @param EpType Endpoint-type list containing `"Continuous"` or `"Binary"`.
+#'   Unnamed entries are assigned endpoint names automatically.
+#' @param sigma Endpoint-specific arm standard deviations. Values are ordered
+#'   control, treatment 1, treatment 2, and so on.
 #' @param CommonStdDev Whether treatment standard deviations equal control.
-#' @param prop.ctr Endpoint-specific binary control proportions.
-#' @param allocRatio Arm allocation ratios, control first.
+#' @param prop.ctr Endpoint-specific binary control arm proportions.
+#' @param allocRatio Arm allocation ratios, control first, followed by
+#'   treatment 1, treatment 2, and so on.
 #' @param WI Initial graph weights.
 #' @param G Initial graph transition matrix.
 #' @param test.type CER test type: `"Parametric"`, `"Non-Parametric"`, or
@@ -496,7 +497,12 @@ SetupDesign_CER <- function(
   names( EpType ) <- if( is.null( names( EpType ) ) ) paste0( "EP", seq_len( nEps ) ) else names( EpType )
   names( sigma ) <- names( EpType )
   names( prop.ctr ) <- names( EpType )
-  names( allocRatio ) <- c( "Control", paste0( "Treatment", seq_len( nArms - 1L ) ) )
+  vArmNames <- c( "Control", paste0( "Treatment", seq_len( nArms - 1L ) ) )
+  names( allocRatio ) <- vArmNames
+  for( iEndpoint in seq_len( nEps ) )
+  {
+    names( sigma[[ iEndpoint ]] ) <- vArmNames[ seq_along( sigma[[ iEndpoint ]] ) ]
+  }
   mHypoMap <- getHypoMap2( "MAMSMEP", nHypothesis, nEps, nArms, EpType )
   lGraphs <- genWeights( w = WI, g = G, HypothesisName = vHypotheses )
   nMvtDimension <- nHypothesis
@@ -582,7 +588,10 @@ SetupDesign_CER <- function(
 #' @param p_raw Named raw p-values for the active hypotheses.
 #' @param look Optional look number, which must match the next look.
 #' @param selection Hypotheses retained for look 2.
-#' @param new_sample_size Cumulative stage-2 sample sizes, named by arm.
+#' @param new_sample_size Cumulative stage-2 sample sizes in control followed
+#'   by unique continuing-treatment arm order. Names are ignored. The vector
+#'   must contain exactly one value for the control and each unique treatment
+#'   arm represented by the continuing hypotheses.
 #' @param new_weights New weights for the continuing hypotheses.
 #' @param new_G New transition matrix for the continuing hypotheses.
 #' @param plotGraphs If `TRUE`, plot the graph after analysis.
@@ -640,8 +649,7 @@ AnalyzeLook_CER <- function(
       row.names( mcpObj$WH ) <- NULL
     }
     lCer <- .cer_structured_cer(
-      design = design, wh = mcpObj$WH, p_stage1 = mcpObj$p_raw,
-      boundary = design$plan_boundary$Stage2Bdry
+      design = design, wh = mcpObj$WH, p_stage1 = mcpObj$p_raw
     )
     state <- .cer_new_state( design, mcpObj, lStage1, lCer )
     if( isTRUE( plotGraphs ) )
@@ -699,39 +707,38 @@ AnalyzeLook_CER <- function(
   }
 
   bHasSampleAdaptation <- !is.null( new_sample_size )
-  vNewSample <- new_sample_size
   mStage2Allocation <- design$allocation$cumulative
-  if( bHasSampleAdaptation )
-  {
-    if( !is.numeric( vNewSample ) || is.null( names( vNewSample ) ) ||
-        anyNA( vNewSample ) || any( !is.finite( vNewSample ) ) ||
-        any( vNewSample <= 0 ) )
-    {
-      stop( "new_sample_size must be a named finite positive numeric vector." )
-    }
-    # Derive incremental stage-2 allocation ratios from cumulative sample sizes;
-    # the CER adaptation routines require positive ratios for every continuing arm.
-    vArmNames <- colnames( mStage2Allocation )
-    if( any( !names( vNewSample ) %in% vArmNames ) ||
-        anyDuplicated( names( vNewSample ) ) )
-    {
-      stop( "new_sample_size names must be unique planned arm names." )
-    }
-    vRequiredArms <- c(
-      "Control",
-      paste0(
-        "Treatment",
+  vRequiredArms <- c(
+    "Control",
+    paste0(
+      "Treatment",
+      sort( unique(
         design$hypothesis_map$Treatment[
           design$hypothesis_map$Hypothesis %in% mcpObj$IndexSet
         ] - 1L
-      )
+      ) )
     )
-    if( any( !vRequiredArms %in% names( vNewSample ) ) )
+  )
+  if( bHasSampleAdaptation )
+  {
+    if( !is.numeric( new_sample_size ) || anyNA( new_sample_size ) ||
+        any( !is.finite( new_sample_size ) ) || any( new_sample_size <= 0 ) )
     {
-      stop( "new_sample_size must include the control and every continuing arm." )
+      stop( "new_sample_size must be a finite positive numeric vector." )
     }
-    mStage2Allocation[ 2L, names( vNewSample ) ] <- as.numeric( vNewSample )
+
+    # Derive incremental stage-2 allocation ratios from cumulative sample sizes;
+    # the CER adaptation routines require positive ratios for every continuing arm.
+    vArmNames <- colnames( mStage2Allocation )
+    if( length( new_sample_size ) != length( vRequiredArms ) )
+    {
+      stop(
+        "new_sample_size must specify exactly one sample size for the control ",
+        "and each unique treatment arm corresponding to the continuing hypotheses."
+      )
+    }
     vRequiredIndices <- match( vRequiredArms, vArmNames )
+    mStage2Allocation[ 2L, vRequiredIndices ] <- as.numeric( new_sample_size )
     if( any(
       as.numeric( unlist( mStage2Allocation[ 2L, vRequiredIndices ] ) ) <=
         as.numeric( unlist( mStage2Allocation[ 1L, vRequiredIndices ] ) )
@@ -746,15 +753,6 @@ AnalyzeLook_CER <- function(
     state$completion_reason <- "all_hypotheses_dropped"
     return( state )
   }
-  vRequiredArms <- c(
-    "Control",
-    paste0(
-      "Treatment",
-      design$hypothesis_map$Treatment[
-        design$hypothesis_map$Hypothesis %in% mcpObj$IndexSet
-      ] - 1L
-    )
-  )
   if( bHasSelection || bHasSampleAdaptation )
   {
     mStage2Allocation[ 2L, setdiff( colnames( mStage2Allocation ), vRequiredArms ) ] <- NA_real_
@@ -897,7 +895,7 @@ AnalyzeLook_CER <- function(
     inputs = list(
       p_raw = mcpObj$p_raw,
       selection = selection,
-      new_sample_size = vNewSample,
+      new_sample_size = new_sample_size,
       new_weights = new_weights,
       new_G = new_G
     ),
