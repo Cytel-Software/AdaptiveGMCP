@@ -185,3 +185,80 @@ However, termination still goes through a console decision. The caller receives 
 - Regression tests capture results by mocking input and continuation helpers because the function itself does not return its state.
 
 Therefore, the new API should preserve these statistical computations and ordering while replacing prompts and hidden mutable state with explicit arguments, returned state, validation, and deterministic completion rules.
+
+## Comparison of how legacy CER analysis API, its new non-interactive version, and simMAMSMEP() handle stage 2 sample size and potential bugs to be fixed
+Updated todo list
+
+All three implementations treat sample size at the **arm level**, not separately by endpoint or hypothesis.
+
+| Situation | `adaptGMCP_CER()` | `AnalyzeLook_CER()` | `simMAMSMEP()` CER |
+|---|---|---|---|
+| Multiple endpoints and arms | One cumulative final size per arm | One cumulative final size per continuing arm | One incremental stage-2 size per continuing arm |
+| Hypotheses selected/dropped | Updates arms only when explicit selection is performed | Derives arms directly from selected hypotheses | Updates arm presence and optionally reallocates removed-arm accrual |
+| Hypotheses rejected at look 1 | Does not automatically remove their arms | Automatically derives arms from surviving hypotheses | Automatically derives arms from surviving hypotheses |
+
+**Multiple Endpoints And Arms**
+
+All three recognize that hypotheses across different endpoints can share a treatment arm. For example, if H1 and H3 concern Treatment 1 on different endpoints, they share the same Treatment 1 sample size.
+
+- `adaptGMCP_CER()` asks for cumulative final sample sizes for all arms in `ArmsPresent`.
+- `AnalyzeLook_CER()` asks for cumulative final sample sizes for control and the unique treatments represented by continuing hypotheses.
+- `simMAMSMEP()` derives incremental stage-2 sample sizes internally from the planned allocation and `ImplicitSSR`.
+
+Thus, endpoint multiplicity does not create additional sample-size entries.
+
+The analysis APIs differ in validation: `AnalyzeLook_CER()` requires finite positive values exceeding look-1 accrual, while the legacy input helper has little validation.
+
+**Selected And Dropped Hypotheses**
+
+With a valid explicit selection, the two analysis APIs are broadly equivalent:
+
+- Selection occurs before sample-size adaptation.
+- Treatment arms represented by selected hypotheses continue.
+- Arms no longer represented are assigned `NA`.
+- One sample size is used for every selected hypothesis sharing that arm.
+
+The simulation follows the same arm-removal principle but additionally controls redistribution through `ImplicitSSR`:
+
+- `"All"` redistributes accrual from every absent arm.
+- `"Selection"` redistributes accrual only from arms removed by selection.
+- `"None"` performs no redistribution.
+
+Neither analysis API performs automatic redistribution. The user directly provides final cumulative sizes and can manually reproduce a desired redistribution.
+
+There are selection edge-case differences:
+
+- Legacy selection intersects the user’s choice with the currently active hypotheses, but derives `ArmsPresent` from the unfiltered selection input.
+- `AnalyzeLook_CER()` currently allows a planned but already rejected hypothesis to be explicitly selected again, incorrectly reactivating it.
+
+**Rejected At Look 1**
+
+If only some hypotheses for a treatment are rejected, but another hypothesis for that treatment survives:
+
+- All implementations continue that treatment arm.
+
+If every hypothesis associated with a treatment is rejected:
+
+- `AnalyzeLook_CER()` removes that treatment from the required `new_sample_size` vector and assigns its final allocation `NA`.
+- `simMAMSMEP()` marks that treatment absent and gives it no stage-2 accrual. With default `ImplicitSSR = "All"`, its planned stage-2 accrual is redistributed among continuing arms.
+- `adaptGMCP_CER()` does not update `ArmsPresent` following rejection alone. It still requests a final cumulative size for the rejected treatment arm.
+
+Despite requesting that redundant sample size, the legacy API does not retest the rejected hypothesis:
+
+- It requests stage-2 p-values only for continuing hypotheses.
+- The rejected hypothesis receives an `NA` stage-2 p-value.
+- Its rejected-arm sample size does not affect the surviving H2 calculation in the studied one-endpoint, two-treatment example.
+
+**Simulation Alignment**
+
+For determining which arms continue after look-1 rejection:
+
+- **`AnalyzeLook_CER()` matches `simMAMSMEP()`.**
+- **`adaptGMCP_CER()` differs** because rejection does not automatically update `ArmsPresent`.
+
+For automatic redistribution:
+
+- `simMAMSMEP()` supports it through `ImplicitSSR`.
+- Neither analysis API performs it automatically.
+
+One lower-level difference remains: legacy analysis calculates its stored stage-2 allocation ratio from cumulative totals, whereas `AnalyzeLook_CER()` and the simulation calculate it from stage-2 increments. The covariance helper later recomputes cumulative ratios, so this generally affects stored internal state more than the final boundary calculation.

@@ -105,23 +105,30 @@ normalize_dunnett_correlation <- function(test.type, correlation, arg_name = "Co
 applySelection <- function(mcpObj, selected_hyps, look) {
   if (is.null(selected_hyps)) return(mcpObj)
   if (!is.character(selected_hyps)) stop("selection must be a character vector")
+  if (anyDuplicated(selected_hyps)) {
+    warning("selection contains duplicate hypothesis names; duplicates will be ignored", call. = FALSE)
+  }
   selected_hyps <- unique(selected_hyps)
 
   if (length(selected_hyps) == 0) stop("selection must retain at least one hypothesis")
 
-  if (!all(selected_hyps %in% mcpObj$HypoMap$Hypothesis)) {
+  # At this point, mcpObj$IndexSet contains the hypotheses that 
+  # are currently active (not dropped and not rejected).
+  # User's selection must be a subset of these active hypotheses.
+  if (!all(selected_hyps %in% mcpObj$IndexSet)) {
     stop(
-      "selection must be a subset of available hypotheses. Available hypotheses: ",
-      toString(mcpObj$HypoMap$Hypothesis)
+      "selection must be a subset of current IndexSet. Current IndexSet: ",
+      toString(mcpObj$IndexSet)
     )
   }
 
+  # Appending the current look to the existing list of selection looks as PC method
+  # allows more than 2 looks and selection to be done at multiple looks.
+  # In CER method, only 2 looks are allowed.
   mcpObj$SelectionLook <- c(mcpObj$SelectionLook, as.integer(look))
   mcpObj$SelectedIndex <- selected_hyps
 
-  # At this point, the index set of the MCP object is updated to reflect the selected hypotheses.
-  mcpObj$IndexSet <- mcpObj$SelectedIndex
-
+  # Now marking all non-selected active hypotheses as dropped
   active_names <- names(mcpObj$DroppedFlag)
   for (nm in active_names) {
     if (!mcpObj$DroppedFlag[[nm]] && !mcpObj$rej_flag_Prev[[nm]]) {
@@ -129,6 +136,7 @@ applySelection <- function(mcpObj, selected_hyps, look) {
     }
   }
 
+  # Updating the IndexSet to reflect only the selected hypotheses
   mcpObj$IndexSet <- intersect(mcpObj$IndexSet, selected_hyps)
 
   if (length(mcpObj$IndexSet) == 0) {

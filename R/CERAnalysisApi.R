@@ -613,6 +613,26 @@ AnalyzeLook_CER <- function(
     {
       stop( "look must be 1 when state is NULL." )
     }
+
+    # Parameters `selection`, `new_sample_size`, `new_weights`, and `new_G` are not used in look 1.
+    # Give warnings if these parameters are provided, as they will be ignored in look 1.
+    if( !is.null( selection ) )
+    {
+      warning( "Parameter 'selection' is ignored in look 1." )
+    }
+    if( !is.null( new_sample_size ) )
+    {
+      warning( "Parameter 'new_sample_size' is ignored in look 1." )
+    }
+    if( !is.null( new_weights ) )
+    {
+      warning( "Parameter 'new_weights' is ignored in look 1." )
+    }
+    if( !is.null( new_G ) )
+    {
+      warning( "Parameter 'new_G' is ignored in look 1." )
+    }
+
     mcpObj <- .cer_plan_mcp( design )
     p_stage1 <- validate_p_raw( p_raw, design$hypothesis_names )
     mcpObj$CurrentLook <- 1L

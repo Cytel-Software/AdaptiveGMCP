@@ -46,7 +46,7 @@ getSelectedHypo2 <- function(simID, mcpObj) {
   ############### Step-1: get the available hypothesis to select#################
   # Subset for the not rejected hypothesis
   # contHypo <- mcpObj$HypoMap[mcpObj$HypoPresent, ]
-  # only exclude the treatments for which both endpoints are rejected
+  # only exclude the treatments for which all endpoints are rejected
   hypothesis_not_rejected <- mcpObj$HypoMap[!mcpObj$rej_flag_Prev, ]
   contHypo <- mcpObj$HypoMap[mcpObj$HypoMap$Treatment %in% hypothesis_not_rejected$Treatment, ]
   # Selection based on end points

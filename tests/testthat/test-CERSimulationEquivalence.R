@@ -141,6 +141,14 @@ RunCerSimulationEquivalence <- function(fixture_path, input_data)
   } else {
     NULL
   }
+  if (adapted) {
+    # Simulation selection can retain rejected hypotheses associated with selected arms,
+    # whereas analysis selection accepts only hypotheses still active after look 1.
+    stage2_hypotheses <- intersect(
+      stage2_hypotheses,
+      cer_state$active_hypotheses
+    )
+  }
   if (adapted && length(stage2_hypotheses) == 0) {
     return(invisible(NULL))
   }
