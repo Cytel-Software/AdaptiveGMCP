@@ -7,6 +7,9 @@
 
 ## Corrections
 
+* Corrected parametric CER covariance calculations for unequal allocation
+  ratios so treatment indices consistently skip the leading control ratio.
+
 * CER design inputs now expose consistent control/treatment arm names across
   allocation ratios, endpoint-specific standard deviations, and proportions;
   CER Look 2 sample-size adaptations are interpreted positionally in control

@@ -47,6 +47,43 @@ test_that("Test the Sigma Matrix Computation for MAMSMEP(Parametric) designs", {
   expect_equal(object = compSigmaS, expected = benchmarkSigmaS)
 })
 
+test_that("getSigma uses treatment allocation ratios for unequal allocations", {
+  vAllocRatio <- c(
+    Control = 1,
+    Treatment1 = 2,
+    Treatment2 = 3,
+    Treatment3 = 4
+  )
+  mCumulativeSampleSize <- matrix(
+    c(
+      100, 200, 300, 400,
+      200, 400, 600, 800
+    ),
+    nrow = 2,
+    byrow = TRUE
+  )
+  lSigma <- getSigma(
+    EpType = list("EP1" = "Continuous"),
+    SS_Cum = mCumulativeSampleSize,
+    sigma = list("EP1" = rep(1, 4)),
+    prop.ctr = NA,
+    allocRatio = vAllocRatio,
+    CommonStdDev = FALSE,
+    info_frac = c(0.5, 1)
+  )
+
+  dExpectedCovariance <- sqrt(
+    (vAllocRatio["Treatment2"] / (1 + vAllocRatio["Treatment2"])) *
+      (vAllocRatio["Treatment3"] / (1 + vAllocRatio["Treatment3"]))
+  )
+
+  # Treatment indices 2 and 3 must use Treatment2 and Treatment3, not prior arms.
+  expect_equal(
+    object = lSigma$SigmaZ$EP1["Z21", "Z31"],
+    expected = unname(dExpectedCovariance)
+  )
+})
+
 # Test provided by Benjamin Fallmann<benjamin.fallmann@meduniwien.ac.at> while debugging issue #19
 test_that("Test the Sigma Matrix Computation for MAMSMEP(Parametric) designs, with additional arms", {
   # Test Case:1 Two-Stage Multi-Arm with one Endpoint

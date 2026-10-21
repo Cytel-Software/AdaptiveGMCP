@@ -333,7 +333,7 @@ testthat::test_that( "CER indexes non-parametric PCER by hypothesis", {
   )
   testthat::expect_equal(
     unname( state$results$stage1$cer_pcer$data$PCER[[ iRow ]][[ 1L ]] ),
-    0.0009152201,
+    0.0009919540885684,
     tolerance = 1e-8
   )
 } )
