@@ -77,6 +77,11 @@ For every active hypothesis, `pValueAdaptGmcpHelper.R:214` prompts for a raw p-v
 
 `cerPlanBoundary.R:8` first obtains the Stage 1 alpha spending from `rpact`.
 
+For parametric covariance calculations, allocation ratios are ordered control
+first, then Treatment 1 through the final treatment. Hypothesis indices refer
+to treatment arms, so the covariance calculation skips the leading control
+ratio when retrieving a treatment allocation.
+
 For every intersection hypothesis, it partitions the active hypotheses into local testing subsets:
 
 - Correlated hypotheses within an endpoint use a weighted parametric test.

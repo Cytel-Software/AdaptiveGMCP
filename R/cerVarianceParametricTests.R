@@ -12,23 +12,25 @@
 # With this assumption, the covariance matrix computation simplifies greatly and all dependence on
 # nuisance parameters and arm wise sample sizes goes away. Also, the covariance formulas become endpoint independent.
 # This function is intended to replace the varCovZ function in boundary computation.
-# (i1,i2) : index for the hypothesis
+# (i1,i2) : one-based treatment/hypothesis indices; control is not indexed
 # (k1,k2) : index for the looks
-# allocRatio : vector providing arm wise allocation ratios including control arm
+# allocRatio : vector providing arm wise allocation ratios with control first
 # info_frac : information fraction at look 1
 varCovZ_Null <- function(i1, k1, i2, k2, allocRatio, info_frac) {
   val <- if (i1 == i2 & k1 == k2) { # Variance Case-1: Same treatment, same look
       1
     } else if (k1 == k2 & i1 != i2) # Covariance Case-2: Different treatments, same look
     {
-        sqrt((allocRatio[i1] / (1 + allocRatio[i1])) * (allocRatio[i2] / (1 + allocRatio[i2])))
+        sqrt((allocRatio[i1 + 1] / (1 + allocRatio[i1 + 1])) *
+          (allocRatio[i2 + 1] / (1 + allocRatio[i2 + 1])))
     } else if (i1 == i2 & k1 != k2) # Covariance Case-3: Same treatment, different looks
     {
       sqrt(info_frac[1])
     } else if (i1 != i2 & k1 != k2) # Covariance Case-4: Different treatments, different looks
     {
       sqrt(info_frac[1] * 
-        (allocRatio[i1] / (1 + allocRatio[i1])) * (allocRatio[i2] / (1 + allocRatio[i2])))
+        (allocRatio[i1 + 1] / (1 + allocRatio[i1 + 1])) *
+        (allocRatio[i2 + 1] / (1 + allocRatio[i2 + 1])))
     } else {
       stop("Error in varCovZ_Null: Invalid indices")
     }
