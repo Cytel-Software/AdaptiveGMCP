@@ -1,12 +1,30 @@
 ---
-description: This file defines a mandatory Git sync gate that must run before any repo-changing task.
+description: This file defines when the mandatory Git sync gate applies before local repository changes.
 ---
 
 # Mandatory Git Sync Gate
 
-Before starting any new task, run a repository state check first.
+Run this gate only when the task will change the local repository or Git state.
 
-## Step 0: Repository State Check (Always First)
+## Applicability
+
+Run the gate before:
+
+- Editing, creating, deleting, generating, or reformatting repository files.
+- Refactoring code or updating dependencies, generated artifacts, configuration, tests, or documentation.
+- Creating commits, changing branches, rebasing, merging, or performing another operation that changes local Git state.
+- Continuing repo-changing work when the working tree is already known to be dirty.
+
+Do not run the gate for:
+
+- Read-only code investigation, explanation, review, or repository searches.
+- Tests, builds, linting, or other validation commands that are not expected to update files.
+- GitHub-only operations such as searching, creating, commenting on, or updating issues and pull requests.
+- Other tasks that neither modify local files nor change local Git state.
+
+## Step 0: Repository State Check
+
+For an applicable task, run this before making changes:
 
 Run:
 
@@ -27,7 +45,7 @@ If any of the above are present:
 
 ## Step 1: Sync With `origin/master`
 
-Before any file edit, code generation, refactor, test run, or commit-related action:
+After Step 0 confirms that the working tree is clean:
 
 1. Run: `git fetch origin master`
 2. Run: `git status --porcelain`
@@ -37,5 +55,6 @@ Before any file edit, code generation, refactor, test run, or commit-related act
 
 ## Enforcement
 
-- Do not make any repository changes until all steps above pass.
+- Do not make local repository or Git-state changes until all applicable steps above pass.
+- Do not invoke this gate solely because a task reads repository content or changes remote GitHub metadata.
 - If any gate step fails, report the exact failure and wait for user direction.

@@ -2009,7 +2009,7 @@ testthat::test_that("AnalyzeLook_PC: selection validity at look > 1", {
       p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
       selection = c("H1", "H5"), plotGraphs = FALSE
     ),
-    regexp = "subset of available hypotheses"
+    regexp = "subset of current IndexSet"
   )
 
   # Empty selection vector

@@ -7,6 +7,12 @@
 
 ## Corrections
 
+* CER design inputs now expose consistent control/treatment arm names across
+  allocation ratios, endpoint-specific standard deviations, and proportions;
+  CER Look 2 sample-size adaptations are interpreted positionally in control
+  and unique continuing-treatment arm order, regardless of names, and must
+  specify exactly that number of arms.
+
 * Removed the redundant `strategy_update` argument from `AnalyzeLook_CER()`;
   strategy adaptations are supplied directly through `new_weights` and
   `new_G`.

@@ -33,15 +33,18 @@ SetupDesign_CER(
 
 \item{SampleSize}{Planned total sample size.}
 
-\item{EpType}{Named endpoint-type list containing `"Continuous"` or `"Binary"`.}
+\item{EpType}{Endpoint-type list containing `"Continuous"` or `"Binary"`.
+Unnamed entries are assigned endpoint names automatically.}
 
-\item{sigma}{Endpoint-specific arm standard deviations.}
+\item{sigma}{Endpoint-specific arm standard deviations. Values are ordered
+control, treatment 1, treatment 2, and so on.}
 
 \item{CommonStdDev}{Whether treatment standard deviations equal control.}
 
-\item{prop.ctr}{Endpoint-specific binary control proportions.}
+\item{prop.ctr}{Endpoint-specific binary control arm proportions.}
 
-\item{allocRatio}{Arm allocation ratios, control first.}
+\item{allocRatio}{Arm allocation ratios, control first, followed by
+treatment 1, treatment 2, and so on.}
 
 \item{WI}{Initial graph weights.}
 

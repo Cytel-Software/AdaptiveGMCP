@@ -137,8 +137,36 @@ CaptureCerRegressionOutputsForTest <- function( lScenario )
         ) )
       }
 
+      vTargetArms <- names(vStage2SampleSize)
+
+      if (is.null(vTargetArms) || any(!nzchar(vTargetArms)))
+      {
+        stop(
+          "Stage-2 sample sizes must be named by arm.",
+          call. = FALSE
+        )
+      }
+
+      if (anyDuplicated(vTargetArms))
+      {
+        stop(
+          "Stage-2 sample-size arm names must be unique.",
+          call. = FALSE
+        )
+      }
+
+      vUnknownArms <- setdiff(vTargetArms, colnames(AllocSampleSize))
+      if (length(vUnknownArms) > 0L)
+      {
+        stop(
+          "Unknown stage-2 sample-size arm(s): ",
+          paste(vUnknownArms, collapse = ", "),
+          call. = FALSE
+        )
+      }
+
       mNewAllocSampleSize <- AllocSampleSize
-      mNewAllocSampleSize[ 2, names( vStage2SampleSize ) ] <- as.numeric( vStage2SampleSize )
+      mNewAllocSampleSize[2, vTargetArms] <- as.numeric(vStage2SampleSize)
 
       return( list(
         newAllocSampleSize = mNewAllocSampleSize,

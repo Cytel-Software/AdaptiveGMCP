@@ -351,8 +351,9 @@ Issues: #59 and #62.
 3. Reuse selection and strategy helpers only after verifying that their state
    semantics match CER.
 4. Replace sample-size prompts with a pure validator and application helper.
-5. Validate cumulative sizes against Stage 1 accrual, active arms, names,
-   dimensions, finiteness, and resulting allocation ratios.
+5. Validate cumulative sizes against Stage 1 accrual, the exact number of
+   unique continuing arms, finiteness, and resulting allocation ratios while
+   treating vector names as irrelevant.
 6. For adapted Stage 2, combine planned artifacts from `design` with current
    decisions from `state`, preserve conditional error, compute cumulative
    p-values, and test against adjusted boundaries.
