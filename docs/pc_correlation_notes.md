@@ -1,25 +1,25 @@
 # PC Analysis Correlation Notes
 
-This note explains the role of `Correlation` in the stateless PC analysis API.
+This note explains the role of the `mCorrelation` argument in the non-interactive PC analysis API.
 
 ## Summary
 
-- `SetupAnalysis_PC()` no longer accepts a `Correlation` argument.
-- `AnalyzeLook_PC()` accepts `Correlation` as a look-level input.
-- For `test.type = "Dunnett"` or `"Partly-Parametric"`, `Correlation` is mandatory at look 1.
-- For later looks, `Correlation` is optional; if omitted, the most recently stored matrix is reused.
+- `SetupAnalysisPC()` no longer accepts a `Correlation` argument.
+- `AnalyzeLookPC()` accepts `mCorrelation` as a look-level input.
+- For `strTestType = "Dunnett"` or `"Partly-Parametric"`, `mCorrelation` is mandatory at look 1.
+- For later looks, `mCorrelation` is optional; if omitted, the most recently stored matrix is reused.
 - These matrices affect the multiplicity-adjusted intersection p-values used by the p-value combination analysis.
 - They do not directly change graph weights, transition rules, alpha-spending boundaries, or selection decisions.
 
-## `Correlation` in `SetupAnalysis_PC()`
+## `Correlation` in `SetupAnalysisPC()`
 
-`SetupAnalysis_PC()` does not accept user-supplied correlation input.
+`SetupAnalysisPC()` does not accept user-supplied correlation input.
 
-Behavior depends on `test.type`:
+Behavior depends on `strTestType`:
 
 - `"Dunnett"` and `"Partly-Parametric"`:
   - `mcpObj$Correlation` is initialized to `NULL`.
-  - The required matrix is supplied at look 1 through `AnalyzeLook_PC(Correlation = ...)`.
+  - The required matrix is supplied at look 1 through `AnalyzeLookPC(mCorrelation = ...)`.
 - `"Bonf"`:
   - `mcpObj$Correlation` is initialized to a diagonal/`NA` matrix.
   - This effectively removes parametric dependence borrowing across different hypotheses.
@@ -31,21 +31,21 @@ Key code:
 - `R/PcAnalysisApi.R`: correlation setup and storage in `mcpObj$Correlation`
 - `R/pValueAdaptGmcpHelper.R`: downstream use in adjusted p-value calculations
 
-## `Correlation` in `AnalyzeLook_PC()`
+## `Correlation` in `AnalyzeLookPC()`
 
-`AnalyzeLook_PC()` accepts `Correlation` as a look-level argument.
+`AnalyzeLookPC()` accepts `mCorrelation` as a look-level argument.
 
-- At look 1, `Correlation` is required for `test.type = "Dunnett"` and `"Partly-Parametric"`.
-- At look > 1, `Correlation` is optional for those test types.
+- At look 1, `mCorrelation` is required for `strTestType = "Dunnett"` and `"Partly-Parametric"`.
+- At look > 1, `mCorrelation` is optional for those test types.
 - If supplied, it is validated by `applyCorrelationUpdate()` and replaces the stored matrix.
 - If omitted at look > 1, the previously stored matrix remains in effect.
 - It must be a symmetric `d x d` matrix with diagonal equal to 1.
 - Entries must lie in `[-1, 1]` or be `NA`.
-- If the current `test.type` is `"Dunnett"` and `Correlation` contains any `NA`, the code issues a warning and converts `test.type` to `"Partly-Parametric"` before storing the replacement matrix.
+- If the current `strTestType` is `"Dunnett"` and `mCorrelation` contains any `NA`, the code issues a warning and converts `strTestType` to `"Partly-Parametric"` before storing the replacement matrix.
 
 Important detail:
 
-- `Correlation` is a full replacement when provided, not an incremental patch.
+- `mCorrelation` is a full replacement when provided, not an incremental patch.
 - The matrix dimension stays tied to the full initial hypothesis set, not only the currently active hypotheses.
 
 Key code:
@@ -74,7 +74,7 @@ The p-value combination method works in two layers:
 1. At each look, compute adjusted p-values for each relevant intersection hypothesis.
 2. From look 2 onward, combine look-wise adjusted p-values across looks using the inverse-normal method.
 
-`Correlation` matters in step 1:
+`mCorrelation` matters in step 1:
 
 - They determine the adjusted p-values produced at the current look.
 - Those adjusted p-values are then carried forward into the inverse-normal combination step.
@@ -82,13 +82,13 @@ The p-value combination method works in two layers:
 
 By contrast, these inputs do not directly control:
 
-- graph structure updates (`new_weights`, `new_G`)
-- hypothesis selection (`selection`)
+- graph structure updates (`vWeights`, `mGMatrix`)
+- hypothesis selection (`vSelectHypo`)
 - group-sequential boundaries from `rpact`
-- inverse-normal weights derived from `info_frac`
+- inverse-normal weights derived from `vInfoFracts`
 
 ## Practical Interpretation
 
-For `"Dunnett"` and `"Partly-Parametric"`, supply `Correlation` at look 1.
+For `"Dunnett"` and `"Partly-Parametric"`, supply `mCorrelation` at look 1.
 
-At later looks, supply `Correlation` only when the dependence structure needs to change; otherwise omit it to keep using the current stored matrix.
+At later looks, supply `mCorrelation` only when the dependence structure needs to change; otherwise omit it to keep using the current stored matrix.

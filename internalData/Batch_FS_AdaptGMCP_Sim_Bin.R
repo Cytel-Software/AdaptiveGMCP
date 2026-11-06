@@ -4,9 +4,9 @@
 
 library(tidyverse)
 
-# We will use the function simMAMSMEP_Wrapper() for executing a batch.
+# We will use the function SimulateMAMSMEPWrapper() for executing a batch.
 
-# # First constructing a model as required by simMAMSMEP_Wrapper() and testing it
+# # First constructing a model as required by SimulateMAMSMEPWrapper() and testing it
 # # manually
 # num_arms <- 5 # four treatment arms versus a common control
 # ep_type <- list(EP1 = "Binary") # One binary endpoint
@@ -37,7 +37,7 @@ library(tidyverse)
 #
 # out1
 
-# Now trying the same example using simMAMSMEP_Wrapper()
+# Now trying the same example using SimulateMAMSMEPWrapper()
 # dfInput <- read_csv("internalData/BatchInput_FS_GMCP_Sim_Bin.csv")
 # dfInput <- read_csv("internalData/BatchInput_AGMCP_Sim_Bin_2.csv")
 dfInput <- read_csv("internalData/BatchInput_AGMCP_Sim_Bin_3.csv")
@@ -56,7 +56,7 @@ dfInput$nSimulation <- 100 # 10000 #
 
 tStartTime <- Sys.time()
 
-dfOutput <- simMAMSMEP_Wrapper(InputDF = dfInput %>%
+dfOutput <- SimulateMAMSMEPWrapper(dfInput = dfInput %>%
                                  filter(ModelID %in% nModelsToRun))
 
 tElapTime <- Sys.time() - tStartTime

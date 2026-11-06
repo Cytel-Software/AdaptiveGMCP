@@ -1,5 +1,5 @@
-# Section 5: genPowerTablePlots positive contract cases.
-# genPowerTablePlots reshapes wrapper-style power output into wide/long tables. It requires a
+# Section 5: GeneratePowerTablePlots positive contract cases.
+# GeneratePowerTablePlots reshapes wrapper-style power output into wide/long tables. It requires a
 # template (ModelID, Level1, Level2, Method) with exactly two Method values and a dfOut carrying
 # the requested PowerType column. Inputs are built inline; ggplot2/gridExtra are Suggests, so the
 # function's library() calls are guarded with skip_if_not_installed.
@@ -45,27 +45,27 @@ ExpectValidPowerTableContract <- function(res, expectedScenarioRows)
   testthat::expect_setequal(unique(res$TableLong$MAMS), c("CER", "CombPValue"))
 }
 
-testthat::test_that("Section 5 positive contract: genPowerTablePlots builds tables for Global.Power", {
+testthat::test_that("Section 5 positive contract: GeneratePowerTablePlots builds tables for Global.Power", {
   testthat::skip_if_not_installed("ggplot2")
   testthat::skip_if_not_installed("gridExtra")
 
-  res <- genPowerTablePlots(
-    PowerType = "Global.Power",
-    dfOut = MakePlotDfOut(),
-    TableTemDF = MakePlotTemplateDF()
+  res <- GeneratePowerTablePlots(
+    strPowerType = "Global.Power",
+    dfOutput = MakePlotDfOut(),
+    dfTableTemplate = MakePlotTemplateDF()
   )
 
   ExpectValidPowerTableContract(res = res, expectedScenarioRows = 2)
 })
 
-testthat::test_that("Section 5 positive contract: genPowerTablePlots builds tables for Conjunctive.Power", {
+testthat::test_that("Section 5 positive contract: GeneratePowerTablePlots builds tables for Conjunctive.Power", {
   testthat::skip_if_not_installed("ggplot2")
   testthat::skip_if_not_installed("gridExtra")
 
-  res <- genPowerTablePlots(
-    PowerType = "Conjunctive.Power",
-    dfOut = MakePlotDfOut(),
-    TableTemDF = MakePlotTemplateDF()
+  res <- GeneratePowerTablePlots(
+    strPowerType = "Conjunctive.Power",
+    dfOutput = MakePlotDfOut(),
+    dfTableTemplate = MakePlotTemplateDF()
   )
 
   ExpectValidPowerTableContract(res = res, expectedScenarioRows = 2)

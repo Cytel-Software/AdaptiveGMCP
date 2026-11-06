@@ -293,7 +293,7 @@ testthat::test_that("Section 3 negative: WI length mismatch is rejected", {
   ExpectInvalidInput(out = out, field = "'WI'")
 })
 
-# Section 4: simMAMSMEP_Wrapper positive contract cases.
+# Section 4: SimulateMAMSMEPWrapper positive contract cases.
 # The wrapper consumes a data frame of scenario rows (CSV-style) and maps each row to simMAMSMEP
 # via run1TestCase. Input rows are built inline with hard-coded values (expression columns as
 # R-code strings). nSimulation / nSimulation_Stage2 / Parallel are set to fast, serial values.
@@ -358,7 +358,7 @@ testthat::test_that("Section 4 positive contract: wrapper runs binary CombPValue
     plotGraphs = FALSE, Parallel = FALSE
   )
 
-  dfOut <- simMAMSMEP_Wrapper(InputDF = dfInput, sOutPath = tempfile(fileext = ".csv"))
+  dfOut <- SimulateMAMSMEPWrapper(dfInput = dfInput, strOutputPath = tempfile(fileext = ".csv"))
 
   ExpectValidWrapperOutput(dfOut = dfOut, expectedModelIds = 1)
   testthat::expect_equal(dfOut$Method, "CombPValue")
@@ -383,7 +383,7 @@ testthat::test_that("Section 4 positive contract: wrapper runs continuous CER sc
     plotGraphs = FALSE, Parallel = FALSE
   )
 
-  dfOut <- simMAMSMEP_Wrapper(InputDF = dfInput, sOutPath = tempfile(fileext = ".csv"))
+  dfOut <- SimulateMAMSMEPWrapper(dfInput = dfInput, strOutputPath = tempfile(fileext = ".csv"))
 
   ExpectValidWrapperOutput(dfOut = dfOut, expectedModelIds = 2)
   testthat::expect_equal(dfOut$Method, "CER")
@@ -419,13 +419,13 @@ testthat::test_that("Section 4 positive contract: wrapper runs mixed endpoint Co
     plotGraphs = FALSE, Parallel = FALSE
   )
 
-  dfOut <- simMAMSMEP_Wrapper(InputDF = dfInput, sOutPath = tempfile(fileext = ".csv"))
+  dfOut <- SimulateMAMSMEPWrapper(dfInput = dfInput, strOutputPath = tempfile(fileext = ".csv"))
 
   ExpectValidWrapperOutput(dfOut = dfOut, expectedModelIds = 164)
   testthat::expect_equal(dfOut$Method, "CombPValue")
 })
 
-# Section 5: simMAMSMEP_Wrapper negative/validation cases.
+# Section 5: SimulateMAMSMEPWrapper negative/validation cases.
 # The wrapper skips rows whose scenario fails; when no row succeeds it has no results to
 # assemble and errors while finalizing output. Each test induces one bad row and asserts the
 # wrapper surfaces a failure rather than returning a valid result.
@@ -457,7 +457,7 @@ testthat::test_that("Section 5 negative: wrapper fails when a required column is
   dfInput$Method <- NULL
 
   testthat::expect_error(
-    simMAMSMEP_Wrapper(InputDF = dfInput, sOutPath = tempfile(fileext = ".csv"))
+    SimulateMAMSMEPWrapper(dfInput = dfInput, strOutputPath = tempfile(fileext = ".csv"))
   )
 })
 
@@ -466,7 +466,7 @@ testthat::test_that("Section 5 negative: wrapper fails on an unparseable express
   dfInput$WI <- "c(1/4, 1/4, 1/4,"
 
   testthat::expect_error(
-    simMAMSMEP_Wrapper(InputDF = dfInput, sOutPath = tempfile(fileext = ".csv"))
+    SimulateMAMSMEPWrapper(dfInput = dfInput, strOutputPath = tempfile(fileext = ".csv"))
   )
 })
 
@@ -476,6 +476,6 @@ testthat::test_that("Section 5 negative: wrapper fails on inconsistent per-row d
   dfInput$Arms.alloc.ratio <- "c(1, 1, 1)"
 
   testthat::expect_error(
-    simMAMSMEP_Wrapper(InputDF = dfInput, sOutPath = tempfile(fileext = ".csv"))
+    SimulateMAMSMEPWrapper(dfInput = dfInput, strOutputPath = tempfile(fileext = ".csv"))
   )
 })

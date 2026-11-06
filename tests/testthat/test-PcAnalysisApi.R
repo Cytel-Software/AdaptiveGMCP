@@ -26,14 +26,14 @@ testthat::test_that("Test 1: PC analysis API scaffolds", {
   tt <- "Partly-Parametric"
   des <- "asOF"
 
-  state <- SetupAnalysis_PC(
-    WI = wi,
-    G = g,
-    test.type = tt,
-    alpha = alp,
-    planned_info_frac = t,
-    typeOfDesign = des,
-    plotGraphs = FALSE
+  state <- SetupAnalysisPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = tt,
+    dAlpha = alp,
+    vInfoFracts = t,
+    strDesignType = des,
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_s3_class(state, "PCAnalysisState")
@@ -42,9 +42,9 @@ testthat::test_that("Test 1: PC analysis API scaffolds", {
   # Look 1
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30),
-    Correlation = corr,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30),
+    mCorrelation = corr,
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_equal(state$completed_looks, 1L)
@@ -60,9 +60,9 @@ testthat::test_that("Test 1: PC analysis API scaffolds", {
   # Look 2 with selection
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.02, H2 = 0.10, H4 = 0.40),
-    selection = c("H1", "H2", "H4"),
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.02, H2 = 0.10, H4 = 0.40),
+    vSelectHypo = c("H1", "H2", "H4"),
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_equal(state$completed_looks, 2L)
@@ -78,8 +78,8 @@ testthat::test_that("Test 1: PC analysis API scaffolds", {
   # Look 3
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H2 = 0.05, H4 = 0.10),
-    plotGraphs = FALSE
+    vRawPVals = c(H2 = 0.05, H4 = 0.10),
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_equal(state$completed_looks, 3L)
@@ -110,8 +110,8 @@ testthat::test_that("print.PCAnalysisState reports setup and current-look result
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.10, H2 = 0.20),
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.10, H2 = 0.20),
+    bPlotGraphs = FALSE
   )
   look_one_output <- capture.output(print(state))
   testthat::expect_true(any(grepl("Adj P-values for the intersection hypotheses at Look: 1", look_one_output, fixed = TRUE)))
@@ -122,8 +122,8 @@ testthat::test_that("print.PCAnalysisState reports setup and current-look result
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.08, H2 = 0.12),
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.08, H2 = 0.12),
+    bPlotGraphs = FALSE
   )
   look_two_output <- capture.output(print(state))
   testthat::expect_true(any(grepl("Combined P-values for the intersection hypotheses at Look: 2", look_two_output, fixed = TRUE)))
@@ -154,15 +154,15 @@ testthat::test_that("Test 2: PC analysis API scaffolds (strategy modification)",
   tt <- "Partly-Parametric"
   des <- "asOF"
 
-  state <- SetupAnalysis_PC(
-    WI = wi,
-    G = g,
-    test.type = tt,
-    alpha = alp,
-    planned_info_frac = t,
-    typeOfDesign = des,
-    plotGraphs = FALSE,
-    MultipleWinners = FALSE
+  state <- SetupAnalysisPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = tt,
+    dAlpha = alp,
+    vInfoFracts = t,
+    strDesignType = des,
+    bPlotGraphs = FALSE,
+    bMultipleWinners = FALSE
   )
 
   testthat::expect_identical(
@@ -173,9 +173,9 @@ testthat::test_that("Test 2: PC analysis API scaffolds (strategy modification)",
   # Look 1
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.03, H2 = 0.20, H3 = 0.10, H4 = 0.25),
-    Correlation = corr,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.03, H2 = 0.20, H3 = 0.10, H4 = 0.25),
+    mCorrelation = corr,
+    bPlotGraphs = FALSE
   )
 
   exp_out <- readRDS(testthat::test_path("t2.l1.AdjPValues.rds"))
@@ -192,10 +192,10 @@ testthat::test_that("Test 2: PC analysis API scaffolds (strategy modification)",
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.02, H2 = 0.12, H3 = 0.08, H4 = 0.20),
-    new_weights = new_weights,
-    new_G = new_G,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.02, H2 = 0.12, H3 = 0.08, H4 = 0.20),
+    vWeights = new_weights,
+    mGMatrix = new_G,
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_equal(state$completed_looks, 2L)
@@ -235,15 +235,15 @@ testthat::test_that("Test 3: PC analysis API scaffolds (full transition at look 
   tt <- "Partly-Parametric"
   des <- "asOF"
 
-  state <- SetupAnalysis_PC(
-    WI = wi,
-    G = g,
-    test.type = tt,
-    alpha = alp,
-    planned_info_frac = t,
-    typeOfDesign = des,
-    plotGraphs = FALSE,
-    MultipleWinners = TRUE
+  state <- SetupAnalysisPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = tt,
+    dAlpha = alp,
+    vInfoFracts = t,
+    strDesignType = des,
+    bPlotGraphs = FALSE,
+    bMultipleWinners = TRUE
   )
 
   exp_out <- readRDS(testthat::test_path("t3.bdryTab.rds"))
@@ -252,9 +252,9 @@ testthat::test_that("Test 3: PC analysis API scaffolds (full transition at look 
   # Look 1
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.04, H2 = 0.18, H3 = 0.12, H4 = 0.22),
-    Correlation = corr,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.04, H2 = 0.18, H3 = 0.12, H4 = 0.22),
+    mCorrelation = corr,
+    bPlotGraphs = FALSE
   )
 
   exp_out <- readRDS(testthat::test_path("t3.l1.AdjPValues.rds"))
@@ -279,12 +279,12 @@ testthat::test_that("Test 3: PC analysis API scaffolds (full transition at look 
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.03, H2 = 0.10, H3 = 0.08),
-    selection = selection,
-    new_weights = new_weights,
-    new_G = new_G,
-    Correlation = Correlation,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.03, H2 = 0.10, H3 = 0.08),
+    vSelectHypo = selection,
+    vWeights = new_weights,
+    mGMatrix = new_G,
+    mCorrelation = Correlation,
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_equal(state$completed_looks, 2L)
@@ -298,56 +298,56 @@ testthat::test_that("Test 3: PC analysis API scaffolds (full transition at look 
 
 ############
 # Test 4: look argument validation # COMPLETED
-testthat::test_that("AnalyzeLook_PC: look argument validation and error handling", {
+testthat::test_that("AnalyzeLookPC: look argument validation and error handling", {
   # Minimal 2-hypothesis, 2-look setup (no option guard needed — tests error conditions and
   # completed_looks only, not specific computed output values)
   wi <- c(0.5, 0.5)
   g <- matrix(c(0, 1, 1, 0), byrow = TRUE, nrow = 2)
   corr <- matrix(c(1, 0.5, 0.5, 1), byrow = TRUE, nrow = 2)
 
-  state0 <- SetupAnalysis_PC(
-    WI = wi,
-    G = g,
-    test.type = "Bonf",
-    alpha = 0.025,
-    planned_info_frac = c(0.5, 1.0),
-    plotGraphs = FALSE
+  state0 <- SetupAnalysisPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = "Bonf",
+    dAlpha = 0.025,
+    vInfoFracts = c(0.5, 1.0),
+    bPlotGraphs = FALSE
   )
 
   # --- Pure validation errors (fired before any computation) ---
 
   # look mismatch: state expects look 1, user passes look = 2
   testthat::expect_error(
-    AnalyzeLook_PC_TestWrapper(state0, p_raw = c(H1 = 0.10, H2 = 0.20), look = 2L, plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper(state0, vRawPVals = c(H1 = 0.10, H2 = 0.20), nLook = 2L, bPlotGraphs = FALSE),
     regexp = "does not match the expected next look"
   )
 
   # look is non-numeric
   testthat::expect_error(
-    AnalyzeLook_PC_TestWrapper(state0, p_raw = c(H1 = 0.10, H2 = 0.20), look = "a", plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper(state0, vRawPVals = c(H1 = 0.10, H2 = 0.20), nLook = "a", bPlotGraphs = FALSE),
     regexp = "single positive integer"
   )
 
   # look is non-integer numeric (1.5)
   testthat::expect_error(
-    AnalyzeLook_PC_TestWrapper(state0, p_raw = c(H1 = 0.10, H2 = 0.20), look = 1.5, plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper(state0, vRawPVals = c(H1 = 0.10, H2 = 0.20), nLook = 1.5, bPlotGraphs = FALSE),
     regexp = "single positive integer"
   )
 
   # look = 0 (not positive)
   testthat::expect_error(
-    AnalyzeLook_PC_TestWrapper(state0, p_raw = c(H1 = 0.10, H2 = 0.20), look = 0L, plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper(state0, vRawPVals = c(H1 = 0.10, H2 = 0.20), nLook = 0L, bPlotGraphs = FALSE),
     regexp = "single positive integer"
   )
 
   # --- Correct usage ---
 
   # look = NULL (default): proceeds normally and completed_looks advances
-  state1_null <- AnalyzeLook_PC_TestWrapper(state0, p_raw = c(H1 = 0.10, H2 = 0.20), look = NULL, plotGraphs = FALSE)
+  state1_null <- AnalyzeLook_PC_TestWrapper(state0, vRawPVals = c(H1 = 0.10, H2 = 0.20), nLook = NULL, bPlotGraphs = FALSE)
   testthat::expect_equal(state1_null$completed_looks, 1L)
 
   # look = 1L (correct explicit value): same result as omitting look
-  state1_expl <- AnalyzeLook_PC_TestWrapper(state0, p_raw = c(H1 = 0.10, H2 = 0.20), look = 1L, plotGraphs = FALSE)
+  state1_expl <- AnalyzeLook_PC_TestWrapper(state0, vRawPVals = c(H1 = 0.10, H2 = 0.20), nLook = 1L, bPlotGraphs = FALSE)
   testthat::expect_equal(state1_expl$completed_looks, 1L)
 
   testthat::expect_equal(state1_null, state1_expl)
@@ -355,12 +355,12 @@ testthat::test_that("AnalyzeLook_PC: look argument validation and error handling
   # --- After final look: completed-trial error ---
 
   # Run look 2 to complete the trial
-  state2 <- AnalyzeLook_PC_TestWrapper(state1_null, p_raw = c(H1 = 0.10, H2 = 0.20), look = 2L, plotGraphs = FALSE)
+  state2 <- AnalyzeLook_PC_TestWrapper(state1_null, vRawPVals = c(H1 = 0.10, H2 = 0.20), nLook = 2L, bPlotGraphs = FALSE)
   testthat::expect_true(state2$trial_completed)
 
   # Calling again after final look must report that the trial has concluded.
   testthat::expect_error(
-    AnalyzeLook_PC_TestWrapper(state2, p_raw = c(H1 = 0.10, H2 = 0.20), plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper(state2, vRawPVals = c(H1 = 0.10, H2 = 0.20), bPlotGraphs = FALSE),
     regexp = "Trial already concluded"
   )
 
@@ -371,24 +371,24 @@ testthat::test_that("AnalyzeLook_PC: look argument validation and error handling
   state_early_stopped$trial_completed <- TRUE   # completed_looks (1) < LastLook (2)
 
   testthat::expect_error(
-    AnalyzeLook_PC_TestWrapper(state_early_stopped, p_raw = c(H1 = 0.10, H2 = 0.20), plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper(state_early_stopped, vRawPVals = c(H1 = 0.10, H2 = 0.20), bPlotGraphs = FALSE),
     regexp = "Trial already concluded"
   )
 })
 
 ############
 # Test 5: Always-on structural invariant test (no skip guard, no RDS fixtures) # COMPLETED
-testthat::test_that("AnalyzeLook_PC: structural invariants hold across looks", {
+testthat::test_that("AnalyzeLookPC: structural invariants hold across looks", {
   wi <- c(0.5, 0.5)
   g <- matrix(c(0, 1, 1, 0), byrow = TRUE, nrow = 2)
   
-  state <- SetupAnalysis_PC(
-    WI = wi,
-    G = g,
-    test.type = "Bonf",
-    alpha = 0.025,
-    planned_info_frac = c(0.5, 1.0),
-    plotGraphs = FALSE
+  state <- SetupAnalysisPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = "Bonf",
+    dAlpha = 0.025,
+    vInfoFracts = c(0.5, 1.0),
+    bPlotGraphs = FALSE
   )
 
   # Initial state
@@ -400,8 +400,8 @@ testthat::test_that("AnalyzeLook_PC: structural invariants hold across looks", {
   # Look 1: completed_looks advances, AdjPValues is populated, trial not yet complete
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.10, H2 = 0.20),
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.10, H2 = 0.20),
+    bPlotGraphs = FALSE
   )
   testthat::expect_equal(state$completed_looks, 1L)
   testthat::expect_false(state$trial_completed)
@@ -412,15 +412,15 @@ testthat::test_that("AnalyzeLook_PC: structural invariants hold across looks", {
   # Look 2 (final look): trial_completed flips to TRUE, completed_looks = 2
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.10, H2 = 0.20),
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.10, H2 = 0.20),
+    bPlotGraphs = FALSE
   )
   testthat::expect_equal(state$completed_looks, 2L)
   testthat::expect_true(state$trial_completed)
 
   # Calling again after trial is complete must error
   testthat::expect_error(
-    AnalyzeLook_PC_TestWrapper(state, p_raw = c(H1 = 0.10, H2 = 0.20), plotGraphs = FALSE)
+    AnalyzeLook_PC_TestWrapper(state, vRawPVals = c(H1 = 0.10, H2 = 0.20), bPlotGraphs = FALSE)
   )
 })
 
@@ -442,13 +442,13 @@ testthat::test_that("Test 6a: Bonferroni, fixed-sample, 3-hypo simple allocation
   t <- c(1)  # Fixed sample: 1 look
 
   # Setup
-  state <- SetupAnalysis_PC(
-    WI = wi,
-    G = g,
-    test.type = tt,
-    alpha = alp,
-    planned_info_frac = t,
-    plotGraphs = FALSE
+  state <- SetupAnalysisPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = tt,
+    dAlpha = alp,
+    vInfoFracts = t,
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_s3_class(state, "PCAnalysisState")
@@ -459,8 +459,8 @@ testthat::test_that("Test 6a: Bonferroni, fixed-sample, 3-hypo simple allocation
   # Raw p-values from file: p1=0.02, p2=0.055, p3=0.012
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.02, H2 = 0.055, H3 = 0.012),
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.02, H2 = 0.055, H3 = 0.012),
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_equal(state$completed_looks, 1L)
@@ -497,13 +497,13 @@ testthat::test_that("Test 6b: Bonferroni, fixed-sample, 4-hypo hierarchical gate
   t <- c(1)  # Fixed sample: 1 look
 
   # Setup
-  state <- SetupAnalysis_PC(
-    WI = wi,
-    G = g,
-    test.type = tt,
-    alpha = alp,
-    planned_info_frac = t,
-    plotGraphs = FALSE
+  state <- SetupAnalysisPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = tt,
+    dAlpha = alp,
+    vInfoFracts = t,
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_s3_class(state, "PCAnalysisState")
@@ -514,8 +514,8 @@ testthat::test_that("Test 6b: Bonferroni, fixed-sample, 4-hypo hierarchical gate
   # Raw p-values from file: p1=0.04, p2=0.01, p3=0.03, p4=0.04
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.04, H2 = 0.01, H3 = 0.03, H4 = 0.04),
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.04, H2 = 0.01, H3 = 0.03, H4 = 0.04),
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_equal(state$completed_looks, 1L)
@@ -550,13 +550,13 @@ testthat::test_that("Test 6c: Bonferroni, fixed-sample, 4-hypo serial gatekeepin
   t <- c(1)  # Fixed sample: 1 look
 
   # Setup
-  state <- SetupAnalysis_PC(
-    WI = wi,
-    G = g,
-    test.type = tt,
-    alpha = alp,
-    planned_info_frac = t,
-    plotGraphs = FALSE
+  state <- SetupAnalysisPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = tt,
+    dAlpha = alp,
+    vInfoFracts = t,
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_s3_class(state, "PCAnalysisState")
@@ -566,8 +566,8 @@ testthat::test_that("Test 6c: Bonferroni, fixed-sample, 4-hypo serial gatekeepin
   # Raw p-values from file: p1=0.076, p2=0.035, p3=0.563, p4=0.407
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.076, H2 = 0.035, H3 = 0.563, H4 = 0.407),
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.076, H2 = 0.035, H3 = 0.563, H4 = 0.407),
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_equal(state$completed_looks, 1L)
@@ -609,15 +609,15 @@ testthat::test_that("Test 7: Dunnett, group-sequential, 2-look, no selection/upd
   )
 
   # Setup
-  state <- SetupAnalysis_PC(
-    WI = wi,
-    G = g,
-    test.type = tt,
-    alpha = alp,
-    planned_info_frac = t,
-    typeOfDesign = des,
-    MultipleWinners = TRUE,
-    plotGraphs = FALSE
+  state <- SetupAnalysisPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = tt,
+    dAlpha = alp,
+    vInfoFracts = t,
+    strDesignType = des,
+    bMultipleWinners = TRUE,
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_s3_class(state, "PCAnalysisState")
@@ -628,9 +628,9 @@ testthat::test_that("Test 7: Dunnett, group-sequential, 2-look, no selection/upd
   # Raw p-values from file: p1=0.00045, p2=0.0952, p3=0.0225, p4=0.1104
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.00045, H2 = 0.0952, H3 = 0.0225, H4 = 0.1104),
-    Correlation = corr,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.00045, H2 = 0.0952, H3 = 0.0225, H4 = 0.1104),
+    mCorrelation = corr,
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_equal(state$completed_looks, 1L)
@@ -645,8 +645,8 @@ testthat::test_that("Test 7: Dunnett, group-sequential, 2-look, no selection/upd
   # Raw p-values from file: p2=0.1121, p3=0.0112, p4=0.1153
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H2 = 0.1121, H3 = 0.0112, H4 = 0.1153),
-    plotGraphs = FALSE
+    vRawPVals = c(H2 = 0.1121, H3 = 0.0112, H4 = 0.1153),
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_equal(state$completed_looks, 2L)
@@ -686,23 +686,23 @@ testthat::test_that("Test 8: Dunnett, group-sequential, 2-look, weight modificat
   )
 
   # Setup
-  state <- SetupAnalysis_PC(
-    WI = wi,
-    G = g,
-    test.type = tt,
-    alpha = alp,
-    planned_info_frac = t,
-    typeOfDesign = des,
-    MultipleWinners = TRUE,
-    plotGraphs = FALSE
+  state <- SetupAnalysisPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = tt,
+    dAlpha = alp,
+    vInfoFracts = t,
+    strDesignType = des,
+    bMultipleWinners = TRUE,
+    bPlotGraphs = FALSE
   )
 
   # Look 1 (same as Test 7)
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.00045, H2 = 0.0952, H3 = 0.0225, H4 = 0.1104),
-    Correlation = corr,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.00045, H2 = 0.0952, H3 = 0.0225, H4 = 0.1104),
+    mCorrelation = corr,
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_equal(state$completed_looks, 1L)
@@ -726,10 +726,10 @@ testthat::test_that("Test 8: Dunnett, group-sequential, 2-look, weight modificat
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H2 = 0.0299, H3 = 0.0225, H4 = 0.0586),
-    new_weights = new_weights,
-    new_G = new_G,
-    plotGraphs = FALSE
+    vRawPVals = c(H2 = 0.0299, H3 = 0.0225, H4 = 0.0586),
+    vWeights = new_weights,
+    mGMatrix = new_G,
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_equal(state$completed_looks, 2L)
@@ -762,13 +762,13 @@ testthat::test_that("Test 9: Simes test, fixed-sample, 4-hypo", {
   t <- c(1)  # Fixed sample: 1 look
 
   # Setup
-  state <- SetupAnalysis_PC(
-    WI = wi,
-    G = g,
-    test.type = tt,
-    alpha = alp,
-    planned_info_frac = t,
-    plotGraphs = FALSE
+  state <- SetupAnalysisPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = tt,
+    dAlpha = alp,
+    vInfoFracts = t,
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_s3_class(state, "PCAnalysisState")
@@ -778,8 +778,8 @@ testthat::test_that("Test 9: Simes test, fixed-sample, 4-hypo", {
   # Raw p-values from file: p1=0.01, p2=0.005, p3=0.015, p4=0.022
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.01, H2 = 0.005, H3 = 0.015, H4 = 0.022),
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.01, H2 = 0.005, H3 = 0.015, H4 = 0.022),
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_equal(state$completed_looks, 1L)
@@ -824,13 +824,13 @@ testthat::test_that("Test 10: Dunnett, fixed-sample, 4-hypo, full correlation", 
   )
 
   # Setup
-  state <- SetupAnalysis_PC(
-    WI = wi,
-    G = g,
-    test.type = tt,
-    alpha = alp,
-    planned_info_frac = t,
-    plotGraphs = FALSE
+  state <- SetupAnalysisPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = tt,
+    dAlpha = alp,
+    vInfoFracts = t,
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_s3_class(state, "PCAnalysisState")
@@ -840,9 +840,9 @@ testthat::test_that("Test 10: Dunnett, fixed-sample, 4-hypo, full correlation", 
   # Raw p-values from file: p1=0.01, p2=0.02, p3=0.005, p4=0.5
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.01, H2 = 0.02, H3 = 0.005, H4 = 0.5),
-    Correlation = corr,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.01, H2 = 0.02, H3 = 0.005, H4 = 0.5),
+    mCorrelation = corr,
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_equal(state$completed_looks, 1L)
@@ -887,13 +887,13 @@ testthat::test_that("Test 11: Dunnett, fixed-sample, 4-hypo, equal weights", {
   )
 
   # Setup
-  state <- SetupAnalysis_PC(
-    WI = wi,
-    G = g,
-    test.type = tt,
-    alpha = alp,
-    planned_info_frac = t,
-    plotGraphs = FALSE
+  state <- SetupAnalysisPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = tt,
+    dAlpha = alp,
+    vInfoFracts = t,
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_s3_class(state, "PCAnalysisState")
@@ -904,9 +904,9 @@ testthat::test_that("Test 11: Dunnett, fixed-sample, 4-hypo, equal weights", {
   # Raw p-values from file: p1=0.638, p2=0.01, p3=0.007, p4=3.959E-4
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.638, H2 = 0.01, H3 = 0.007, H4 = 3.959e-4),
-    Correlation = corr,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.638, H2 = 0.01, H3 = 0.007, H4 = 3.959e-4),
+    mCorrelation = corr,
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_equal(state$completed_looks, 1L)
@@ -943,24 +943,24 @@ testthat::test_that("PC equivalence M07: asP design", {
     nrow = 4
   )
 
-  state <- SetupAnalysis_PC(
-    WI = wi,
-    G = g,
-    test.type = "Dunnett",
-    alpha = 0.025,
-    planned_info_frac = c(0.5, 1.0),
-    typeOfDesign = "asP",
-    MultipleWinners = TRUE,
-    Selection = FALSE,
-    UpdateStrategy = FALSE,
-    plotGraphs = FALSE
+  state <- SetupAnalysisPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = "Dunnett",
+    dAlpha = 0.025,
+    vInfoFracts = c(0.5, 1.0),
+    strDesignType = "asP",
+    bMultipleWinners = TRUE,
+    bSelection = FALSE,
+    bUpdateStrategy = FALSE,
+    bPlotGraphs = FALSE
   )
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
-    Correlation = corr,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
+    mCorrelation = corr,
+    bPlotGraphs = FALSE
   )
 
   exp_mcp <- readRDS(testthat::test_path("M07.l1.mcpObj.rds"))
@@ -968,8 +968,8 @@ testthat::test_that("PC equivalence M07: asP design", {
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.08, H2 = 0.09, H3 = 0.12, H4 = 0.15),
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.08, H2 = 0.09, H3 = 0.12, H4 = 0.15),
+    bPlotGraphs = FALSE
   )
 
   exp_mcp <- readRDS(testthat::test_path("M07.l2.mcpObj.rds"))
@@ -1003,25 +1003,25 @@ testthat::test_that("PC equivalence M11: asHSD design", {
     nrow = 4
   )
 
-  state <- SetupAnalysis_PC(
-    WI = wi,
-    G = g,
-    test.type = "Dunnett",
-    alpha = 0.025,
-    planned_info_frac = c(0.5, 1.0),
-    typeOfDesign = "asHSD",
-    gammaA = 2.5,
-    MultipleWinners = TRUE,
-    Selection = FALSE,
-    UpdateStrategy = FALSE,
-    plotGraphs = FALSE
+  state <- SetupAnalysisPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = "Dunnett",
+    dAlpha = 0.025,
+    vInfoFracts = c(0.5, 1.0),
+    strDesignType = "asHSD",
+    dGammaA = 2.5,
+    bMultipleWinners = TRUE,
+    bSelection = FALSE,
+    bUpdateStrategy = FALSE,
+    bPlotGraphs = FALSE
   )
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.25, H2 = 0.30, H3 = 0.35, H4 = 0.40),
-    Correlation = corr,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.25, H2 = 0.30, H3 = 0.35, H4 = 0.40),
+    mCorrelation = corr,
+    bPlotGraphs = FALSE
   )
 
   exp_mcp <- readRDS(testthat::test_path("M11.l1.mcpObj.rds"))
@@ -1029,8 +1029,8 @@ testthat::test_that("PC equivalence M11: asHSD design", {
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.07, H2 = 0.09, H3 = 0.10, H4 = 0.12),
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.07, H2 = 0.09, H3 = 0.10, H4 = 0.12),
+    bPlotGraphs = FALSE
   )
 
   exp_mcp <- readRDS(testthat::test_path("M11.l2.mcpObj.rds"))
@@ -1064,25 +1064,25 @@ testthat::test_that("PC equivalence M12: asKD design", {
     nrow = 4
   )
 
-  state <- SetupAnalysis_PC(
-    WI = wi,
-    G = g,
-    test.type = "Dunnett",
-    alpha = 0.025,
-    planned_info_frac = c(0.5, 1.0),
-    typeOfDesign = "asKD",
-    gammaA = 2.5,
-    MultipleWinners = TRUE,
-    Selection = FALSE,
-    UpdateStrategy = FALSE,
-    plotGraphs = FALSE
+  state <- SetupAnalysisPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = "Dunnett",
+    dAlpha = 0.025,
+    vInfoFracts = c(0.5, 1.0),
+    strDesignType = "asKD",
+    dGammaA = 2.5,
+    bMultipleWinners = TRUE,
+    bSelection = FALSE,
+    bUpdateStrategy = FALSE,
+    bPlotGraphs = FALSE
   )
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.28, H2 = 0.31, H3 = 0.33, H4 = 0.37),
-    Correlation = corr,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.28, H2 = 0.31, H3 = 0.33, H4 = 0.37),
+    mCorrelation = corr,
+    bPlotGraphs = FALSE
   )
 
   exp_mcp <- readRDS(testthat::test_path("M12.l1.mcpObj.rds"))
@@ -1090,8 +1090,8 @@ testthat::test_that("PC equivalence M12: asKD design", {
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.06, H2 = 0.09, H3 = 0.11, H4 = 0.13),
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.06, H2 = 0.09, H3 = 0.11, H4 = 0.13),
+    bPlotGraphs = FALSE
   )
 
   exp_mcp <- readRDS(testthat::test_path("M12.l2.mcpObj.rds"))
@@ -1136,24 +1136,24 @@ testthat::test_that("PC equivalence M19: correlation-only adaptation", {
     nrow = 4
   )
 
-  state <- SetupAnalysis_PC(
-    WI = wi,
-    G = g,
-    test.type = "Dunnett",
-    alpha = 0.025,
-    planned_info_frac = c(0.5, 1.0),
-    typeOfDesign = "asOF",
-    MultipleWinners = TRUE,
-    Selection = FALSE,
-    UpdateStrategy = FALSE,
-    plotGraphs = FALSE
+  state <- SetupAnalysisPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = "Dunnett",
+    dAlpha = 0.025,
+    vInfoFracts = c(0.5, 1.0),
+    strDesignType = "asOF",
+    bMultipleWinners = TRUE,
+    bSelection = FALSE,
+    bUpdateStrategy = FALSE,
+    bPlotGraphs = FALSE
   )
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.26, H2 = 0.29, H3 = 0.34, H4 = 0.38),
-    Correlation = corr,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.26, H2 = 0.29, H3 = 0.34, H4 = 0.38),
+    mCorrelation = corr,
+    bPlotGraphs = FALSE
   )
 
   exp_mcp <- readRDS(testthat::test_path("M19.l1.mcpObj.rds"))
@@ -1161,9 +1161,9 @@ testthat::test_that("PC equivalence M19: correlation-only adaptation", {
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.07, H2 = 0.08, H3 = 0.11, H4 = 0.14),
-    Correlation = new_corr,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.07, H2 = 0.08, H3 = 0.11, H4 = 0.14),
+    mCorrelation = new_corr,
+    bPlotGraphs = FALSE
   )
 
   exp_mcp <- readRDS(testthat::test_path("M19.l2.mcpObj.rds"))
@@ -1197,24 +1197,24 @@ testthat::test_that("PC equivalence M22: early-stop efficacy path", {
     nrow = 4
   )
 
-  state <- SetupAnalysis_PC(
-    WI = wi,
-    G = g,
-    test.type = "Dunnett",
-    alpha = 0.025,
-    planned_info_frac = c(0.5, 1.0),
-    typeOfDesign = "asOF",
-    MultipleWinners = FALSE,
-    Selection = FALSE,
-    UpdateStrategy = FALSE,
-    plotGraphs = FALSE
+  state <- SetupAnalysisPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = "Dunnett",
+    dAlpha = 0.025,
+    vInfoFracts = c(0.5, 1.0),
+    strDesignType = "asOF",
+    bMultipleWinners = FALSE,
+    bSelection = FALSE,
+    bUpdateStrategy = FALSE,
+    bPlotGraphs = FALSE
   )
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 1e-4, H2 = 0.40, H3 = 0.45, H4 = 0.50),
-    Correlation = corr,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 1e-4, H2 = 0.40, H3 = 0.45, H4 = 0.50),
+    mCorrelation = corr,
+    bPlotGraphs = FALSE
   )
 
   exp_mcp <- readRDS(testthat::test_path("M22.l1.mcpObj.rds"))
@@ -1250,24 +1250,24 @@ testthat::test_that("PC equivalence M24: MultipleWinners FALSE", {
     nrow = 4
   )
 
-  state <- SetupAnalysis_PC(
-    WI = wi,
-    G = g,
-    test.type = "Dunnett",
-    alpha = 0.025,
-    planned_info_frac = c(0.5, 1.0),
-    typeOfDesign = "asOF",
-    MultipleWinners = FALSE,
-    Selection = FALSE,
-    UpdateStrategy = FALSE,
-    plotGraphs = FALSE
+  state <- SetupAnalysisPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = "Dunnett",
+    dAlpha = 0.025,
+    vInfoFracts = c(0.5, 1.0),
+    strDesignType = "asOF",
+    bMultipleWinners = FALSE,
+    bSelection = FALSE,
+    bUpdateStrategy = FALSE,
+    bPlotGraphs = FALSE
   )
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.38, H4 = 0.42),
-    Correlation = corr,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.30, H2 = 0.35, H3 = 0.38, H4 = 0.42),
+    mCorrelation = corr,
+    bPlotGraphs = FALSE
   )
 
   exp_mcp <- readRDS(testthat::test_path("M24.l1.mcpObj.rds"))
@@ -1275,8 +1275,8 @@ testthat::test_that("PC equivalence M24: MultipleWinners FALSE", {
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.02, H2 = 0.06, H3 = 0.10, H4 = 0.20),
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.02, H2 = 0.06, H3 = 0.10, H4 = 0.20),
+    bPlotGraphs = FALSE
   )
 
   exp_mcp <- readRDS(testthat::test_path("M24.l2.mcpObj.rds"))
@@ -1310,25 +1310,25 @@ testthat::test_that("PC equivalence M09: WT design", {
     nrow = 4
   )
 
-  state <- SetupAnalysis_PC(
-    WI = wi,
-    G = g,
-    test.type = "Dunnett",
-    alpha = 0.025,
-    planned_info_frac = c(0.5, 1.0),
-    typeOfDesign = "WT",
-    deltaWT = 0.25,
-    MultipleWinners = TRUE,
-    Selection = FALSE,
-    UpdateStrategy = FALSE,
-    plotGraphs = FALSE
+  state <- SetupAnalysisPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = "Dunnett",
+    dAlpha = 0.025,
+    vInfoFracts = c(0.5, 1.0),
+    strDesignType = "WT",
+    dDeltaWT = 0.25,
+    bMultipleWinners = TRUE,
+    bSelection = FALSE,
+    bUpdateStrategy = FALSE,
+    bPlotGraphs = FALSE
   )
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.28, H2 = 0.32, H3 = 0.36, H4 = 0.40),
-    Correlation = corr,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.28, H2 = 0.32, H3 = 0.36, H4 = 0.40),
+    mCorrelation = corr,
+    bPlotGraphs = FALSE
   )
 
   exp_mcp <- readRDS(testthat::test_path("M09.l1.mcpObj.rds"))
@@ -1336,8 +1336,8 @@ testthat::test_that("PC equivalence M09: WT design", {
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.07, H2 = 0.10, H3 = 0.13, H4 = 0.16),
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.07, H2 = 0.10, H3 = 0.13, H4 = 0.16),
+    bPlotGraphs = FALSE
   )
 
   exp_mcp <- readRDS(testthat::test_path("M09.l2.mcpObj.rds"))
@@ -1371,25 +1371,25 @@ testthat::test_that("PC equivalence M13: asUser design", {
     nrow = 4
   )
 
-  state <- SetupAnalysis_PC(
-    WI = wi,
-    G = g,
-    test.type = "Dunnett",
-    alpha = 0.025,
-    planned_info_frac = c(0.5, 1.0),
-    typeOfDesign = "asUser",
-    userAlphaSpending = c(0.008, 0.025),
-    MultipleWinners = TRUE,
-    Selection = FALSE,
-    UpdateStrategy = FALSE,
-    plotGraphs = FALSE
+  state <- SetupAnalysisPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = "Dunnett",
+    dAlpha = 0.025,
+    vInfoFracts = c(0.5, 1.0),
+    strDesignType = "asUser",
+    vUserAlphaSpending = c(0.008, 0.025),
+    bMultipleWinners = TRUE,
+    bSelection = FALSE,
+    bUpdateStrategy = FALSE,
+    bPlotGraphs = FALSE
   )
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.29, H2 = 0.33, H3 = 0.37, H4 = 0.41),
-    Correlation = corr,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.29, H2 = 0.33, H3 = 0.37, H4 = 0.41),
+    mCorrelation = corr,
+    bPlotGraphs = FALSE
   )
 
   exp_mcp <- readRDS(testthat::test_path("M13.l1.mcpObj.rds"))
@@ -1397,8 +1397,8 @@ testthat::test_that("PC equivalence M13: asUser design", {
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.07, H2 = 0.09, H3 = 0.12, H4 = 0.15),
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.07, H2 = 0.09, H3 = 0.12, H4 = 0.15),
+    bPlotGraphs = FALSE
   )
 
   exp_mcp <- readRDS(testthat::test_path("M13.l2.mcpObj.rds"))
@@ -1432,24 +1432,24 @@ testthat::test_that("PC equivalence M17: selection-only adaptation", {
     nrow = 4
   )
 
-  state <- SetupAnalysis_PC(
-    WI = wi,
-    G = g,
-    test.type = "Dunnett",
-    alpha = 0.025,
-    planned_info_frac = c(0.5, 1.0),
-    typeOfDesign = "asOF",
-    MultipleWinners = TRUE,
-    Selection = TRUE,
-    UpdateStrategy = FALSE,
-    plotGraphs = FALSE
+  state <- SetupAnalysisPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = "Dunnett",
+    dAlpha = 0.025,
+    vInfoFracts = c(0.5, 1.0),
+    strDesignType = "asOF",
+    bMultipleWinners = TRUE,
+    bSelection = TRUE,
+    bUpdateStrategy = FALSE,
+    bPlotGraphs = FALSE
   )
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.21, H2 = 0.24, H3 = 0.30, H4 = 0.35),
-    Correlation = corr,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.21, H2 = 0.24, H3 = 0.30, H4 = 0.35),
+    mCorrelation = corr,
+    bPlotGraphs = FALSE
   )
 
   exp_mcp <- readRDS(testthat::test_path("M17.l1.mcpObj.rds"))
@@ -1457,9 +1457,9 @@ testthat::test_that("PC equivalence M17: selection-only adaptation", {
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.05, H2 = 0.07, H4 = 0.11),
-    selection = c("H1", "H2", "H4"),
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.05, H2 = 0.07, H4 = 0.11),
+    vSelectHypo = c("H1", "H2", "H4"),
+    bPlotGraphs = FALSE
   )
 
   exp_mcp <- readRDS(testthat::test_path("M17.l2.mcpObj.rds"))
@@ -1493,24 +1493,24 @@ testthat::test_that("PC equivalence M08: noEarlyEfficacy design", {
     nrow = 4
   )
 
-  state <- SetupAnalysis_PC(
-    WI = wi,
-    G = g,
-    test.type = "Dunnett",
-    alpha = 0.025,
-    planned_info_frac = c(0.5, 1.0),
-    typeOfDesign = "noEarlyEfficacy",
-    MultipleWinners = TRUE,
-    Selection = FALSE,
-    UpdateStrategy = FALSE,
-    plotGraphs = FALSE
+  state <- SetupAnalysisPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = "Dunnett",
+    dAlpha = 0.025,
+    vInfoFracts = c(0.5, 1.0),
+    strDesignType = "noEarlyEfficacy",
+    bMultipleWinners = TRUE,
+    bSelection = FALSE,
+    bUpdateStrategy = FALSE,
+    bPlotGraphs = FALSE
   )
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.31, H2 = 0.34, H3 = 0.38, H4 = 0.43),
-    Correlation = corr,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.31, H2 = 0.34, H3 = 0.38, H4 = 0.43),
+    mCorrelation = corr,
+    bPlotGraphs = FALSE
   )
 
   exp_mcp <- readRDS(testthat::test_path("M08.l1.mcpObj.rds"))
@@ -1518,8 +1518,8 @@ testthat::test_that("PC equivalence M08: noEarlyEfficacy design", {
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.08, H2 = 0.10, H3 = 0.12, H4 = 0.16),
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.08, H2 = 0.10, H3 = 0.12, H4 = 0.16),
+    bPlotGraphs = FALSE
   )
 
   exp_mcp <- readRDS(testthat::test_path("M08.l2.mcpObj.rds"))
@@ -1542,23 +1542,23 @@ testthat::test_that("PC equivalence M02: Sidak baseline", {
     nrow = 4
   )
 
-  state <- SetupAnalysis_PC(
-    WI = wi,
-    G = g,
-    test.type = "Sidak",
-    alpha = 0.025,
-    planned_info_frac = c(1.0),
-    typeOfDesign = "asOF",
-    MultipleWinners = TRUE,
-    Selection = FALSE,
-    UpdateStrategy = FALSE,
-    plotGraphs = FALSE
+  state <- SetupAnalysisPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = "Sidak",
+    dAlpha = 0.025,
+    vInfoFracts = c(1.0),
+    strDesignType = "asOF",
+    bMultipleWinners = TRUE,
+    bSelection = FALSE,
+    bUpdateStrategy = FALSE,
+    bPlotGraphs = FALSE
   )
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.01, H2 = 0.02, H3 = 0.03, H4 = 0.04),
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.01, H2 = 0.02, H3 = 0.03, H4 = 0.04),
+    bPlotGraphs = FALSE
   )
 
   exp_mcp <- readRDS(testthat::test_path("M02.l1.mcpObj.rds"))
@@ -1568,16 +1568,16 @@ testthat::test_that("PC equivalence M02: Sidak baseline", {
 
 ############################################################################
 # Issue #75 matrix row M10: PT design — DEFERRED (N/A for this pass)
-# rpact requires deltaPT0 which is not yet exposed by SetupAnalysis_PC() or
+# rpact requires deltaPT0 which is not yet exposed by SetupAnalysisPC() or
 # adaptGMCP_PC(). This row is marked N/A for this pass. Add a fixture-backed
 # equivalence test once deltaPT0 parameter support is added to the API.
 ############################################################################
 
 ############################################################################
-# Issue #67 Phase 1: SetupAnalysis_PC() contract-validation tests
+# Issue #67 Phase 1: SetupAnalysisPC() contract-validation tests
 ############################################################################
 
-testthat::test_that("SetupAnalysis_PC: WI validation - type, NA, negativity, and sum", {
+testthat::test_that("SetupAnalysisPC: WI validation - type, NA, negativity, and sum", {
   wi <- c(0.5, 0.5, 0, 0)
   g <- matrix(
     c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
@@ -1586,74 +1586,74 @@ testthat::test_that("SetupAnalysis_PC: WI validation - type, NA, negativity, and
 
   # Non-numeric WI
   testthat::expect_error(
-    SetupAnalysis_PC(
-      WI = c("a", "b", "c", "d"), G = g, test.type = "Bonf",
-      alpha = 0.025, planned_info_frac = c(1), plotGraphs = FALSE
+    SetupAnalysisPC(
+      vWeights = c("a", "b", "c", "d"), mGMatrix = g, strTestType = "Bonf",
+      dAlpha = 0.025, vInfoFracts = c(1), bPlotGraphs = FALSE
     ),
     regexp = "numeric, non-negative, and non-NA"
   )
 
   # WI with NA
   testthat::expect_error(
-    SetupAnalysis_PC(
-      WI = c(0.5, NA, 0, 0), G = g, test.type = "Bonf",
-      alpha = 0.025, planned_info_frac = c(1), plotGraphs = FALSE
+    SetupAnalysisPC(
+      vWeights = c(0.5, NA, 0, 0), mGMatrix = g, strTestType = "Bonf",
+      dAlpha = 0.025, vInfoFracts = c(1), bPlotGraphs = FALSE
     ),
     regexp = "numeric, non-negative, and non-NA"
   )
 
   # WI with negative value
   testthat::expect_error(
-    SetupAnalysis_PC(
-      WI = c(0.5, -0.1, 0, 0), G = g, test.type = "Bonf",
-      alpha = 0.025, planned_info_frac = c(1), plotGraphs = FALSE
+    SetupAnalysisPC(
+      vWeights = c(0.5, -0.1, 0, 0), mGMatrix = g, strTestType = "Bonf",
+      dAlpha = 0.025, vInfoFracts = c(1), bPlotGraphs = FALSE
     ),
     regexp = "numeric, non-negative, and non-NA"
   )
 
   # WI summing to > 1
   testthat::expect_error(
-    SetupAnalysis_PC(
-      WI = c(0.6, 0.6, 0, 0), G = g, test.type = "Bonf",
-      alpha = 0.025, planned_info_frac = c(1), plotGraphs = FALSE
+    SetupAnalysisPC(
+      vWeights = c(0.6, 0.6, 0, 0), mGMatrix = g, strTestType = "Bonf",
+      dAlpha = 0.025, vInfoFracts = c(1), bPlotGraphs = FALSE
     ),
-    regexp = "Sum of WI"
+    regexp = "Sum of vWeights"
   )
 
   # WI dimension mismatch with G: WI has 2 elements, G is 4 x 4
   testthat::expect_error(
-    SetupAnalysis_PC(
-      WI = c(0.5, 0.5), G = g, test.type = "Bonf",
-      alpha = 0.025, planned_info_frac = c(1), plotGraphs = FALSE
+    SetupAnalysisPC(
+      vWeights = c(0.5, 0.5), mGMatrix = g, strTestType = "Bonf",
+      dAlpha = 0.025, vInfoFracts = c(1), bPlotGraphs = FALSE
     ),
-    regexp = "transition matrix"
+    regexp = "mGMatrix"
   )
 })
 
-testthat::test_that("SetupAnalysis_PC: G validation - matrix requirement and dimensions", {
+testthat::test_that("SetupAnalysisPC: G validation - matrix requirement and dimensions", {
   wi <- c(0.5, 0.5, 0, 0)
 
   # G is not a matrix (vector instead)
   testthat::expect_error(
-    SetupAnalysis_PC(
-      WI = wi, G = c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
-      test.type = "Bonf", alpha = 0.025, planned_info_frac = c(1), plotGraphs = FALSE
+    SetupAnalysisPC(
+      vWeights = wi, mGMatrix = c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
+      strTestType = "Bonf", dAlpha = 0.025, vInfoFracts = c(1), bPlotGraphs = FALSE
     ),
-    regexp = "transition matrix"
+    regexp = "mGMatrix"
   )
 
   # G has wrong dimensions (3 x 3 instead of 4 x 4)
   gBad <- matrix(c(0, 0.5, 0.5, 0.5, 0, 0.5, 0.5, 0.5, 0), byrow = TRUE, nrow = 3)
   testthat::expect_error(
-    SetupAnalysis_PC(
-      WI = wi, G = gBad, test.type = "Bonf",
-      alpha = 0.025, planned_info_frac = c(1), plotGraphs = FALSE
+    SetupAnalysisPC(
+      vWeights = wi, mGMatrix = gBad, strTestType = "Bonf",
+      dAlpha = 0.025, vInfoFracts = c(1), bPlotGraphs = FALSE
     ),
-    regexp = "transition matrix"
+    regexp = "mGMatrix"
   )
 })
 
-testthat::test_that("SetupAnalysis_PC: planned_info_frac validation - length, bounds, and monotonicity", {
+testthat::test_that("SetupAnalysisPC: vInfoFracts validation - length, bounds, and monotonicity", {
   wi <- c(0.5, 0.5, 0, 0)
   g <- matrix(
     c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
@@ -1662,51 +1662,51 @@ testthat::test_that("SetupAnalysis_PC: planned_info_frac validation - length, bo
 
   # Empty info_frac
   testthat::expect_error(
-    SetupAnalysis_PC(
-      WI = wi, G = g, test.type = "Bonf",
-      alpha = 0.025, planned_info_frac = numeric(0), plotGraphs = FALSE
+    SetupAnalysisPC(
+      vWeights = wi, mGMatrix = g, strTestType = "Bonf",
+      dAlpha = 0.025, vInfoFracts = numeric(0), bPlotGraphs = FALSE
     ),
-    regexp = "info_frac must have length"
+    regexp = "vInfoFracts must have length"
   )
 
   # info_frac contains zero (not in (0, 1])
   testthat::expect_error(
-    SetupAnalysis_PC(
-      WI = wi, G = g, test.type = "Bonf",
-      alpha = 0.025, planned_info_frac = c(0, 0.5, 1.0), plotGraphs = FALSE
+    SetupAnalysisPC(
+      vWeights = wi, mGMatrix = g, strTestType = "Bonf",
+      dAlpha = 0.025, vInfoFracts = c(0, 0.5, 1.0), bPlotGraphs = FALSE
     ),
-    regexp = "info_frac must be in"
+    regexp = "vInfoFracts must be in"
   )
 
   # info_frac contains value > 1
   testthat::expect_error(
-    SetupAnalysis_PC(
-      WI = wi, G = g, test.type = "Bonf",
-      alpha = 0.025, planned_info_frac = c(0.5, 1.2), plotGraphs = FALSE
+    SetupAnalysisPC(
+      vWeights = wi, mGMatrix = g, strTestType = "Bonf",
+      dAlpha = 0.025, vInfoFracts = c(0.5, 1.2), bPlotGraphs = FALSE
     ),
-    regexp = "info_frac must be in"
+    regexp = "vInfoFracts must be in"
   )
 
   # info_frac not strictly increasing (repeated value)
   testthat::expect_error(
-    SetupAnalysis_PC(
-      WI = wi, G = g, test.type = "Bonf",
-      alpha = 0.025, planned_info_frac = c(0.5, 0.5, 1.0), plotGraphs = FALSE
+    SetupAnalysisPC(
+      vWeights = wi, mGMatrix = g, strTestType = "Bonf",
+      dAlpha = 0.025, vInfoFracts = c(0.5, 0.5, 1.0), bPlotGraphs = FALSE
     ),
     regexp = "strictly increasing"
   )
 
   # info_frac not strictly increasing (decreasing segment)
   testthat::expect_error(
-    SetupAnalysis_PC(
-      WI = wi, G = g, test.type = "Bonf",
-      alpha = 0.025, planned_info_frac = c(0.7, 0.5, 1.0), plotGraphs = FALSE
+    SetupAnalysisPC(
+      vWeights = wi, mGMatrix = g, strTestType = "Bonf",
+      dAlpha = 0.025, vInfoFracts = c(0.7, 0.5, 1.0), bPlotGraphs = FALSE
     ),
     regexp = "strictly increasing"
   )
 })
 
-testthat::test_that("SetupAnalysis_PC: unsupported test.type is rejected", {
+testthat::test_that("SetupAnalysisPC: unsupported test.type is rejected", {
   wi <- c(0.5, 0.5, 0, 0)
   g <- matrix(
     c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
@@ -1714,58 +1714,58 @@ testthat::test_that("SetupAnalysis_PC: unsupported test.type is rejected", {
   )
 
   testthat::expect_error(
-    SetupAnalysis_PC(
-      WI = wi, G = g, test.type = "Unknown",
-      alpha = 0.025, planned_info_frac = c(1), plotGraphs = FALSE
+    SetupAnalysisPC(
+      vWeights = wi, mGMatrix = g, strTestType = "Unknown",
+      dAlpha = 0.025, vInfoFracts = c(1), bPlotGraphs = FALSE
     ),
-    regexp = "Unsupported test.type"
+    regexp = "Unsupported strTestType"
   )
 })
 
-testthat::test_that("SetupAnalysis_PC: correlation policy by test.type", {
+testthat::test_that("SetupAnalysisPC: correlation policy by test.type", {
   wi <- c(0.5, 0.5, 0, 0)
   g <- matrix(
     c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
     byrow = TRUE, nrow = 4
   )
-  # Dunnett and Partly-Parametric defer Correlation to AnalyzeLook_PC
-  stateDunnett <- SetupAnalysis_PC(
-    WI = wi, G = g, test.type = "Dunnett",
-    alpha = 0.025, planned_info_frac = c(1), plotGraphs = FALSE
+  # Dunnett and Partly-Parametric defer Correlation to AnalyzeLookPC
+  stateDunnett <- SetupAnalysisPC(
+    vWeights = wi, mGMatrix = g, strTestType = "Dunnett",
+    dAlpha = 0.025, vInfoFracts = c(1), bPlotGraphs = FALSE
   )
   testthat::expect_null(stateDunnett$mcpObj$Correlation)
 
-  statePP <- SetupAnalysis_PC(
-    WI = wi, G = g, test.type = "Partly-Parametric",
-    alpha = 0.025, planned_info_frac = c(1), plotGraphs = FALSE
+  statePP <- SetupAnalysisPC(
+    vWeights = wi, mGMatrix = g, strTestType = "Partly-Parametric",
+    dAlpha = 0.025, vInfoFracts = c(1), bPlotGraphs = FALSE
   )
   testthat::expect_null(statePP$mcpObj$Correlation)
 
   # Bonf: overrides Correlation to identity with NA off-diagonal
-  stateBonf <- SetupAnalysis_PC(
-    WI = wi, G = g, test.type = "Bonf",
-    alpha = 0.025, planned_info_frac = c(1), plotGraphs = FALSE
+  stateBonf <- SetupAnalysisPC(
+    vWeights = wi, mGMatrix = g, strTestType = "Bonf",
+    dAlpha = 0.025, vInfoFracts = c(1), bPlotGraphs = FALSE
   )
   corrExpBonf <- diag(4)
   corrExpBonf[corrExpBonf == 0] <- NA
   testthat::expect_equal(stateBonf$mcpObj$Correlation, corrExpBonf)
 
   # Sidak: sets Correlation to NA
-  stateSidak <- SetupAnalysis_PC(
-    WI = wi, G = g, test.type = "Sidak",
-    alpha = 0.025, planned_info_frac = c(1), plotGraphs = FALSE
+  stateSidak <- SetupAnalysisPC(
+    vWeights = wi, mGMatrix = g, strTestType = "Sidak",
+    dAlpha = 0.025, vInfoFracts = c(1), bPlotGraphs = FALSE
   )
   testthat::expect_true(is.na(stateSidak$mcpObj$Correlation))
 
   # Simes: sets Correlation to NA
-  stateSimes <- SetupAnalysis_PC(
-    WI = wi, G = g, test.type = "Simes",
-    alpha = 0.025, planned_info_frac = c(1), plotGraphs = FALSE
+  stateSimes <- SetupAnalysisPC(
+    vWeights = wi, mGMatrix = g, strTestType = "Simes",
+    dAlpha = 0.025, vInfoFracts = c(1), bPlotGraphs = FALSE
   )
   testthat::expect_true(is.na(stateSimes$mcpObj$Correlation))
 })
 
-testthat::test_that("SetupAnalysis_PC: asUser typeOfDesign requires userAlphaSpending", {
+testthat::test_that("SetupAnalysisPC: asUser typeOfDesign requires userAlphaSpending", {
   wi <- c(0.5, 0.5, 0, 0)
   g <- matrix(
     c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
@@ -1773,23 +1773,23 @@ testthat::test_that("SetupAnalysis_PC: asUser typeOfDesign requires userAlphaSpe
   )
   # Missing userAlphaSpending when typeOfDesign = 'asUser'
   testthat::expect_error(
-    SetupAnalysis_PC(
-      WI = wi, G = g, test.type = "Dunnett",
-      alpha = 0.025, planned_info_frac = c(0.5, 1.0),
-      typeOfDesign = "asUser",
-      plotGraphs = FALSE
+    SetupAnalysisPC(
+      vWeights = wi, mGMatrix = g, strTestType = "Dunnett",
+      dAlpha = 0.025, vInfoFracts = c(0.5, 1.0),
+      strDesignType = "asUser",
+      bPlotGraphs = FALSE
     ),
-    regexp = "userAlphaSpending"
+    regexp = "vUserAlphaSpending"
   )
 
   # Valid asUser call does not error
   testthat::expect_no_error(
-    SetupAnalysis_PC(
-      WI = wi, G = g, test.type = "Dunnett",
-      alpha = 0.025, planned_info_frac = c(0.5, 1.0),
-      typeOfDesign = "asUser",
-      userAlphaSpending = c(0.008, 0.025),
-      plotGraphs = FALSE
+    SetupAnalysisPC(
+      vWeights = wi, mGMatrix = g, strTestType = "Dunnett",
+      dAlpha = 0.025, vInfoFracts = c(0.5, 1.0),
+      strDesignType = "asUser",
+      vUserAlphaSpending = c(0.008, 0.025),
+      bPlotGraphs = FALSE
     )
   )
 })
@@ -1798,71 +1798,71 @@ testthat::test_that("SetupAnalysis_PC: asUser typeOfDesign requires userAlphaSpe
 # Issue #70 Phase 2: AnalyzeLook_PC_TestWrapper() input-validation tests
 ############################################################################
 
-testthat::test_that("AnalyzeLook_PC: non-PCAnalysisState input is rejected", {
+testthat::test_that("AnalyzeLookPC: non-PCAnalysisState input is rejected", {
   testthat::expect_error(
-    AnalyzeLook_PC_TestWrapper(list(), p_raw = c(H1 = 0.1), plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper(list(), vRawPVals = c(H1 = 0.1), bPlotGraphs = FALSE),
     regexp = "PCAnalysisState"
   )
 
   testthat::expect_error(
-    AnalyzeLook_PC_TestWrapper("not_a_state", p_raw = c(H1 = 0.1), plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper("not_a_state", vRawPVals = c(H1 = 0.1), bPlotGraphs = FALSE),
     regexp = "PCAnalysisState"
   )
 })
 
-testthat::test_that("AnalyzeLook_PC: p_raw contract validation", {
+testthat::test_that("AnalyzeLookPC: p_raw contract validation", {
   wi <- c(0.5, 0.5)
   g <- matrix(c(0, 1, 1, 0), byrow = TRUE, nrow = 2)
 
-  state0 <- SetupAnalysis_PC(
-    WI = wi, G = g, test.type = "Bonf",
-    alpha = 0.025, planned_info_frac = c(0.5, 1.0),
-    plotGraphs = FALSE
+  state0 <- SetupAnalysisPC(
+    vWeights = wi, mGMatrix = g, strTestType = "Bonf",
+    dAlpha = 0.025, vInfoFracts = c(0.5, 1.0),
+    bPlotGraphs = FALSE
   )
 
   # Non-numeric p_raw
   testthat::expect_error(
-    AnalyzeLook_PC_TestWrapper(state0, p_raw = c(H1 = "a", H2 = "b"), plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper(state0, vRawPVals = c(H1 = "a", H2 = "b"), bPlotGraphs = FALSE),
     regexp = "p_raw must be numeric"
   )
 
   # p_raw contains NA
   testthat::expect_error(
-    AnalyzeLook_PC_TestWrapper(state0, p_raw = c(H1 = 0.1, H2 = NA), plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper(state0, vRawPVals = c(H1 = 0.1, H2 = NA), bPlotGraphs = FALSE),
     regexp = "p_raw cannot contain NA"
   )
 
   # p_raw value below 0
   testthat::expect_error(
-    AnalyzeLook_PC_TestWrapper(state0, p_raw = c(H1 = -0.1, H2 = 0.2), plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper(state0, vRawPVals = c(H1 = -0.1, H2 = 0.2), bPlotGraphs = FALSE),
     regexp = "p_raw values must be in"
   )
 
   # p_raw value above 1
   testthat::expect_error(
-    AnalyzeLook_PC_TestWrapper(state0, p_raw = c(H1 = 1.1, H2 = 0.2), plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper(state0, vRawPVals = c(H1 = 1.1, H2 = 0.2), bPlotGraphs = FALSE),
     regexp = "p_raw values must be in"
   )
 
   # Unnamed p_raw with wrong length
   testthat::expect_error(
-    AnalyzeLook_PC_TestWrapper(state0, p_raw = c(0.1, 0.2, 0.3), plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper(state0, vRawPVals = c(0.1, 0.2, 0.3), bPlotGraphs = FALSE),
     regexp = "Unnamed p_raw must have length"
   )
 
   # Named p_raw with names not matching current IndexSet
   testthat::expect_error(
-    AnalyzeLook_PC_TestWrapper(state0, p_raw = c(X1 = 0.1, X2 = 0.2), plotGraphs = FALSE),
+    AnalyzeLook_PC_TestWrapper(state0, vRawPVals = c(X1 = 0.1, X2 = 0.2), bPlotGraphs = FALSE),
     regexp = "p_raw names must match"
   )
 
   # Unnamed p_raw with correct length succeeds
   testthat::expect_no_error(
-    AnalyzeLook_PC_TestWrapper(state0, p_raw = c(0.1, 0.2), plotGraphs = FALSE)
+    AnalyzeLook_PC_TestWrapper(state0, vRawPVals = c(0.1, 0.2), bPlotGraphs = FALSE)
   )
 })
 
-testthat::test_that("AnalyzeLook_PC: look 1 adaptations are ignored with a warning", {
+testthat::test_that("AnalyzeLookPC: look 1 adaptations are ignored with a warning", {
   wi <- c(0.5, 0.5, 0, 0)
   g <- matrix(
     c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
@@ -1873,33 +1873,33 @@ testthat::test_that("AnalyzeLook_PC: look 1 adaptations are ignored with a warni
     nrow = 4
   )
 
-  state0 <- SetupAnalysis_PC(
-    WI = wi, G = g, test.type = "Partly-Parametric",
-    alpha = 0.025, planned_info_frac = c(0.5, 1.0),
-    plotGraphs = FALSE
+  state0 <- SetupAnalysisPC(
+    vWeights = wi, mGMatrix = g, strTestType = "Partly-Parametric",
+    dAlpha = 0.025, vInfoFracts = c(0.5, 1.0),
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_error(
     AnalyzeLook_PC_TestWrapper(
-      state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
-      plotGraphs = FALSE
+      state0, vRawPVals = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
+      bPlotGraphs = FALSE
     ),
-    regexp = "Correlation must be provided at look 1"
+    regexp = "mCorrelation must be provided at look 1"
   )
 
   testthat::expect_warning(
     AnalyzeLook_PC_TestWrapper(
-      state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
-      Correlation = corr,
-      selection = c("H1", "H2"), plotGraphs = FALSE
+      state0, vRawPVals = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
+      mCorrelation = corr,
+      vSelectHypo = c("H1", "H2"), bPlotGraphs = FALSE
     ),
-    regexp = "Look 1 uses the initial design.*selection.*ignored"
+    regexp = "Look 1 uses the initial design.*vSelectHypo.*ignored"
   )
   state_selection <- suppressWarnings(
     AnalyzeLook_PC_TestWrapper(
-      state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
-      Correlation = corr,
-      selection = c("H1", "H2"), plotGraphs = FALSE
+      state0, vRawPVals = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
+      mCorrelation = corr,
+      vSelectHypo = c("H1", "H2"), bPlotGraphs = FALSE
     )
   )
   testthat::expect_identical(state_selection$mcpObj$IndexSet, state0$mcpObj$IndexSet)
@@ -1907,19 +1907,19 @@ testthat::test_that("AnalyzeLook_PC: look 1 adaptations are ignored with a warni
 
   testthat::expect_warning(
     AnalyzeLook_PC_TestWrapper(
-      state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
-      Correlation = corr,
-      new_weights = c(H1 = 0.5, H2 = 0.5, H3 = 0, H4 = 0),
-      plotGraphs = FALSE
+      state0, vRawPVals = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
+      mCorrelation = corr,
+      vWeights = c(H1 = 0.5, H2 = 0.5, H3 = 0, H4 = 0),
+      bPlotGraphs = FALSE
     ),
-    regexp = "Look 1 uses the initial design.*new_weights.*ignored"
+    regexp = "Look 1 uses the initial design.*vWeights.*ignored"
   )
   state_weights <- suppressWarnings(
     AnalyzeLook_PC_TestWrapper(
-      state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
-      Correlation = corr,
-      new_weights = c(H1 = 0.5, H2 = 0.5, H3 = 0, H4 = 0),
-      plotGraphs = FALSE
+      state0, vRawPVals = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
+      mCorrelation = corr,
+      vWeights = c(H1 = 0.5, H2 = 0.5, H3 = 0, H4 = 0),
+      bPlotGraphs = FALSE
     )
   )
   testthat::expect_false(state_weights$mcpObj$Modify)
@@ -1927,17 +1927,17 @@ testthat::test_that("AnalyzeLook_PC: look 1 adaptations are ignored with a warni
 
   testthat::expect_warning(
     AnalyzeLook_PC_TestWrapper(
-      state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
-      Correlation = corr,
-      new_G = g, plotGraphs = FALSE
+      state0, vRawPVals = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
+      mCorrelation = corr,
+      mGMatrix = g, bPlotGraphs = FALSE
     ),
-    regexp = "Look 1 uses the initial design.*new_G.*ignored"
+    regexp = "Look 1 uses the initial design.*mGMatrix.*ignored"
   )
   state_graph <- suppressWarnings(
     AnalyzeLook_PC_TestWrapper(
-      state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
-      Correlation = corr,
-      new_G = g, plotGraphs = FALSE
+      state0, vRawPVals = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
+      mCorrelation = corr,
+      mGMatrix = g, bPlotGraphs = FALSE
     )
   )
   testthat::expect_false(state_graph$mcpObj$Modify)
@@ -1945,20 +1945,20 @@ testthat::test_that("AnalyzeLook_PC: look 1 adaptations are ignored with a warni
 
   testthat::expect_warning(
     AnalyzeLook_PC_TestWrapper(
-      state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
-      Correlation = corr,
-      selection = c("H1", "H2"),
-      new_weights = c(H1 = 0.5, H2 = 0.5, H3 = 0, H4 = 0),
-      new_G = g, plotGraphs = FALSE
+      state0, vRawPVals = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
+      mCorrelation = corr,
+      vSelectHypo = c("H1", "H2"),
+      vWeights = c(H1 = 0.5, H2 = 0.5, H3 = 0, H4 = 0),
+      mGMatrix = g, bPlotGraphs = FALSE
     ),
-    regexp = "selection, new_weights, new_G will be ignored"
+    regexp = "vSelectHypo, vWeights, mGMatrix will be ignored"
   )
 
   # Correlation at look 1 is valid
   testthat::expect_no_error(
     AnalyzeLook_PC_TestWrapper(
-      state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
-      Correlation = corr, plotGraphs = FALSE
+      state0, vRawPVals = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
+      mCorrelation = corr, bPlotGraphs = FALSE
     )
   )
 })
@@ -1967,7 +1967,7 @@ testthat::test_that("AnalyzeLook_PC: look 1 adaptations are ignored with a warni
 # Issue #69 Phase 3: look > 1 adaptation gate and mutation-validation tests
 ############################################################################
 
-testthat::test_that("AnalyzeLook_PC: feature-flag gates at look > 1", {
+testthat::test_that("AnalyzeLookPC: feature-flag gates at look > 1", {
   wi <- c(0.5, 0.5, 0, 0)
   g <- matrix(
     c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
@@ -1979,42 +1979,42 @@ testthat::test_that("AnalyzeLook_PC: feature-flag gates at look > 1", {
   )
 
   # Both feature flags disabled
-  stateNoAdapt <- SetupAnalysis_PC(
-    WI = wi, G = g, test.type = "Dunnett",
-    alpha = 0.025, planned_info_frac = c(0.5, 1.0),
-    Selection = FALSE, UpdateStrategy = FALSE,
-    plotGraphs = FALSE
+  stateNoAdapt <- SetupAnalysisPC(
+    vWeights = wi, mGMatrix = g, strTestType = "Dunnett",
+    dAlpha = 0.025, vInfoFracts = c(0.5, 1.0),
+    bSelection = FALSE, bUpdateStrategy = FALSE,
+    bPlotGraphs = FALSE
   )
   stateNoAdapt <- AnalyzeLook_PC_TestWrapper(
     stateNoAdapt,
-    p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
-    Correlation = corr,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
+    mCorrelation = corr,
+    bPlotGraphs = FALSE
   )
 
   # Selection = FALSE: providing selection must error
   testthat::expect_error(
     AnalyzeLook_PC_TestWrapper(
       stateNoAdapt,
-      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      selection = c("H1", "H2"), plotGraphs = FALSE
+      vRawPVals = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      vSelectHypo = c("H1", "H2"), bPlotGraphs = FALSE
     ),
-    regexp = "Selection was disabled"
+    regexp = "selection was disabled"
   )
 
   # UpdateStrategy = FALSE: providing new_weights/new_G must error
   testthat::expect_error(
     AnalyzeLook_PC_TestWrapper(
       stateNoAdapt,
-      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      new_weights = c(H1 = 0.5, H2 = 0.5, H3 = 0, H4 = 0),
-      new_G = g, plotGraphs = FALSE
+      vRawPVals = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      vWeights = c(H1 = 0.5, H2 = 0.5, H3 = 0, H4 = 0),
+      mGMatrix = g, bPlotGraphs = FALSE
     ),
-    regexp = "UpdateStrategy was disabled"
+    regexp = "strategy updates were disabled"
   )
 })
 
-testthat::test_that("AnalyzeLook_PC: selection validity at look > 1", {
+testthat::test_that("AnalyzeLookPC: selection validity at look > 1", {
   wi <- c(0.5, 0.5, 0, 0)
   g <- matrix(
     c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
@@ -2025,25 +2025,25 @@ testthat::test_that("AnalyzeLook_PC: selection validity at look > 1", {
     nrow = 4
   )
 
-  state1 <- SetupAnalysis_PC(
-    WI = wi, G = g, test.type = "Dunnett",
-    alpha = 0.025, planned_info_frac = c(0.5, 1.0),
-    Selection = TRUE, UpdateStrategy = FALSE,
-    plotGraphs = FALSE
+  state1 <- SetupAnalysisPC(
+    vWeights = wi, mGMatrix = g, strTestType = "Dunnett",
+    dAlpha = 0.025, vInfoFracts = c(0.5, 1.0),
+    bSelection = TRUE, bUpdateStrategy = FALSE,
+    bPlotGraphs = FALSE
   )
   state1 <- AnalyzeLook_PC_TestWrapper(
     state1,
-    p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
-    Correlation = corr,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
+    mCorrelation = corr,
+    bPlotGraphs = FALSE
   )
 
   # Non-character selection
   testthat::expect_error(
     AnalyzeLook_PC_TestWrapper(
       state1,
-      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      selection = c(1L, 2L), plotGraphs = FALSE
+      vRawPVals = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      vSelectHypo = c(1L, 2L), bPlotGraphs = FALSE
     ),
     regexp = "selection must be a character"
   )
@@ -2052,8 +2052,8 @@ testthat::test_that("AnalyzeLook_PC: selection validity at look > 1", {
   testthat::expect_error(
     AnalyzeLook_PC_TestWrapper(
       state1,
-      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      selection = c("H1", "H5"), plotGraphs = FALSE
+      vRawPVals = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      vSelectHypo = c("H1", "H5"), bPlotGraphs = FALSE
     ),
     regexp = "subset of current IndexSet"
   )
@@ -2062,8 +2062,8 @@ testthat::test_that("AnalyzeLook_PC: selection validity at look > 1", {
   testthat::expect_error(
     AnalyzeLook_PC_TestWrapper(
       state1,
-      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      selection = character(0), plotGraphs = FALSE
+      vRawPVals = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      vSelectHypo = character(0), bPlotGraphs = FALSE
     ),
     regexp = "retain at least one hypothesis"
   )
@@ -2072,13 +2072,13 @@ testthat::test_that("AnalyzeLook_PC: selection validity at look > 1", {
   testthat::expect_no_error(
     AnalyzeLook_PC_TestWrapper(
       state1,
-      p_raw = c(H1 = 0.10, H2 = 0.15),
-      selection = c("H1", "H2"), plotGraphs = FALSE
+      vRawPVals = c(H1 = 0.10, H2 = 0.15),
+      vSelectHypo = c("H1", "H2"), bPlotGraphs = FALSE
     )
   )
 })
 
-testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
+testthat::test_that("AnalyzeLookPC: strategy update validity at look > 1", {
   wi <- c(0.5, 0.5, 0, 0)
   g <- matrix(
     c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
@@ -2089,17 +2089,17 @@ testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
     nrow = 4
   )
 
-  state1 <- SetupAnalysis_PC(
-    WI = wi, G = g, test.type = "Dunnett",
-    alpha = 0.025, planned_info_frac = c(0.5, 1.0),
-    Selection = FALSE, UpdateStrategy = TRUE,
-    plotGraphs = FALSE
+  state1 <- SetupAnalysisPC(
+    vWeights = wi, mGMatrix = g, strTestType = "Dunnett",
+    dAlpha = 0.025, vInfoFracts = c(0.5, 1.0),
+    bSelection = FALSE, bUpdateStrategy = TRUE,
+    bPlotGraphs = FALSE
   )
   state1 <- AnalyzeLook_PC_TestWrapper(
     state1,
-    p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
-    Correlation = corr,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
+    mCorrelation = corr,
+    bPlotGraphs = FALSE
   )
 
   vValidNewW <- c(H1 = 0.5, H2 = 0.5, H3 = 0, H4 = 0)
@@ -2112,8 +2112,8 @@ testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
   testthat::expect_error(
     AnalyzeLook_PC_TestWrapper(
       state1,
-      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      new_weights = vValidNewW, plotGraphs = FALSE
+      vRawPVals = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      vWeights = vValidNewW, bPlotGraphs = FALSE
     ),
     regexp = "Both new_weights and new_G"
   )
@@ -2122,8 +2122,8 @@ testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
   testthat::expect_error(
     AnalyzeLook_PC_TestWrapper(
       state1,
-      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      new_G = gValidNew, plotGraphs = FALSE
+      vRawPVals = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      mGMatrix = gValidNew, bPlotGraphs = FALSE
     ),
     regexp = "Both new_weights and new_G"
   )
@@ -2132,9 +2132,9 @@ testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
   testthat::expect_error(
     AnalyzeLook_PC_TestWrapper(
       state1,
-      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      new_weights = c(H1 = "a", H2 = "b", H3 = "c", H4 = "d"),
-      new_G = gValidNew, plotGraphs = FALSE
+      vRawPVals = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      vWeights = c(H1 = "a", H2 = "b", H3 = "c", H4 = "d"),
+      mGMatrix = gValidNew, bPlotGraphs = FALSE
     ),
     regexp = "new_weights must be numeric"
   )
@@ -2143,9 +2143,9 @@ testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
   testthat::expect_error(
     AnalyzeLook_PC_TestWrapper(
       state1,
-      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      new_weights = c(0.5, 0.5),
-      new_G = gValidNew, plotGraphs = FALSE
+      vRawPVals = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      vWeights = c(0.5, 0.5),
+      mGMatrix = gValidNew, bPlotGraphs = FALSE
     ),
     regexp = "Unnamed new_weights must have length"
   )
@@ -2154,9 +2154,9 @@ testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
   testthat::expect_error(
     AnalyzeLook_PC_TestWrapper(
       state1,
-      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      new_weights = c(X1 = 0.5, X2 = 0.5, X3 = 0, X4 = 0),
-      new_G = gValidNew, plotGraphs = FALSE
+      vRawPVals = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      vWeights = c(X1 = 0.5, X2 = 0.5, X3 = 0, X4 = 0),
+      mGMatrix = gValidNew, bPlotGraphs = FALSE
     ),
     regexp = "new_weights names must match"
   )
@@ -2165,9 +2165,9 @@ testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
   testthat::expect_error(
     AnalyzeLook_PC_TestWrapper(
       state1,
-      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      new_weights = c(H1 = 0.7, H2 = 0.7, H3 = 0, H4 = 0),
-      new_G = gValidNew, plotGraphs = FALSE
+      vRawPVals = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      vWeights = c(H1 = 0.7, H2 = 0.7, H3 = 0, H4 = 0),
+      mGMatrix = gValidNew, bPlotGraphs = FALSE
     ),
     regexp = "new_weights must sum"
   )
@@ -2176,10 +2176,10 @@ testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
   testthat::expect_error(
     AnalyzeLook_PC_TestWrapper(
       state1,
-      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      new_weights = vValidNewW,
-      new_G = c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
-      plotGraphs = FALSE
+      vRawPVals = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      vWeights = vValidNewW,
+      mGMatrix = c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
+      bPlotGraphs = FALSE
     ),
     regexp = "new_G must be a matrix"
   )
@@ -2188,10 +2188,10 @@ testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
   testthat::expect_error(
     AnalyzeLook_PC_TestWrapper(
       state1,
-      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      new_weights = vValidNewW,
-      new_G = matrix(c(0, 0.5, 0.5, 0.5, 0, 0.5, 0.5, 0.5, 0), byrow = TRUE, nrow = 3),
-      plotGraphs = FALSE
+      vRawPVals = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      vWeights = vValidNewW,
+      mGMatrix = matrix(c(0, 0.5, 0.5, 0.5, 0, 0.5, 0.5, 0.5, 0), byrow = TRUE, nrow = 3),
+      bPlotGraphs = FALSE
     ),
     regexp = "square matrix of size"
   )
@@ -2202,9 +2202,9 @@ testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
   testthat::expect_error(
     AnalyzeLook_PC_TestWrapper(
       state1,
-      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      new_weights = vValidNewW,
-      new_G = gNeg, plotGraphs = FALSE
+      vRawPVals = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      vWeights = vValidNewW,
+      mGMatrix = gNeg, bPlotGraphs = FALSE
     ),
     regexp = "new_G must be non-negative"
   )
@@ -2217,15 +2217,15 @@ testthat::test_that("AnalyzeLook_PC: strategy update validity at look > 1", {
   testthat::expect_error(
     AnalyzeLook_PC_TestWrapper(
       state1,
-      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      new_weights = vValidNewW,
-      new_G = gBadRowSum, plotGraphs = FALSE
+      vRawPVals = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      vWeights = vValidNewW,
+      mGMatrix = gBadRowSum, bPlotGraphs = FALSE
     ),
     regexp = "row sum"
   )
 })
 
-testthat::test_that("AnalyzeLook_PC: correlation update validity at look > 1", {
+testthat::test_that("AnalyzeLookPC: correlation update validity at look > 1", {
   wi <- c(0.5, 0.5, 0, 0)
   g <- matrix(
     c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
@@ -2236,25 +2236,25 @@ testthat::test_that("AnalyzeLook_PC: correlation update validity at look > 1", {
     nrow = 4
   )
 
-  state1 <- SetupAnalysis_PC(
-    WI = wi, G = g, test.type = "Dunnett",
-    alpha = 0.025, planned_info_frac = c(0.5, 1.0),
-    Selection = FALSE, UpdateStrategy = FALSE,
-    plotGraphs = FALSE
+  state1 <- SetupAnalysisPC(
+    vWeights = wi, mGMatrix = g, strTestType = "Dunnett",
+    dAlpha = 0.025, vInfoFracts = c(0.5, 1.0),
+    bSelection = FALSE, bUpdateStrategy = FALSE,
+    bPlotGraphs = FALSE
   )
   state1 <- AnalyzeLook_PC_TestWrapper(
     state1,
-    p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
-    Correlation = corr,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
+    mCorrelation = corr,
+    bPlotGraphs = FALSE
   )
 
   # Correlation not a matrix must error
   testthat::expect_error(
     AnalyzeLook_PC_TestWrapper(
       state1,
-      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      Correlation = c(1, 0.5, 0.5, 1), plotGraphs = FALSE
+      vRawPVals = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      mCorrelation = c(1, 0.5, 0.5, 1), bPlotGraphs = FALSE
     ),
     regexp = "Correlation must be a matrix"
   )
@@ -2263,9 +2263,9 @@ testthat::test_that("AnalyzeLook_PC: correlation update validity at look > 1", {
   testthat::expect_error(
     AnalyzeLook_PC_TestWrapper(
       state1,
-      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      Correlation = matrix(c(1, 0.5, 0.5, 1), nrow = 2),
-      plotGraphs = FALSE
+      vRawPVals = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      mCorrelation = matrix(c(1, 0.5, 0.5, 1), nrow = 2),
+      bPlotGraphs = FALSE
     ),
     regexp = "Correlation must be a"
   )
@@ -2276,8 +2276,8 @@ testthat::test_that("AnalyzeLook_PC: correlation update validity at look > 1", {
   testthat::expect_error(
     AnalyzeLook_PC_TestWrapper(
       state1,
-      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      Correlation = corrAsym, plotGraphs = FALSE
+      vRawPVals = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      mCorrelation = corrAsym, bPlotGraphs = FALSE
     ),
     regexp = "Correlation must be symmetric"
   )
@@ -2288,8 +2288,8 @@ testthat::test_that("AnalyzeLook_PC: correlation update validity at look > 1", {
   testthat::expect_error(
     AnalyzeLook_PC_TestWrapper(
       state1,
-      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      Correlation = corrBadDiag, plotGraphs = FALSE
+      vRawPVals = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      mCorrelation = corrBadDiag, bPlotGraphs = FALSE
     ),
     regexp = "diagonal must be 1"
   )
@@ -2300,8 +2300,8 @@ testthat::test_that("AnalyzeLook_PC: correlation update validity at look > 1", {
   testthat::expect_error(
     AnalyzeLook_PC_TestWrapper(
       state1,
-      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      Correlation = corrOutOfRange, plotGraphs = FALSE
+      vRawPVals = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      mCorrelation = corrOutOfRange, bPlotGraphs = FALSE
     ),
     regexp = "entries must be in"
   )
@@ -2314,8 +2314,8 @@ testthat::test_that("AnalyzeLook_PC: correlation update validity at look > 1", {
   testthat::expect_warning(
     state2 <- AnalyzeLook_PC_TestWrapper(
       state1,
-      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      Correlation = corrValid, plotGraphs = FALSE
+      vRawPVals = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      mCorrelation = corrValid, bPlotGraphs = FALSE
     ),
     regexp = "converted to 'Partly-Parametric'"
   )
@@ -2323,7 +2323,7 @@ testthat::test_that("AnalyzeLook_PC: correlation update validity at look > 1", {
   testthat::expect_identical(state2$design_params$test.type, "Partly-Parametric")
 })
 
-testthat::test_that("AnalyzeLook_PC: look-level sized correlation update maps to initial hypothesis universe", {
+testthat::test_that("AnalyzeLookPC: look-level sized correlation update maps to initial hypothesis universe", {
   wi <- c(0.5, 0.5, 0, 0)
   g <- matrix(
     c(0, 1, 0, 0,
@@ -2341,18 +2341,18 @@ testthat::test_that("AnalyzeLook_PC: look-level sized correlation update maps to
     byrow = TRUE, nrow = 4
   )
 
-  state <- SetupAnalysis_PC(
-    WI = wi, G = g, test.type = "Dunnett",
-    alpha = 0.025, planned_info_frac = c(0.5, 1.0),
-    Selection = TRUE, UpdateStrategy = TRUE,
-    plotGraphs = FALSE
+  state <- SetupAnalysisPC(
+    vWeights = wi, mGMatrix = g, strTestType = "Dunnett",
+    dAlpha = 0.025, vInfoFracts = c(0.5, 1.0),
+    bSelection = TRUE, bUpdateStrategy = TRUE,
+    bPlotGraphs = FALSE
   )
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
-    Correlation = corr_l1,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
+    mCorrelation = corr_l1,
+    bPlotGraphs = FALSE
   )
 
   new_weights <- c(H1 = 0.5, H2 = 0.5, H4 = 0)
@@ -2372,12 +2372,12 @@ testthat::test_that("AnalyzeLook_PC: look-level sized correlation update maps to
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.10, H2 = 0.15, H4 = 0.20),
-    selection = c("H1", "H2", "H4"),
-    new_weights = new_weights,
-    new_G = new_G,
-    Correlation = corr_l2_subset,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.10, H2 = 0.15, H4 = 0.20),
+    vSelectHypo = c("H1", "H2", "H4"),
+    vWeights = new_weights,
+    mGMatrix = new_G,
+    mCorrelation = corr_l2_subset,
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_equal(dim(state$mcpObj$Correlation), c(4, 4))
@@ -2391,7 +2391,7 @@ testthat::test_that("AnalyzeLook_PC: look-level sized correlation update maps to
   testthat::expect_equal(state$completed_looks, 2L)
 })
 
-testthat::test_that("AnalyzeLook_PC: Dunnett stays Dunnett when updated correlation is fully specified", {
+testthat::test_that("AnalyzeLookPC: Dunnett stays Dunnett when updated correlation is fully specified", {
   wi <- c(0.5, 0.5, 0, 0)
   g <- matrix(
     c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
@@ -2402,17 +2402,17 @@ testthat::test_that("AnalyzeLook_PC: Dunnett stays Dunnett when updated correlat
     nrow = 4
   )
 
-  state1 <- SetupAnalysis_PC(
-    WI = wi, G = g, test.type = "Dunnett",
-    alpha = 0.025, planned_info_frac = c(0.5, 1.0),
-    Selection = FALSE, UpdateStrategy = FALSE,
-    plotGraphs = FALSE
+  state1 <- SetupAnalysisPC(
+    vWeights = wi, mGMatrix = g, strTestType = "Dunnett",
+    dAlpha = 0.025, vInfoFracts = c(0.5, 1.0),
+    bSelection = FALSE, bUpdateStrategy = FALSE,
+    bPlotGraphs = FALSE
   )
   state1 <- AnalyzeLook_PC_TestWrapper(
     state1,
-    p_raw = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
-    Correlation = corr,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
+    mCorrelation = corr,
+    bPlotGraphs = FALSE
   )
 
   corrValid <- matrix(
@@ -2422,15 +2422,15 @@ testthat::test_that("AnalyzeLook_PC: Dunnett stays Dunnett when updated correlat
   state2 <- testthat::expect_no_warning(
     AnalyzeLook_PC_TestWrapper(
       state1,
-      p_raw = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      Correlation = corrValid, plotGraphs = FALSE
+      vRawPVals = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
+      mCorrelation = corrValid, bPlotGraphs = FALSE
     )
   )
   testthat::expect_identical(state2$mcpObj$test.type, "Dunnett")
   testthat::expect_identical(state2$design_params$test.type, "Dunnett")
 })
 
-testthat::test_that("AnalyzeLook_PC output validation", {
+testthat::test_that("AnalyzeLookPC output validation", {
     G <- matrix(c(0,0.5,0.5,0,
                 0.5,0,0,0.5,
                 0,1,0,0,
@@ -2444,17 +2444,17 @@ testthat::test_that("AnalyzeLook_PC output validation", {
                 byrow=TRUE, nrow= 4)
 
     # Setting up the design
-    state <- SetupAnalysis_PC(WI = c(1/2,1/2,0,0), G = G, test.type = "Partly-Parametric",
-                alpha = 0.025, planned_info_frac = c(0.5,0.7,1), typeOfDesign = "asOF",
-                plotGraphs = FALSE)
+    state <- SetupAnalysisPC(vWeights = c(1/2,1/2,0,0), mGMatrix = G, strTestType = "Partly-Parametric",
+                dAlpha = 0.025, vInfoFracts = c(0.5,0.7,1), strDesignType = "asOF",
+                bPlotGraphs = FALSE)
 
     # print("Initial design:")
     # print(state)
 
     # Look 1 Analysis
-    state <- AnalyzeLook_PC(state, look = 1,
-                p_raw = c(H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30),
-                Correlation  = corr, plotGraphs = FALSE)
+    state <- AnalyzeLookPC(state, nLook = 1,
+                vRawPVals = c(H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30),
+                mCorrelation  = corr, bPlotGraphs = FALSE)
 
     act_out <- state$mcpObj
 
@@ -2469,9 +2469,9 @@ testthat::test_that("AnalyzeLook_PC output validation", {
     testthat::expect_true( CompareImportantMcpMembers( act_out, exp_out ) )
 
     # Look 2 Analysis
-    state <- AnalyzeLook_PC(state, look = 2,
-                p_raw = c(H1 = 0.02, H2 = 0.10, H4 = 0.40),
-                selection = c("H1", "H2", "H4"), plotGraphs = FALSE)
+    state <- AnalyzeLookPC(state, nLook = 2,
+                vRawPVals = c(H1 = 0.02, H2 = 0.10, H4 = 0.40),
+                vSelectHypo = c("H1", "H2", "H4"), bPlotGraphs = FALSE)
 
     exp_out <- readRDS(testthat::test_path("PC-test-01.l2.mcpObj.rds"))
     act_out <- state$mcpObj
@@ -2479,8 +2479,8 @@ testthat::test_that("AnalyzeLook_PC output validation", {
     testthat::expect_true( CompareImportantMcpMembers( act_out, exp_out ) )
 
     # Look 3 Analysis
-    state <- AnalyzeLook_PC(state, look = 3,
-                p_raw = c(H2 = 0.005, H4 = 0.10), plotGraphs = FALSE)
+    state <- AnalyzeLookPC(state, nLook = 3,
+                vRawPVals = c(H2 = 0.005, H4 = 0.10), bPlotGraphs = FALSE)
 
     exp_out <- readRDS(testthat::test_path("PC-test-01.l3.mcpObj.rds"))
     act_out <- state$mcpObj
@@ -2488,17 +2488,17 @@ testthat::test_that("AnalyzeLook_PC output validation", {
     testthat::expect_true( CompareImportantMcpMembers( act_out, exp_out ) )
 })
 
-testthat::test_that("AnalyzeLook_PC preserves design-time testing quantities", {
+testthat::test_that("AnalyzeLookPC preserves design-time testing quantities", {
   vWi <- c(0.5, 0.5)
   mG <- matrix(c(0, 1, 1, 0), nrow = 2, byrow = TRUE)
 
-  state <- SetupAnalysis_PC(
-    WI = vWi,
-    G = mG,
-    test.type = "Sidak",
-    alpha = 0.025,
-    planned_info_frac = c(0.5, 1.0),
-    plotGraphs = FALSE
+  state <- SetupAnalysisPC(
+    vWeights = vWi,
+    mGMatrix = mG,
+    strTestType = "Sidak",
+    dAlpha = 0.025,
+    vInfoFracts = c(0.5, 1.0),
+    bPlotGraphs = FALSE
   )
 
   expectedInvNormWeights <- state$mcpObj$InvNormWeights
@@ -2506,10 +2506,10 @@ testthat::test_that("AnalyzeLook_PC preserves design-time testing quantities", {
   expectedBdryTab <- state$mcpObj$bdryTab
   expectedThresholds <- state$thresholds
 
-  state <- AnalyzeLook_PC(
-    state = state,
-    p_raw = c(H1 = 0.20, H2 = 0.25),
-    plotGraphs = FALSE
+  state <- AnalyzeLookPC(
+    cState = state,
+    vRawPVals = c(H1 = 0.20, H2 = 0.25),
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_equal(state$mcpObj$CutOff, expectedThresholds[1])
@@ -2519,10 +2519,10 @@ testthat::test_that("AnalyzeLook_PC preserves design-time testing quantities", {
   testthat::expect_equal(state$mcpObj$LastLook, 2)
   testthat::expect_false(state$trial_completed)
 
-  state <- AnalyzeLook_PC(
-    state = state,
-    p_raw = c(H1 = 0.20, H2 = 0.25),
-    plotGraphs = FALSE
+  state <- AnalyzeLookPC(
+    cState = state,
+    vRawPVals = c(H1 = 0.20, H2 = 0.25),
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_equal(state$mcpObj$CutOff, expectedThresholds[2])

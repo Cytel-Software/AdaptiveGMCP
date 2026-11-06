@@ -4,17 +4,17 @@
 \alias{PlotAnalysisGraph}
 \title{Plot analysis graph from a PCAnalysisState object}
 \usage{
-PlotAnalysisGraph(state, stage = NULL, title = NULL)
+PlotAnalysisGraph(cState, stage = NULL, strTitle = NULL)
 }
 \arguments{
-\item{state}{A "PCAnalysisState" object.}
+\item{cState}{A "PCAnalysisState" object.}
 
 \item{stage}{Which stage to plot.
 - NULL: plot the current (latest) graph
 - 0 or "initial": plot the initial graph
 - positive integer k: plot graph snapshot after look k analysis}
 
-\item{title}{Optional title override.}
+\item{strTitle}{Optional title override.}
 }
 \value{
 A visNetwork widget.

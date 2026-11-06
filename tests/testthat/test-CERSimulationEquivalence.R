@@ -46,22 +46,22 @@ BuildCerDesignFromSimulationRow <- function( input_row )
   })
   names(prop.ctr) <- names(lEpType)
 
-  SetupDesign_CER(
+  SetupDesignCER(
     nArms = input_row$nArms,
     nEps = input_row$nEps,
-    SampleSize = input_row$SampleSize,
-    EpType = lEpType,
-    sigma = Arms.std.dev,
-    CommonStdDev = ifelse(is.na(input_row$CommonStdDev), FALSE, input_row$CommonStdDev),
-    prop.ctr = prop.ctr,
-    allocRatio = Arms.alloc.ratio,
-    WI = WI,
-    G = G,
-    test.type = input_row$test.type,
-    alpha = input_row$alpha,
-    info_frac = info_frac,
-    typeOfDesign = ifelse(is.na(input_row$typeOfDesign), "asOF", input_row$typeOfDesign),
-    plotGraphs = FALSE
+    nSampleSize = input_row$SampleSize,
+    lEpTypes = lEpType,
+    lSigma = Arms.std.dev,
+    bCommonStdDev = ifelse(is.na(input_row$CommonStdDev), FALSE, input_row$CommonStdDev),
+    lCtrlProps = prop.ctr,
+    vAllocRatios = Arms.alloc.ratio,
+    vWeights = WI,
+    mGMatrix = G,
+    strTestType = input_row$test.type,
+    dAlpha = input_row$alpha,
+    vInfoFracts = info_frac,
+    strDesignType = ifelse(is.na(input_row$typeOfDesign), "asOF", input_row$typeOfDesign),
+    bPlotGraphs = FALSE
   )
 }
 
@@ -113,10 +113,10 @@ RunCerSimulationEquivalence <- function(fixture_path, input_data)
   )
 
   stage1_p_values <- BuildNamedIncrementalPValues(sim_out$IncrRawPVals$stage1)
-  cer_state <- AnalyzeLook_CER(
-    design = design,
-    p_raw = stage1_p_values,
-    look = 1L
+  cer_state <- AnalyzeLookCER(
+    cDesign = design,
+    vRawPVals = stage1_p_values,
+    nLook = 1L
   )
 
   testthat::expect_equal(
@@ -162,18 +162,18 @@ RunCerSimulationEquivalence <- function(fixture_path, input_data)
   )
   stage2_intersection_weights <- cer_state$WH
   stage2_arguments <- list(
-    design = design,
-    state = cer_state,
-    p_raw = stage2_p_values,
-    look = 2L
+    cDesign = design,
+    cState = cer_state,
+    vRawPVals = stage2_p_values,
+    nLook = 2L
   )
   if (adapted) {
-    stage2_arguments$selection <- stage2_hypotheses
-    stage2_arguments$new_sample_size <- BuildStage2SampleSize(
+    stage2_arguments$vSelectHypo <- stage2_hypotheses
+    stage2_arguments$vNewSampleSizes <- BuildStage2SampleSize(
       sim_out$Stage2SampleSize
     )
   }
-  cer_state <- do.call(AnalyzeLook_CER, stage2_arguments)
+  cer_state <- do.call(AnalyzeLookCER, stage2_arguments)
 
   expected_stage2_boundary <- if (adapted) {
     sim_out$AdjStage2Bdry

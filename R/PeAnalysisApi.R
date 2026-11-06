@@ -212,16 +212,16 @@ BuildPECorrelationMatrix <- function(
 #' Setup analysis object for population enrichment (P-value combination method)
 #'
 #' Creates a non-interactive population-enrichment analysis state object.
-#' The look-specific correlation matrix is computed in [AnalyzeLook_PE_PC()] so
+#' The look-specific correlation matrix is computed in [AnalyzeLookPEPC()] so
 #' setup remains design-only.
 #'
 #' PE wrapper contract:
-#' - [SetupAnalysis_PE_PC()] does not compute or store a correlation matrix.
-#' - [AnalyzeLook_PE_PC()] requires look-specific population sample sizes and
+#' - [SetupAnalysisPEPC()] does not compute or store a correlation matrix.
+#' - [AnalyzeLookPEPC()] requires look-specific population sample sizes and
 #'   computes the correlation matrix for that look.
-#' - \code{planned_info_frac} defines the planned analysis schedule and
+#' - \code{vInfoFracts} defines the planned analysis schedule and
 #'   boundaries; it is distinct from the cumulative sample sizes supplied to
-#'   [AnalyzeLook_PE_PC()] at each formal look.
+#'   [AnalyzeLookPEPC()] at each formal look.
 #' - Sample-size vectors follow order \code{(n0, n1, n2, ...)} where \code{n0}
 #'   is the control arm.
 #' - Hypothesis ordering is endpoint-major, treatment-minor, with a full-
@@ -232,86 +232,86 @@ BuildPECorrelationMatrix <- function(
 #' between looks, and the same arm order is used for the graph, p-values, and
 #' both sample-size vectors.
 #'
-#' @param WI Vector of node weights for the initial graph.
-#' @param G Transition matrix for the graph.
-#' @param test.type Character specifying test type.
+#' @param vWeights Vector of node weights for the initial graph.
+#' @param mGMatrix Transition matrix for the graph.
+#' @param strTestType Character specifying test type.
 #' Supported values: "Bonf", "Sidak", "Simes", "Dunnett", "Partly-Parametric".
-#' @param alpha One-sided type-1 error.
-#' @param planned_info_frac Vector of cumulative information fractions planned at design
+#' @param dAlpha One-sided type-1 error.
+#' @param vInfoFracts Vector of cumulative information fractions planned at design
 #' time for the trial schedule across looks. PE analysis currently supports
 #' one-look or two-look workflows only. Values determine the fixed PC
 #' combination weights and stopping boundaries, and must be finite, strictly
 #' increasing, and in (0, 1].
-#' @param typeOfDesign Group sequential design type (rpact).
-#' @param deltaWT Parameter for typeOfDesign = "WT".
-#' @param deltaPT1 Parameter for typeOfDesign = "PT".
-#' @param gammaA Parameter for typeOfDesign = "asHSD" or "asKD".
-#' @param userAlphaSpending Alpha spending values for typeOfDesign = "asUser".
-#' @param MultipleWinners Logical; TRUE means reject as many hypotheses as
+#' @param strDesignType Group sequential design type (rpact).
+#' @param dDeltaWT Parameter for strDesignType = "WT".
+#' @param dDeltaPT1 Parameter for strDesignType = "PT".
+#' @param dGammaA Parameter for strDesignType = "asHSD" or "asKD".
+#' @param vUserAlphaSpending Alpha spending values for strDesignType = "asUser".
+#' @param bMultipleWinners Logical; TRUE means reject as many hypotheses as
 #' possible, FALSE means reject at most one hypothesis.
-#' @param Selection Logical; TRUE if selection of hypotheses is allowed at
+#' @param bSelection Logical; TRUE if selection of hypotheses is allowed at
 #' interim looks.
-#' @param UpdateStrategy Logical; TRUE if the graphical test strategy can be
+#' @param bUpdateStrategy Logical; TRUE if the graphical test strategy can be
 #' modified at interim looks.
-#' @param plotGraphs Logical; if TRUE, plots the initial graph.
+#' @param bPlotGraphs Logical; if TRUE, plots the initial graph.
 #'
 #' @return An object of class "PCAnalysisState".
 #' @export
-SetupAnalysis_PE_PC <- function(
-    WI,
-    G,
-    test.type = "Partly-Parametric",
-    alpha = 0.025,
-    planned_info_frac = c( 0.5, 1.0 ),
-    typeOfDesign = "asOF",
-    deltaWT = 0,
-    deltaPT1 = 0,
-    gammaA = 2,
-    userAlphaSpending = NULL,
-    MultipleWinners = TRUE,
-    Selection = TRUE,
-    UpdateStrategy = TRUE,
-    plotGraphs = TRUE )
+SetupAnalysisPEPC <- function(
+    vWeights,
+    mGMatrix,
+    strTestType = "Partly-Parametric",
+    dAlpha = 0.025,
+    vInfoFracts = c( 0.5, 1.0 ),
+    strDesignType = "asOF",
+    dDeltaWT = 0,
+    dDeltaPT1 = 0,
+    dGammaA = 2,
+    vUserAlphaSpending = NULL,
+    bMultipleWinners = TRUE,
+    bSelection = TRUE,
+    bUpdateStrategy = TRUE,
+    bPlotGraphs = TRUE )
 {
-  if( !is.numeric( planned_info_frac ) || length( planned_info_frac ) < 1L ||
-      length( planned_info_frac ) > 2L )
+  if( !is.numeric( vInfoFracts ) || length( vInfoFracts ) < 1L ||
+      length( vInfoFracts ) > 2L )
   {
     stop(
       "PE analysis currently supports one-look or two-look workflows only. ",
-      "planned_info_frac must be a numeric vector of length 1 or 2."
+      "vInfoFracts must be a numeric vector of length 1 or 2."
     )
   }
 
-  if( anyNA( planned_info_frac ) || !all( is.finite( planned_info_frac ) ) )
+  if( anyNA( vInfoFracts ) || !all( is.finite( vInfoFracts ) ) )
   {
-    stop( "planned_info_frac must contain finite, non-missing numeric values." )
+    stop( "vInfoFracts must contain finite, non-missing numeric values." )
   }
 
-  if( any( planned_info_frac <= 0 ) || any( planned_info_frac > 1 ) )
+  if( any( vInfoFracts <= 0 ) || any( vInfoFracts > 1 ) )
   {
-    stop( "planned_info_frac values must be in (0, 1]." )
+    stop( "vInfoFracts values must be in (0, 1]." )
   }
 
-  if( length( planned_info_frac ) > 1L && any( diff( planned_info_frac ) <= 0 ) )
+  if( length( vInfoFracts ) > 1L && any( diff( vInfoFracts ) <= 0 ) )
   {
-    stop( "planned_info_frac must be strictly increasing." )
+    stop( "vInfoFracts must be strictly increasing." )
   }
 
-  state <- SetupAnalysis_PC(
-    WI = WI,
-    G = G,
-    test.type = test.type,
-    alpha = alpha,
-    planned_info_frac = planned_info_frac,
-    typeOfDesign = typeOfDesign,
-    deltaWT = deltaWT,
-    deltaPT1 = deltaPT1,
-    gammaA = gammaA,
-    userAlphaSpending = userAlphaSpending,
-    MultipleWinners = MultipleWinners,
-    Selection = Selection,
-    UpdateStrategy = UpdateStrategy,
-    plotGraphs = plotGraphs
+  state <- SetupAnalysisPC(
+    vWeights = vWeights,
+    mGMatrix = mGMatrix,
+    strTestType = strTestType,
+    dAlpha = dAlpha,
+    vInfoFracts = vInfoFracts,
+    strDesignType = strDesignType,
+    dDeltaWT = dDeltaWT,
+    dDeltaPT1 = dDeltaPT1,
+    dGammaA = dGammaA,
+    vUserAlphaSpending = vUserAlphaSpending,
+    bMultipleWinners = bMultipleWinners,
+    bSelection = bSelection,
+    bUpdateStrategy = bUpdateStrategy,
+    bPlotGraphs = bPlotGraphs
   )
 
   state$pe_sample_history <- vector( "list", 0 )
@@ -321,10 +321,10 @@ SetupAnalysis_PE_PC <- function(
 
 #' Analyze one look for population enrichment (P-value combination method)
 #'
-#' Advances an existing [SetupAnalysis_PE_PC()] state object by exactly one
-#' look. The look-specific population correlation matrix is derived from the
+#' Advances an existing state from [SetupAnalysisPEPC()] by exactly one look.
+#' The current-look population correlation matrix is derived from the
 #' supplied full- and sub-population sample sizes and then passed to
-#' [AnalyzeLook_PC()].
+#' [AnalyzeLookPC()].
 #' PE analysis currently supports a maximum of two analyzed looks per design state.
 #' The caller is responsible for performing each formal analysis at its
 #' scheduled information fraction.
@@ -337,46 +337,46 @@ SetupAnalysis_PE_PC <- function(
 #' fractions, but must have the same length at every look, remain
 #' non-decreasing, and satisfy subgroup \code{<=} full-population counts.
 #'
-#' @param state A "PCAnalysisState" object created by [SetupAnalysis_PE_PC()].
-#' @param p_raw Named numeric vector of raw p-values for active hypotheses.
-#' @param fullpop_sample_sizes Numeric vector of cumulative full-population sample
+#' @param cState A "PCAnalysisState" object created by [SetupAnalysisPEPC()].
+#' @param vRawPVals Named numeric vector of raw p-values for active hypotheses.
+#' @param vFullPopulationSampleSizes Numeric vector of cumulative full-population sample
 #' sizes ordered as control first, then treatment arms. Must be non-decreasing
 #' across looks and the same length at every look.
-#' @param subpop_sample_sizes Numeric vector of cumulative subgroup sample sizes
+#' @param vSubpopulationSampleSizes Numeric vector of cumulative subgroup sample sizes
 #' ordered as control first, then treatment arms. Must be non-decreasing across
 #' looks and the same length at every look.
-#' @param look Optional positive integer naming the current look number.
-#' @param selection Optional character vector of hypotheses to retain for this
+#' @param nLook Optional positive integer naming the current look number.
+#' @param vSelectHypo Optional character vector of hypotheses to retain for this
 #' look (only meaningful when look > 1).
-#' @param new_weights Optional numeric vector of new weights for continuing
+#' @param vWeights Optional numeric vector of new weights for continuing
 #' hypotheses.
-#' @param new_G Optional transition matrix for continuing hypotheses.
-#' @param plotGraphs Logical; if TRUE, plots graphs at key points.
+#' @param mGMatrix Optional transition matrix for continuing hypotheses.
+#' @param bPlotGraphs Logical; if TRUE, plots graphs at key points.
 #'
 #' @return Updated "PCAnalysisState" object.
 #' @export
-AnalyzeLook_PE_PC <- function(
-    state,
-    p_raw,
-    fullpop_sample_sizes,
-    subpop_sample_sizes,
-    look = NULL,
-    selection = NULL,
-    new_weights = NULL,
-    new_G = NULL,
-    plotGraphs = TRUE )
+AnalyzeLookPEPC <- function(
+    cState,
+    vRawPVals,
+    vFullPopulationSampleSizes,
+    vSubpopulationSampleSizes,
+    nLook = NULL,
+    vSelectHypo = NULL,
+    vWeights = NULL,
+    mGMatrix = NULL,
+    bPlotGraphs = TRUE )
 {
-  if( !inherits( state, "PCAnalysisState" ) )
+  if( !inherits( cState, "PCAnalysisState" ) )
   {
     stop( "state must be a PCAnalysisState object" )
   }
 
-  if( isTRUE( state$trial_completed ) )
+  if( isTRUE( cState$trial_completed ) )
   {
     stop( "Trial already concluded - stopping criteria met." )
   }
 
-  if( state$completed_looks >= 2L )
+  if( cState$completed_looks >= 2L )
   {
     stop(
       "PE analysis currently supports a maximum of 2 analyzed looks per design."
@@ -384,83 +384,83 @@ AnalyzeLook_PE_PC <- function(
   }
 
   ValidatePESampleSizes(
-    fullpop_sample_sizes = fullpop_sample_sizes,
-    subpop_sample_sizes = subpop_sample_sizes
+    fullpop_sample_sizes = vFullPopulationSampleSizes,
+    subpop_sample_sizes = vSubpopulationSampleSizes
   )
 
-  if( state$completed_looks > 0L )
+  if( cState$completed_looks > 0L )
   {
-    vPrevFull <- state$pe_sample_history[[ state$completed_looks ]]$fullpop
-    vPrevSub <- state$pe_sample_history[[ state$completed_looks ]]$subpop
+    vPrevFull <- cState$pe_sample_history[[ cState$completed_looks ]]$fullpop
+    vPrevSub <- cState$pe_sample_history[[ cState$completed_looks ]]$subpop
 
-    if( length( fullpop_sample_sizes ) != length( vPrevFull ) ||
-        length( subpop_sample_sizes ) != length( vPrevSub ) )
+    if( length( vFullPopulationSampleSizes ) != length( vPrevFull ) ||
+        length( vSubpopulationSampleSizes ) != length( vPrevSub ) )
     {
       stop(
-        "fullpop_sample_sizes and subpop_sample_sizes must have the same length as at look 1."
+        "Full- and sub-population sample-size vectors must match their lengths at look 1."
       )
     }
 
-    if( any( fullpop_sample_sizes < vPrevFull ) || any( subpop_sample_sizes < vPrevSub ) )
+    if( any( vFullPopulationSampleSizes < vPrevFull ) || any( vSubpopulationSampleSizes < vPrevSub ) )
     {
       stop( "Cumulative sample sizes must be non-decreasing across looks." )
     }
   }
 
-  nInitial <- length( state$mcpObj$IntialHypothesis )
+  nInitial <- length( cState$mcpObj$IntialHypothesis )
   dFullCorrelation <- BuildPECorrelationMatrix(
-    fullpop_sample_sizes = fullpop_sample_sizes,
-    subpop_sample_sizes = subpop_sample_sizes,
+    fullpop_sample_sizes = vFullPopulationSampleSizes,
+    subpop_sample_sizes = vSubpopulationSampleSizes,
     n_hypotheses = nInitial,
-    hypothesis_names = state$mcpObj$IntialHypothesis
+    hypothesis_names = cState$mcpObj$IntialHypothesis
   )
 
   # Use the post-selection active set when selection is specified at look > 1,
-  # because AnalyzeLook_PC applies selection before validating the correlation matrix.
-  vActiveNames <- if( !is.null( selection ) && state$completed_looks > 0L )
+  # because AnalyzeLookPC applies selection before validating the correlation matrix.
+  vActiveNames <- if( !is.null( vSelectHypo ) && cState$completed_looks > 0L )
   {
-    if( !all( selection %in% state$mcpObj$IndexSet ) )
+    if( !all( vSelectHypo %in% cState$mcpObj$IndexSet ) )
     {
       stop(
         "selection must be a subset of current IndexSet. Current IndexSet: ",
-        toString( state$mcpObj$IndexSet )
+        toString( cState$mcpObj$IndexSet )
       )
     }
 
-    intersect( state$mcpObj$IndexSet, unique( selection ) )
+    intersect( cState$mcpObj$IndexSet, unique( vSelectHypo ) )
   } else
   {
-    state$mcpObj$IndexSet
+    cState$mcpObj$IndexSet
   }
 
   dCorrelation <- dFullCorrelation[ vActiveNames, vActiveNames, drop = FALSE ]
 
-  nPreviousLooks <- state$completed_looks
+  nPreviousLooks <- cState$completed_looks
 
-  state <- do.call(
-    AnalyzeLook_PC,
+  cState <- do.call(
+    AnalyzeLookPC,
     list(
-      state = state,
-      p_raw = p_raw,
-      Correlation = dCorrelation,
-      look = look,
-      selection = selection,
-      new_weights = new_weights,
-      new_G = new_G,
-      plotGraphs = plotGraphs
+      cState = cState,
+      vRawPVals = vRawPVals,
+      mCorrelation = dCorrelation,
+      nLook = nLook,
+      vSelectHypo = vSelectHypo,
+      vWeights = vWeights,
+      mGMatrix = mGMatrix,
+      bPlotGraphs = bPlotGraphs
     )
   )
 
-  if( state$completed_looks == nPreviousLooks + 1L )
+  if( cState$completed_looks == nPreviousLooks + 1L )
   {
     # Update PE look history only after successful completion of this look.
     lPELookInfo <- list(
-      fullpop = fullpop_sample_sizes,
-      subpop = subpop_sample_sizes
+      fullpop = vFullPopulationSampleSizes,
+      subpop = vSubpopulationSampleSizes
     )
 
-    state$pe_sample_history[[ state$completed_looks ]] <- lPELookInfo
+    cState$pe_sample_history[[ cState$completed_looks ]] <- lPELookInfo
   }
 
-  return( state )
+  return( cState )
 }

@@ -25,13 +25,13 @@ CompareImportantMcpMembers <- function( actMcp, expMcp, dTolerance = 1e-6 )
 # any existing passing test.
 # --------------------------------------------------------------------------------------------------
 
-# Calls AnalyzeLook_PC() via do.call() so validation/error tests can pass malformed
+# Calls AnalyzeLookPC() via do.call() so validation/error tests can pass malformed
 # arguments (e.g. non-numeric `look`) without tripping R's own argument matching first.
 AnalyzeLook_PC_TestWrapper <- function( state, ... )
 {
   lArgs <- list( ... )
-  lArgs$state <- state
-  return( do.call( AnalyzeLook_PC, lArgs ) )
+  lArgs$cState <- state
+  return( do.call( AnalyzeLookPC, lArgs ) )
 }
 
 # Standard 2-hypothesis parallel graph (H1, H2 fully independent, equal weights) used
@@ -40,13 +40,13 @@ pc_fixture_2h <- function(test.type = "Bonf",
                            alpha = 0.025,
                            planned_info_frac = c(0.5, 1.0),
                            ...) {
-  SetupAnalysis_PC(
-    WI = c(0.5, 0.5),
-    G = matrix(c(0, 1, 1, 0), byrow = TRUE, nrow = 2),
-    test.type = test.type,
-    alpha = alpha,
-    planned_info_frac = planned_info_frac,
-    plotGraphs = FALSE,
+  SetupAnalysisPC(
+    vWeights = c(0.5, 0.5),
+    mGMatrix = matrix(c(0, 1, 1, 0), byrow = TRUE, nrow = 2),
+    strTestType = test.type,
+    dAlpha = alpha,
+    vInfoFracts = planned_info_frac,
+    bPlotGraphs = FALSE,
     ...
   )
 }
@@ -63,19 +63,19 @@ pc_fixture_4h <- function(test.type = "Partly-Parametric",
                            planned_info_frac = c(0.5, 0.7, 1),
                            typeOfDesign = "asOF",
                            ...) {
-  SetupAnalysis_PC(
-    WI = c(0.5, 0.5, 0, 0),
-    G = matrix(c(
+  SetupAnalysisPC(
+    vWeights = c(0.5, 0.5, 0, 0),
+    mGMatrix = matrix(c(
       0, 0.5, 0.5, 0,
       0.5, 0, 0, 0.5,
       0, 1, 0, 0,
       1, 0, 0, 0
     ), byrow = TRUE, nrow = 4),
-    test.type = test.type,
-    alpha = alpha,
-    planned_info_frac = planned_info_frac,
-    typeOfDesign = typeOfDesign,
-    plotGraphs = FALSE,
+    strTestType = test.type,
+    dAlpha = alpha,
+    vInfoFracts = planned_info_frac,
+    strDesignType = typeOfDesign,
+    bPlotGraphs = FALSE,
     ...
   )
 }
@@ -91,17 +91,17 @@ pc_fixture_4h_correlation <- function() {
   ), byrow = TRUE, nrow = 4)
 }
 
-# Asserts that SetupAnalysis_PC(), called with the supplied arguments, raises an error
+# Asserts that SetupAnalysisPC(), called with the supplied arguments, raises an error
 # whose message matches `regexp`. Compact wrapper to avoid repeating the
 # `plotGraphs = FALSE` boilerplate in setup-validation tests.
 expect_pc_setup_error <- function(regexp, ...) {
-  testthat::expect_error(SetupAnalysis_PC(..., plotGraphs = FALSE), regexp = regexp)
+  testthat::expect_error(SetupAnalysisPC(..., bPlotGraphs = FALSE), regexp = regexp)
 }
 
 # Asserts that advancing `state` by one look with the supplied arguments raises an error
 # whose message matches `regexp`. Compact wrapper around AnalyzeLook_PC_TestWrapper().
 expect_pc_look_error <- function(state, regexp, ...) {
-  testthat::expect_error(AnalyzeLook_PC_TestWrapper(state, ..., plotGraphs = FALSE), regexp = regexp)
+  testthat::expect_error(AnalyzeLook_PC_TestWrapper(state, ..., bPlotGraphs = FALSE), regexp = regexp)
 }
 
 # Asserts the common structural invariants that should hold for any PCAnalysisState:

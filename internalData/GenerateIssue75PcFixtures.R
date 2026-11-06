@@ -423,7 +423,7 @@ GenerateIssue75Fixtures <- function()
       )
     )
     # M10 (PT design) is deferred: rpact requires deltaPT0 which is not yet a
-    # parameter in SetupAnalysis_PC() or adaptGMCP_PC(). Add M10 once deltaPT0
+    # parameter in SetupAnalysisPC() or adaptGMCP_PC(). Add M10 once deltaPT0
     # support is added to the API (tracked separately).
   )
 

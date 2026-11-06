@@ -62,7 +62,7 @@ jobs:
 
       - name: Smoke check installed package
         run: |
-          Rscript -e "library(AdaptGMCP); required <- c('simMAMSMEP','adaptGMCP_CER','adaptGMCP_PC','plotGraph','genPowerTablePlots','AdaptGMCPSimApp'); missing <- setdiff(required, getNamespaceExports('AdaptGMCP')); if (length(missing) > 0) stop(sprintf('Missing expected exports: %s', paste(missing, collapse = ', '))); cat('Smoke check passed. Package loaded and expected exports are available.\\n')"
+          Rscript -e "library(AdaptGMCP); required <- c('AnalyzeLookCER','AnalyzeLookPC','AnalyzeLookPEPC','PlotAnalysisGraph','PlotGraphCER','SetupAnalysisPC','SetupAnalysisPEPC','SetupDesignCER','GeneratePowerTablePlots','SimulateMAMSMEPWrapper','simMAMSMEP','adaptGMCP_CER','adaptGMCP_PC','plotGraph','AdaptGMCPSimApp'); missing <- setdiff(required, getNamespaceExports('AdaptGMCP')); if (length(missing) > 0) stop(sprintf('Missing expected exports: %s', paste(missing, collapse = ', '))); cat('Smoke check passed. Package loaded and expected exports are available.\\n')"
 
       - name: Extract version and release notes
         id: meta

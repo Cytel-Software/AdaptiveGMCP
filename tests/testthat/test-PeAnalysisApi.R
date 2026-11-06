@@ -1,26 +1,26 @@
-testthat::test_that( "SetupAnalysis_PE_PC creates a design-only PE state", {
+testthat::test_that( "SetupAnalysisPEPC creates a design-only PE state", {
   wi <- rep( 1 / 8, 8 )
   g <- matrix( 0, nrow = 8, ncol = 8 )
   infoFrac <- c( 0.5, 1 )
 
-  peState <- SetupAnalysis_PE_PC(
-    WI = wi,
-    G = g,
-    test.type = "Partly-Parametric",
-    alpha = 0.025,
-    planned_info_frac = infoFrac,
-    typeOfDesign = "asOF",
-    plotGraphs = FALSE
+  peState <- SetupAnalysisPEPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = "Partly-Parametric",
+    dAlpha = 0.025,
+    vInfoFracts = infoFrac,
+    strDesignType = "asOF",
+    bPlotGraphs = FALSE
   )
 
-  manualState <- SetupAnalysis_PC(
-    WI = wi,
-    G = g,
-    test.type = "Partly-Parametric",
-    alpha = 0.025,
-    planned_info_frac = infoFrac,
-    typeOfDesign = "asOF",
-    plotGraphs = FALSE
+  manualState <- SetupAnalysisPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = "Partly-Parametric",
+    dAlpha = 0.025,
+    vInfoFracts = infoFrac,
+    strDesignType = "asOF",
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_s3_class( peState, "PCAnalysisState" )
@@ -28,77 +28,77 @@ testthat::test_that( "SetupAnalysis_PE_PC creates a design-only PE state", {
   testthat::expect_equal( peState$mcpObj$bdryTab, manualState$mcpObj$bdryTab )
 } )
 
-testthat::test_that( "SetupAnalysis_PE_PC supports one-look and rejects >2-look PE workflows", {
+testthat::test_that( "SetupAnalysisPEPC supports one-look and rejects >2-look PE workflows", {
   wi <- rep( 1 / 4, 4 )
   g <- matrix( 0, nrow = 4, ncol = 4 )
 
-  oneLookState <- SetupAnalysis_PE_PC(
-    WI = wi,
-    G = g,
-    test.type = "Partly-Parametric",
-    alpha = 0.025,
-    planned_info_frac = c( 1 ),
-    typeOfDesign = "asOF",
-    plotGraphs = FALSE
+  oneLookState <- SetupAnalysisPEPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = "Partly-Parametric",
+    dAlpha = 0.025,
+    vInfoFracts = c( 1 ),
+    strDesignType = "asOF",
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_s3_class( oneLookState, "PCAnalysisState" )
   testthat::expect_equal( nrow( oneLookState$mcpObj$bdryTab ), 1L )
 
   testthat::expect_error(
-    SetupAnalysis_PE_PC(
-      WI = wi,
-      G = g,
-      test.type = "Partly-Parametric",
-      alpha = 0.025,
-      planned_info_frac = c( 0.5, 0.7, 1 ),
-      typeOfDesign = "asOF",
-      plotGraphs = FALSE
+    SetupAnalysisPEPC(
+      vWeights = wi,
+      mGMatrix = g,
+      strTestType = "Partly-Parametric",
+      dAlpha = 0.025,
+      vInfoFracts = c( 0.5, 0.7, 1 ),
+      strDesignType = "asOF",
+      bPlotGraphs = FALSE
     ),
     "PE analysis currently supports one-look or two-look workflows only"
   )
 
   testthat::expect_error(
-    SetupAnalysis_PE_PC(
-      WI = wi,
-      G = g,
-      test.type = "Partly-Parametric",
-      alpha = 0.025,
-      planned_info_frac = c( NA_real_, 1 ),
-      typeOfDesign = "asOF",
-      plotGraphs = FALSE
+    SetupAnalysisPEPC(
+      vWeights = wi,
+      mGMatrix = g,
+      strTestType = "Partly-Parametric",
+      dAlpha = 0.025,
+      vInfoFracts = c( NA_real_, 1 ),
+      strDesignType = "asOF",
+      bPlotGraphs = FALSE
     ),
-    "planned_info_frac must contain finite, non-missing numeric values"
+    "vInfoFracts must contain finite, non-missing numeric values"
   )
 
   testthat::expect_error(
-    SetupAnalysis_PE_PC(
-      WI = wi,
-      G = g,
-      test.type = "Partly-Parametric",
-      alpha = 0.025,
-      planned_info_frac = c( 0, 1 ),
-      typeOfDesign = "asOF",
-      plotGraphs = FALSE
+    SetupAnalysisPEPC(
+      vWeights = wi,
+      mGMatrix = g,
+      strTestType = "Partly-Parametric",
+      dAlpha = 0.025,
+      vInfoFracts = c( 0, 1 ),
+      strDesignType = "asOF",
+      bPlotGraphs = FALSE
     ),
-    "planned_info_frac values must be in"
+    "vInfoFracts values must be in"
   )
 
   testthat::expect_error(
-    SetupAnalysis_PE_PC(
-      WI = wi,
-      G = g,
-      test.type = "Partly-Parametric",
-      alpha = 0.025,
-      planned_info_frac = c( 0.7, 0.7 ),
-      typeOfDesign = "asOF",
-      plotGraphs = FALSE
+    SetupAnalysisPEPC(
+      vWeights = wi,
+      mGMatrix = g,
+      strTestType = "Partly-Parametric",
+      dAlpha = 0.025,
+      vInfoFracts = c( 0.7, 0.7 ),
+      strDesignType = "asOF",
+      bPlotGraphs = FALSE
     ),
-    "planned_info_frac must be strictly increasing"
+    "vInfoFracts must be strictly increasing"
   )
 } )
 
-testthat::test_that( "AnalyzeLook_PE_PC derives a generic look-level correlation matrix", {
+testthat::test_that( "AnalyzeLookPEPC derives a generic look-level correlation matrix", {
   wi <- rep( 1 / 8, 8 )
   g <- matrix( 0, nrow = 8, ncol = 8 )
   infoFrac <- c( 0.5, 1 )
@@ -106,14 +106,14 @@ testthat::test_that( "AnalyzeLook_PE_PC derives a generic look-level correlation
   fullpopSampleSizes <- c( 120, 80, 70 )
   subpopSampleSizes <- c( 90, 55, 45 )
 
-  peState <- SetupAnalysis_PE_PC(
-    WI = wi,
-    G = g,
-    test.type = "Partly-Parametric",
-    alpha = 0.025,
-    planned_info_frac = infoFrac,
-    typeOfDesign = "asOF",
-    plotGraphs = FALSE
+  peState <- SetupAnalysisPEPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = "Partly-Parametric",
+    dAlpha = 0.025,
+    vInfoFracts = infoFrac,
+    strDesignType = "asOF",
+    bPlotGraphs = FALSE
   )
 
   expectedCorrelation <- AdaptGMCP:::BuildPECorrelationMatrix(
@@ -127,29 +127,29 @@ testthat::test_that( "AnalyzeLook_PE_PC derives a generic look-level correlation
   testthat::expect_false( is.na( expectedCorrelation[ "H1", "H2" ] ) )
   testthat::expect_false( is.na( expectedCorrelation[ "H1", "H5" ] ) )
 
-  peState <- AnalyzeLook_PE_PC(
-    state = peState,
-    p_raw = c( H1 = 0.01, H2 = 0.04, H3 = 0.02, H4 = 0.03, H5 = 0.05, H6 = 0.06, H7 = 0.07, H8 = 0.08 ),
-    fullpop_sample_sizes = fullpopSampleSizes,
-    subpop_sample_sizes = subpopSampleSizes,
-    plotGraphs = FALSE
+  peState <- AnalyzeLookPEPC(
+    cState = peState,
+    vRawPVals = c( H1 = 0.01, H2 = 0.04, H3 = 0.02, H4 = 0.03, H5 = 0.05, H6 = 0.06, H7 = 0.07, H8 = 0.08 ),
+    vFullPopulationSampleSizes = fullpopSampleSizes,
+    vSubpopulationSampleSizes = subpopSampleSizes,
+    bPlotGraphs = FALSE
   )
 
-  manualState <- SetupAnalysis_PC(
-    WI = wi,
-    G = g,
-    test.type = "Partly-Parametric",
-    alpha = 0.025,
-    planned_info_frac = infoFrac,
-    typeOfDesign = "asOF",
-    plotGraphs = FALSE
+  manualState <- SetupAnalysisPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = "Partly-Parametric",
+    dAlpha = 0.025,
+    vInfoFracts = infoFrac,
+    strDesignType = "asOF",
+    bPlotGraphs = FALSE
   )
 
-  manualState <- AnalyzeLook_PC(
-    state = manualState,
-    p_raw = c( H1 = 0.01, H2 = 0.04, H3 = 0.02, H4 = 0.03, H5 = 0.05, H6 = 0.06, H7 = 0.07, H8 = 0.08 ),
-    Correlation = expectedCorrelation,
-    plotGraphs = FALSE
+  manualState <- AnalyzeLookPC(
+    cState = manualState,
+    vRawPVals = c( H1 = 0.01, H2 = 0.04, H3 = 0.02, H4 = 0.03, H5 = 0.05, H6 = 0.06, H7 = 0.07, H8 = 0.08 ),
+    mCorrelation = expectedCorrelation,
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_equal( peState$mcpObj$Correlation, expectedCorrelation )
@@ -160,46 +160,46 @@ testthat::test_that( "AnalyzeLook_PE_PC derives a generic look-level correlation
   testthat::expect_equal( peState$pe_sample_history[[ 1 ]]$subpop, subpopSampleSizes )
 } )
 
-testthat::test_that( "AnalyzeLook_PE_PC ignores look-1 selection and strategy inputs", {
+testthat::test_that( "AnalyzeLookPEPC ignores look-1 selection and strategy inputs", {
   wi <- rep( 1 / 8, 8 )
   g <- matrix( 0, nrow = 8, ncol = 8 )
   fullpopSampleSizes <- c( 120, 80, 70 )
   subpopSampleSizes <- c( 90, 55, 45 )
   pRaw <- setNames( rep( 0.4, 8 ), paste0( "H", seq_len( 8 ) ) )
-  state0 <- SetupAnalysis_PE_PC(
-    WI = wi,
-    G = g,
-    test.type = "Partly-Parametric",
-    alpha = 0.025,
-    planned_info_frac = c( 0.5, 1 ),
-    typeOfDesign = "asOF",
-    plotGraphs = FALSE
+  state0 <- SetupAnalysisPEPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = "Partly-Parametric",
+    dAlpha = 0.025,
+    vInfoFracts = c( 0.5, 1 ),
+    strDesignType = "asOF",
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_warning(
-    AnalyzeLook_PE_PC(
-      state = state0,
-      p_raw = pRaw,
-      fullpop_sample_sizes = fullpopSampleSizes,
-      subpop_sample_sizes = subpopSampleSizes,
-      selection = "H1",
-      new_weights = wi,
-      new_G = g,
-      plotGraphs = FALSE
+    AnalyzeLookPEPC(
+      cState = state0,
+      vRawPVals = pRaw,
+      vFullPopulationSampleSizes = fullpopSampleSizes,
+      vSubpopulationSampleSizes = subpopSampleSizes,
+      vSelectHypo = "H1",
+      vWeights = wi,
+      mGMatrix = g,
+      bPlotGraphs = FALSE
     ),
-    regexp = "Look 1 uses the initial design.*selection, new_weights, new_G will be ignored"
+    regexp = "Look 1 uses the initial design.*vSelectHypo, vWeights, mGMatrix will be ignored"
   )
 
   peState <- suppressWarnings(
-    AnalyzeLook_PE_PC(
-      state = state0,
-      p_raw = pRaw,
-      fullpop_sample_sizes = fullpopSampleSizes,
-      subpop_sample_sizes = subpopSampleSizes,
-      selection = "H1",
-      new_weights = wi,
-      new_G = g,
-      plotGraphs = FALSE
+    AnalyzeLookPEPC(
+      cState = state0,
+      vRawPVals = pRaw,
+      vFullPopulationSampleSizes = fullpopSampleSizes,
+      vSubpopulationSampleSizes = subpopSampleSizes,
+      vSelectHypo = "H1",
+      vWeights = wi,
+      mGMatrix = g,
+      bPlotGraphs = FALSE
     )
   )
 
@@ -209,100 +209,100 @@ testthat::test_that( "AnalyzeLook_PE_PC ignores look-1 selection and strategy in
   testthat::expect_length( peState$pe_sample_history, 1 )
 } )
 
-testthat::test_that( "AnalyzeLook_PE_PC validates look-level sample sizes", {
+testthat::test_that( "AnalyzeLookPEPC validates look-level sample sizes", {
   wi <- rep( 1 / 4, 4 )
   g <- matrix( 0, nrow = 4, ncol = 4 )
   infoFrac <- c( 0.5, 1 )
 
-  peState <- SetupAnalysis_PE_PC(
-    WI = wi,
-    G = g,
-    test.type = "Partly-Parametric",
-    alpha = 0.025,
-    planned_info_frac = infoFrac,
-    typeOfDesign = "asOF",
-    plotGraphs = FALSE
+  peState <- SetupAnalysisPEPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = "Partly-Parametric",
+    dAlpha = 0.025,
+    vInfoFracts = infoFrac,
+    strDesignType = "asOF",
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_error(
-    AnalyzeLook_PE_PC(
-      state = peState,
-      p_raw = c( H1 = 0.01, H2 = 0.02, H3 = 0.03, H4 = 0.04 ),
-      fullpop_sample_sizes = c( 50, 25 ),
-      subpop_sample_sizes = c( 60, 20 ),
-      plotGraphs = FALSE
+    AnalyzeLookPEPC(
+      cState = peState,
+      vRawPVals = c( H1 = 0.01, H2 = 0.02, H3 = 0.03, H4 = 0.04 ),
+      vFullPopulationSampleSizes = c( 50, 25 ),
+      vSubpopulationSampleSizes = c( 60, 20 ),
+      bPlotGraphs = FALSE
     ),
     "Subgroup sample sizes must not exceed full-population sample sizes"
   )
 
 } )
 
-testthat::test_that( "AnalyzeLook_PE_PC rejects a call after the planned final look", {
+testthat::test_that( "AnalyzeLookPEPC rejects a call after the planned final look", {
   wi <- rep( 0.5, 2 )
   g <- matrix( c( 0, 1, 1, 0 ), byrow = TRUE, nrow = 2 )
 
-  peState <- SetupAnalysis_PE_PC(
-    WI = wi,
-    G = g,
-    test.type = "Bonf",
-    alpha = 0.025,
-    planned_info_frac = c( 0.5, 1 ),
-    typeOfDesign = "asOF",
-    plotGraphs = FALSE
+  peState <- SetupAnalysisPEPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = "Bonf",
+    dAlpha = 0.025,
+    vInfoFracts = c( 0.5, 1 ),
+    strDesignType = "asOF",
+    bPlotGraphs = FALSE
   )
 
-  peState <- AnalyzeLook_PE_PC(
-    state = peState,
-    p_raw = c( H1 = 0.5, H2 = 0.6 ),
-    fullpop_sample_sizes = c( 40, 40 ),
-    subpop_sample_sizes = c( 20, 20 ),
-    plotGraphs = FALSE
+  peState <- AnalyzeLookPEPC(
+    cState = peState,
+    vRawPVals = c( H1 = 0.5, H2 = 0.6 ),
+    vFullPopulationSampleSizes = c( 40, 40 ),
+    vSubpopulationSampleSizes = c( 20, 20 ),
+    bPlotGraphs = FALSE
   )
 
-  peState <- AnalyzeLook_PE_PC(
-    state = peState,
-    p_raw = c( H1 = 0.45, H2 = 0.55 ),
-    fullpop_sample_sizes = c( 70, 70 ),
-    subpop_sample_sizes = c( 35, 35 ),
-    plotGraphs = FALSE
+  peState <- AnalyzeLookPEPC(
+    cState = peState,
+    vRawPVals = c( H1 = 0.45, H2 = 0.55 ),
+    vFullPopulationSampleSizes = c( 70, 70 ),
+    vSubpopulationSampleSizes = c( 35, 35 ),
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_error(
-    AnalyzeLook_PE_PC(
-      state = peState,
-      p_raw = c( H1 = 0.4, H2 = 0.5 ),
-      fullpop_sample_sizes = c( 90, 90 ),
-      subpop_sample_sizes = c( 45, 45 ),
-      plotGraphs = FALSE
+    AnalyzeLookPEPC(
+      cState = peState,
+      vRawPVals = c( H1 = 0.4, H2 = 0.5 ),
+      vFullPopulationSampleSizes = c( 90, 90 ),
+      vSubpopulationSampleSizes = c( 45, 45 ),
+      bPlotGraphs = FALSE
     ),
     "Trial already concluded - stopping criteria met"
   )
 } )
 
-testthat::test_that( "AnalyzeLook_PE_PC short-circuits completed trials", {
-  peState <- SetupAnalysis_PE_PC(
-    WI = c( 0.5, 0.5 ),
-    G = matrix( c( 0, 1, 1, 0 ), byrow = TRUE, nrow = 2 ),
-    test.type = "Bonf",
-    planned_info_frac = c( 1 ),
-    plotGraphs = FALSE
+testthat::test_that( "AnalyzeLookPEPC short-circuits completed trials", {
+  peState <- SetupAnalysisPEPC(
+    vWeights = c( 0.5, 0.5 ),
+    mGMatrix = matrix( c( 0, 1, 1, 0 ), byrow = TRUE, nrow = 2 ),
+    strTestType = "Bonf",
+    vInfoFracts = c( 1 ),
+    bPlotGraphs = FALSE
   )
 
   peState$trial_completed <- TRUE
 
   testthat::expect_error(
-    AnalyzeLook_PE_PC(
-      state = peState,
-      p_raw = c( H1 = 0.5, H2 = 0.6 ),
-      fullpop_sample_sizes = numeric( 0 ),
-      subpop_sample_sizes = numeric( 0 ),
-      plotGraphs = FALSE
+    AnalyzeLookPEPC(
+      cState = peState,
+      vRawPVals = c( H1 = 0.5, H2 = 0.6 ),
+      vFullPopulationSampleSizes = numeric( 0 ),
+      vSubpopulationSampleSizes = numeric( 0 ),
+      bPlotGraphs = FALSE
     ),
     "Trial already concluded - stopping criteria met"
   )
 } )
 
-testthat::test_that( "AnalyzeLook_PE_PC does not update PE sample history on PC early return", {
+testthat::test_that( "AnalyzeLookPEPC does not update PE sample history on PC early return", {
   wi <- rep( 1 / 4, 4 )
   g <- matrix( 0, nrow = 4, ncol = 4 )
   infoFrac <- c( 0.5, 1 )
@@ -312,34 +312,34 @@ testthat::test_that( "AnalyzeLook_PE_PC does not update PE sample history on PC 
   vFullpopAttemptedLook2 <- c( 120, 70 )
   vSubpopAttemptedLook2 <- c( 90, 50 )
 
-  peState <- SetupAnalysis_PE_PC(
-    WI = wi,
-    G = g,
-    test.type = "Partly-Parametric",
-    alpha = 0.025,
-    planned_info_frac = infoFrac,
-    typeOfDesign = "asOF",
-    plotGraphs = FALSE
+  peState <- SetupAnalysisPEPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = "Partly-Parametric",
+    dAlpha = 0.025,
+    vInfoFracts = infoFrac,
+    strDesignType = "asOF",
+    bPlotGraphs = FALSE
   )
 
-  peState <- AnalyzeLook_PE_PC(
-    state = peState,
-    p_raw = c( H1 = 0.01, H2 = 0.02, H3 = 0.03, H4 = 0.04 ),
-    fullpop_sample_sizes = vFullpopLook1,
-    subpop_sample_sizes = vSubpopLook1,
-    plotGraphs = FALSE
+  peState <- AnalyzeLookPEPC(
+    cState = peState,
+    vRawPVals = c( H1 = 0.01, H2 = 0.02, H3 = 0.03, H4 = 0.04 ),
+    vFullPopulationSampleSizes = vFullpopLook1,
+    vSubpopulationSampleSizes = vSubpopLook1,
+    bPlotGraphs = FALSE
   )
 
   peState$mcpObj$IndexSet <- character( 0 )
   peState$trial_completed <- FALSE
   peState$completion_reason <- NULL
 
-  peState <- AnalyzeLook_PE_PC(
-    state = peState,
-    p_raw = numeric( 0 ),
-    fullpop_sample_sizes = vFullpopAttemptedLook2,
-    subpop_sample_sizes = vSubpopAttemptedLook2,
-    plotGraphs = FALSE
+  peState <- AnalyzeLookPEPC(
+    cState = peState,
+    vRawPVals = numeric( 0 ),
+    vFullPopulationSampleSizes = vFullpopAttemptedLook2,
+    vSubpopulationSampleSizes = vSubpopAttemptedLook2,
+    bPlotGraphs = FALSE
   )
 
   vRecordedLooks <- which( !vapply( peState$pe_sample_history, is.null, logical( 1 ) ) )
@@ -352,7 +352,7 @@ testthat::test_that( "AnalyzeLook_PE_PC does not update PE sample history on PC 
   testthat::expect_equal( peState$pe_sample_history[[ 1 ]]$subpop, vSubpopLook1 )
 } )
 
-testthat::test_that( "AnalyzeLook_PE_PC retains sample-size history and correlation", {
+testthat::test_that( "AnalyzeLookPEPC retains sample-size history and correlation", {
   wi <- rep( 1 / 8, 8 )
   g <- matrix( 0, nrow = 8, ncol = 8 )
   infoFrac <- c( 0.5, 1 )
@@ -360,22 +360,22 @@ testthat::test_that( "AnalyzeLook_PE_PC retains sample-size history and correlat
   fullpopSampleSizes <- c( 100, 30, 100 )
   subpopSampleSizes <- c( 70, 20, 60 )
 
-  peState <- SetupAnalysis_PE_PC(
-    WI = wi,
-    G = g,
-    test.type = "Partly-Parametric",
-    alpha = 0.025,
-    planned_info_frac = infoFrac,
-    typeOfDesign = "asOF",
-    plotGraphs = FALSE
+  peState <- SetupAnalysisPEPC(
+    vWeights = wi,
+    mGMatrix = g,
+    strTestType = "Partly-Parametric",
+    dAlpha = 0.025,
+    vInfoFracts = infoFrac,
+    strDesignType = "asOF",
+    bPlotGraphs = FALSE
   )
 
-  peState <- AnalyzeLook_PE_PC(
-    state = peState,
-    p_raw = c( H1 = 0.02, H2 = 0.03, H3 = 0.01, H4 = 0.04, H5 = 0.06, H6 = 0.05, H7 = 0.07, H8 = 0.08 ),
-    fullpop_sample_sizes = fullpopSampleSizes,
-    subpop_sample_sizes = subpopSampleSizes,
-    plotGraphs = FALSE
+  peState <- AnalyzeLookPEPC(
+    cState = peState,
+    vRawPVals = c( H1 = 0.02, H2 = 0.03, H3 = 0.01, H4 = 0.04, H5 = 0.06, H6 = 0.05, H7 = 0.07, H8 = 0.08 ),
+    vFullPopulationSampleSizes = fullpopSampleSizes,
+    vSubpopulationSampleSizes = subpopSampleSizes,
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_equal( peState$pe_sample_history[[ 1 ]]$fullpop, fullpopSampleSizes )

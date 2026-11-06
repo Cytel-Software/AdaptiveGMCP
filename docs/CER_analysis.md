@@ -196,7 +196,7 @@ Updated todo list
 
 All three implementations treat sample size at the **arm level**, not separately by endpoint or hypothesis.
 
-| Situation | `adaptGMCP_CER()` | `AnalyzeLook_CER()` | `simMAMSMEP()` CER |
+| Situation | `adaptGMCP_CER()` | `AnalyzeLookCER()` | `simMAMSMEP()` CER |
 |---|---|---|---|
 | Multiple endpoints and arms | One cumulative final size per arm | One cumulative final size per continuing arm | One incremental stage-2 size per continuing arm |
 | Hypotheses selected/dropped | Updates arms only when explicit selection is performed | Derives arms directly from selected hypotheses | Updates arm presence and optionally reallocates removed-arm accrual |
@@ -207,12 +207,12 @@ All three implementations treat sample size at the **arm level**, not separately
 All three recognize that hypotheses across different endpoints can share a treatment arm. For example, if H1 and H3 concern Treatment 1 on different endpoints, they share the same Treatment 1 sample size.
 
 - `adaptGMCP_CER()` asks for cumulative final sample sizes for all arms in `ArmsPresent`.
-- `AnalyzeLook_CER()` asks for cumulative final sample sizes for control and the unique treatments represented by continuing hypotheses.
+- `AnalyzeLookCER()` asks for cumulative final sample sizes for control and the unique treatments represented by continuing hypotheses.
 - `simMAMSMEP()` derives incremental stage-2 sample sizes internally from the planned allocation and `ImplicitSSR`.
 
 Thus, endpoint multiplicity does not create additional sample-size entries.
 
-The analysis APIs differ in validation: `AnalyzeLook_CER()` requires finite positive values exceeding look-1 accrual, while the legacy input helper has little validation.
+The analysis APIs differ in validation: `AnalyzeLookCER()` requires finite positive values exceeding look-1 accrual, while the legacy input helper has little validation.
 
 **Selected And Dropped Hypotheses**
 
@@ -234,7 +234,7 @@ Neither analysis API performs automatic redistribution. The user directly provid
 There are selection edge-case differences:
 
 - Legacy selection intersects the user’s choice with the currently active hypotheses, but derives `ArmsPresent` from the unfiltered selection input.
-- `AnalyzeLook_CER()` currently allows a planned but already rejected hypothesis to be explicitly selected again, incorrectly reactivating it.
+- `AnalyzeLookCER()` currently allows a planned but already rejected hypothesis to be explicitly selected again, incorrectly reactivating it.
 
 **Rejected At Look 1**
 
@@ -244,7 +244,7 @@ If only some hypotheses for a treatment are rejected, but another hypothesis for
 
 If every hypothesis associated with a treatment is rejected:
 
-- `AnalyzeLook_CER()` removes that treatment from the required `new_sample_size` vector and assigns its final allocation `NA`.
+- `AnalyzeLookCER()` removes that treatment from the required `vNewSampleSizes` vector and assigns its final allocation `NA`.
 - `simMAMSMEP()` marks that treatment absent and gives it no stage-2 accrual. With default `ImplicitSSR = "All"`, its planned stage-2 accrual is redistributed among continuing arms.
 - `adaptGMCP_CER()` does not update `ArmsPresent` following rejection alone. It still requests a final cumulative size for the rejected treatment arm.
 
@@ -258,7 +258,7 @@ Despite requesting that redundant sample size, the legacy API does not retest th
 
 For determining which arms continue after look-1 rejection:
 
-- **`AnalyzeLook_CER()` matches `simMAMSMEP()`.**
+- **`AnalyzeLookCER()` matches `simMAMSMEP()`.**
 - **`adaptGMCP_CER()` differs** because rejection does not automatically update `ArmsPresent`.
 
 For automatic redistribution:
@@ -266,4 +266,4 @@ For automatic redistribution:
 - `simMAMSMEP()` supports it through `ImplicitSSR`.
 - Neither analysis API performs it automatically.
 
-One lower-level difference remains: legacy analysis calculates its stored stage-2 allocation ratio from cumulative totals, whereas `AnalyzeLook_CER()` and the simulation calculate it from stage-2 increments. The covariance helper later recomputes cumulative ratios, so this generally affects stored internal state more than the final boundary calculation.
+One lower-level difference remains: legacy analysis calculates its stored stage-2 allocation ratio from cumulative totals, whereas `AnalyzeLookCER()` and the simulation calculate it from stage-2 increments. The covariance helper later recomputes cumulative ratios, so this generally affects stored internal state more than the final boundary calculation.

@@ -119,17 +119,17 @@ correlations.
 
 Setup inputs:
 
-- WI, G
-- test.type
-- alpha
-- info_frac
-- typeOfDesign and optional spending parameters
-- Correlation (required for parametric tests)
+- `vWeights`, `mGMatrix`
+- `strTestType`
+- `dAlpha`
+- `vInfoFracts`
+- `strDesignType` and optional spending parameters
 
 Per-look inputs:
 
-- p_raw for active hypotheses
-- optional selection/new_weights/new_G/new_correlation for look > 1
+- `vRawPVals` for active hypotheses
+- optional `vSelectHypo`, `vWeights`, `mGMatrix`, and
+  `mCorrelation` for look > 1
 
 ## Expected Outputs
 
@@ -177,9 +177,10 @@ The D1 design sign-off is accepted only if all thresholds below are met.
 
 6. Look-1 adaptation guardrail threshold
 - Look 1 always uses the initial design created during setup.
-- Acceptance criterion: look-1 calls that supply selection, new_weights, or
-   new_G must warn that those inputs are ignored and continue with the initial
-   design. Correlation handling remains unchanged.
+- Acceptance criterion: look-1 calls that supply `vSelectHypo`,
+  `vWeights`, or `mGMatrix` must warn that those inputs are
+  ignored and continue with the initial design. Correlation handling remains
+  unchanged.
 
 7. End-to-end scenario reproducibility threshold
 - Each T1 seed scenario must produce stable state transitions for active set,

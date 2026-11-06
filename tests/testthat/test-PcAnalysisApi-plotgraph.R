@@ -20,7 +20,7 @@ testthat::test_that("PlotAnalysisGraph: stage = NULL with completed_looks = 0 re
 
 testthat::test_that("PlotAnalysisGraph: stage = NULL after looks are analyzed returns the latest graph", {
   state <- pc_fixture_2h(planned_info_frac = c(0.5, 1.0))
-  state <- AnalyzeLook_PC_TestWrapper(state, p_raw = c(H1 = 0.30, H2 = 0.35), plotGraphs = FALSE)
+  state <- AnalyzeLook_PC_TestWrapper(state, vRawPVals = c(H1 = 0.30, H2 = 0.35), bPlotGraphs = FALSE)
 
   widget <- PlotAnalysisGraph(state)
   testthat::expect_true(!is.null(widget))
@@ -28,7 +28,7 @@ testthat::test_that("PlotAnalysisGraph: stage = NULL after looks are analyzed re
 
 testthat::test_that("PlotAnalysisGraph: stage = 0 and stage = 'initial' both return the initial graph", {
   state <- pc_fixture_2h(planned_info_frac = c(0.5, 1.0))
-  state <- AnalyzeLook_PC_TestWrapper(state, p_raw = c(H1 = 0.30, H2 = 0.35), plotGraphs = FALSE)
+  state <- AnalyzeLook_PC_TestWrapper(state, vRawPVals = c(H1 = 0.30, H2 = 0.35), bPlotGraphs = FALSE)
 
   widget_zero_int <- PlotAnalysisGraph(state, stage = 0L)
   widget_zero_dbl <- PlotAnalysisGraph(state, stage = 0)
@@ -41,8 +41,8 @@ testthat::test_that("PlotAnalysisGraph: stage = 0 and stage = 'initial' both ret
 
 testthat::test_that("PlotAnalysisGraph: positive integer stage returns the snapshot for that look", {
   state <- pc_fixture_2h(planned_info_frac = c(0.5, 0.75, 1.0))
-  state <- AnalyzeLook_PC_TestWrapper(state, p_raw = c(H1 = 0.30, H2 = 0.35), plotGraphs = FALSE)
-  state <- AnalyzeLook_PC_TestWrapper(state, p_raw = c(H1 = 0.28, H2 = 0.32), plotGraphs = FALSE)
+  state <- AnalyzeLook_PC_TestWrapper(state, vRawPVals = c(H1 = 0.30, H2 = 0.35), bPlotGraphs = FALSE)
+  state <- AnalyzeLook_PC_TestWrapper(state, vRawPVals = c(H1 = 0.28, H2 = 0.32), bPlotGraphs = FALSE)
 
   testthat::expect_true(!is.null(PlotAnalysisGraph(state, stage = 1)))
   testthat::expect_true(!is.null(PlotAnalysisGraph(state, stage = 2)))
@@ -55,7 +55,7 @@ testthat::test_that("PlotAnalysisGraph: non-PCAnalysisState input is rejected", 
 
 testthat::test_that("PlotAnalysisGraph: stage validation rejects a non-integer numeric value", {
   state <- pc_fixture_2h(planned_info_frac = c(0.5, 1.0))
-  state <- AnalyzeLook_PC_TestWrapper(state, p_raw = c(H1 = 0.30, H2 = 0.35), plotGraphs = FALSE)
+  state <- AnalyzeLook_PC_TestWrapper(state, vRawPVals = c(H1 = 0.30, H2 = 0.35), bPlotGraphs = FALSE)
 
   testthat::expect_error(
     PlotAnalysisGraph(state, stage = 1.5),
@@ -65,7 +65,7 @@ testthat::test_that("PlotAnalysisGraph: stage validation rejects a non-integer n
 
 testthat::test_that("PlotAnalysisGraph: stage validation rejects an out-of-range stage", {
   state <- pc_fixture_2h(planned_info_frac = c(0.5, 1.0))
-  state <- AnalyzeLook_PC_TestWrapper(state, p_raw = c(H1 = 0.30, H2 = 0.35), plotGraphs = FALSE)
+  state <- AnalyzeLook_PC_TestWrapper(state, vRawPVals = c(H1 = 0.30, H2 = 0.35), bPlotGraphs = FALSE)
   # Only look 1 has been analyzed; completed_looks == 1.
 
   testthat::expect_error(
@@ -86,7 +86,7 @@ testthat::test_that("PlotAnalysisGraph: stage validation rejects an out-of-range
 
 testthat::test_that("PlotAnalysisGraph: stage validation rejects an unsupported type", {
   state <- pc_fixture_2h(planned_info_frac = c(0.5, 1.0))
-  state <- AnalyzeLook_PC_TestWrapper(state, p_raw = c(H1 = 0.30, H2 = 0.35), plotGraphs = FALSE)
+  state <- AnalyzeLook_PC_TestWrapper(state, vRawPVals = c(H1 = 0.30, H2 = 0.35), bPlotGraphs = FALSE)
 
   testthat::expect_error(
     PlotAnalysisGraph(state, stage = TRUE),

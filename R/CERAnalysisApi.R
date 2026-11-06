@@ -427,65 +427,65 @@
 
 #' Create an immutable planned two-look CER design
 #'
-#' `SetupDesign_CER()` normalizes all planning inputs and computes the planned
+#' `SetupDesignCER()` normalizes all planning inputs and computes the planned
 #' allocation, covariance, graph intersections, and CER boundaries. It never
 #' reads from the console and does not store observed p-values or analysis state.
 #'
 #' @param nArms Number of arms including control.
 #' @param nEps Number of endpoints.
-#' @param SampleSize Planned total sample size.
-#' @param EpType Endpoint-type list containing `"Continuous"` or `"Binary"`.
+#' @param nSampleSize Planned total sample size.
+#' @param lEpTypes Endpoint-type list containing `"Continuous"` or `"Binary"`.
 #'   Unnamed entries are assigned endpoint names automatically.
-#' @param sigma Endpoint-specific arm standard deviations. Values are ordered
+#' @param lSigma Endpoint-specific arm standard deviations. Values are ordered
 #'   control, treatment 1, treatment 2, and so on.
-#' @param CommonStdDev Whether treatment standard deviations equal control.
-#' @param prop.ctr Endpoint-specific binary control arm proportions.
-#' @param allocRatio Arm allocation ratios, control first, followed by
+#' @param bCommonStdDev Whether treatment standard deviations equal control.
+#' @param lCtrlProps Endpoint-specific binary control arm proportions.
+#' @param vAllocRatios Arm allocation ratios, control first, followed by
 #'   treatment 1, treatment 2, and so on.
-#' @param WI Initial graph weights.
-#' @param G Initial graph transition matrix.
-#' @param test.type CER test type: `"Parametric"`, `"Non-Parametric"`, or
+#' @param vWeights Initial graph weights.
+#' @param mGMatrix Initial graph transition matrix.
+#' @param strTestType CER test type: `"Parametric"`, `"Non-Parametric"`, or
 #'   `"Partly-Parametric"`.
-#' @param alpha One-sided type-I error rate.
-#' @param info_frac Exactly two increasing cumulative information fractions,
+#' @param dAlpha One-sided type-I error rate.
+#' @param vInfoFracts Exactly two increasing cumulative information fractions,
 #'   ending at 1.
-#' @param typeOfDesign Group-sequential design type.
-#' @param deltaWT Wang--Tsiatis parameter.
-#' @param deltaPT1 Pampallona--Tsiatis parameter.
-#' @param gammaA Alpha-spending parameter.
-#' @param userAlphaSpending Cumulative spending for `typeOfDesign = "asUser"`.
-#' @param plotGraphs If `TRUE`, plot the initial graph.
+#' @param strDesignType Group-sequential design type.
+#' @param dDeltaWT Wang--Tsiatis parameter.
+#' @param dDeltaPT1 Pampallona--Tsiatis parameter.
+#' @param dGammaA Alpha-spending parameter.
+#' @param vUserAlphaSpending Cumulative spending for `strDesignType = "asUser"`.
+#' @param bPlotGraphs If `TRUE`, plot the initial graph.
 #' @return A `CERDesign` object.
 #' @export
-SetupDesign_CER <- function(
+SetupDesignCER <- function(
     nArms = 3,
     nEps = 2,
-    SampleSize = 500,
-    EpType = list( EP1 = "Continuous", EP2 = "Continuous" ),
-    sigma = list( EP1 = c( 1, 1.1, 1.2 ), EP2 = c( 1, 1.1, 1.2 ) ),
-    CommonStdDev = FALSE,
-    prop.ctr = list( EP1 = NA, EP2 = NA ),
-    allocRatio = rep( 1, nArms ),
-    WI = rep( 1 / ( nEps * ( nArms - 1 ) ), nEps * ( nArms - 1 ) ),
-    G = matrix( 0, nrow = nEps * ( nArms - 1 ), ncol = nEps * ( nArms - 1 ) ),
-    test.type = "Partly-Parametric",
-    alpha = 0.025,
-    info_frac = c( 0.5, 1 ),
-    typeOfDesign = "asOF",
-    deltaWT = 0,
-    deltaPT1 = 0,
-    gammaA = 2,
-    userAlphaSpending = NULL,
-    plotGraphs = FALSE )
+    nSampleSize = 500,
+    lEpTypes = list( EP1 = "Continuous", EP2 = "Continuous" ),
+    lSigma = list( EP1 = c( 1, 1.1, 1.2 ), EP2 = c( 1, 1.1, 1.2 ) ),
+    bCommonStdDev = FALSE,
+    lCtrlProps = list( EP1 = NA, EP2 = NA ),
+    vAllocRatios = rep( 1, nArms ),
+    vWeights = rep( 1 / ( nEps * ( nArms - 1 ) ), nEps * ( nArms - 1 ) ),
+    mGMatrix = matrix( 0, nrow = nEps * ( nArms - 1 ), ncol = nEps * ( nArms - 1 ) ),
+    strTestType = "Partly-Parametric",
+    dAlpha = 0.025,
+    vInfoFracts = c( 0.5, 1 ),
+    strDesignType = "asOF",
+    dDeltaWT = 0,
+    dDeltaPT1 = 0,
+    dGammaA = 2,
+    vUserAlphaSpending = NULL,
+    bPlotGraphs = FALSE )
 {
   .cer_validate_design_inputs(
-    nArms = nArms, nEps = nEps, SampleSize = SampleSize,
-    EpType = EpType, sigma = sigma, CommonStdDev = CommonStdDev,
-    prop.ctr = prop.ctr,
-    allocRatio = allocRatio, WI = WI, G = G, test.type = test.type,
-    alpha = alpha, info_frac = info_frac, typeOfDesign = typeOfDesign,
-    deltaWT = deltaWT, deltaPT1 = deltaPT1, gammaA = gammaA,
-    userAlphaSpending = userAlphaSpending
+    nArms = nArms, nEps = nEps, SampleSize = nSampleSize,
+    EpType = lEpTypes, sigma = lSigma, CommonStdDev = bCommonStdDev,
+    prop.ctr = lCtrlProps,
+    allocRatio = vAllocRatios, WI = vWeights, G = mGMatrix, test.type = strTestType,
+    alpha = dAlpha, info_frac = vInfoFracts, typeOfDesign = strDesignType,
+    deltaWT = dDeltaWT, deltaPT1 = dDeltaPT1, gammaA = dGammaA,
+    userAlphaSpending = vUserAlphaSpending
   )
 
   # Normalize names and derive the hypothesis map before calling the shared
@@ -494,27 +494,27 @@ SetupDesign_CER <- function(
   nEps <- as.integer( nEps )
   nHypothesis <- nEps * ( nArms - 1L )
   vHypotheses <- paste0( "H", seq_len( nHypothesis ) )
-  names( EpType ) <- if( is.null( names( EpType ) ) ) paste0( "EP", seq_len( nEps ) ) else names( EpType )
-  names( sigma ) <- names( EpType )
-  names( prop.ctr ) <- names( EpType )
+  names( lEpTypes ) <- if( is.null( names( lEpTypes ) ) ) paste0( "EP", seq_len( nEps ) ) else names( lEpTypes )
+  names( lSigma ) <- names( lEpTypes )
+  names( lCtrlProps ) <- names( lEpTypes )
   vArmNames <- c( "Control", paste0( "Treatment", seq_len( nArms - 1L ) ) )
-  names( allocRatio ) <- vArmNames
+  names( vAllocRatios ) <- vArmNames
   for( iEndpoint in seq_len( nEps ) )
   {
-    names( sigma[[ iEndpoint ]] ) <- vArmNames[ seq_along( sigma[[ iEndpoint ]] ) ]
+    names( lSigma[[ iEndpoint ]] ) <- vArmNames[ seq_along( lSigma[[ iEndpoint ]] ) ]
   }
-  mHypoMap <- getHypoMap2( "MAMSMEP", nHypothesis, nEps, nArms, EpType )
-  lGraphs <- genWeights( w = WI, g = G, HypothesisName = vHypotheses )
+  mHypoMap <- getHypoMap2( "MAMSMEP", nHypothesis, nEps, nArms, lEpTypes )
+  lGraphs <- genWeights( w = vWeights, g = mGMatrix, HypothesisName = vHypotheses )
   nMvtDimension <- nHypothesis
   mvtnorm_algo <- chooseMVTAlgo( nMvtDimension )
   lPlanned <- ComputeCERPlannedDesign(
     nEps = nEps, nLooks = 2L, nHypothesis = nHypothesis,
-    EpType = EpType, sigma = sigma, prop.ctr = prop.ctr,
-    allocRatio = allocRatio, SampleSize = SampleSize, alpha = alpha,
-    info_frac = info_frac, typeOfDesign = typeOfDesign, deltaWT = deltaWT,
-    deltaPT1 = deltaPT1, gammaA = gammaA,
-    userAlphaSpending = userAlphaSpending, test.type = test.type,
-    HypoMap = mHypoMap, CommonStdDev = CommonStdDev,
+    EpType = lEpTypes, sigma = lSigma, prop.ctr = lCtrlProps,
+    allocRatio = vAllocRatios, SampleSize = nSampleSize, alpha = dAlpha,
+    info_frac = vInfoFracts, typeOfDesign = strDesignType, deltaWT = dDeltaWT,
+    deltaPT1 = dDeltaPT1, gammaA = dGammaA,
+    userAlphaSpending = vUserAlphaSpending, test.type = strTestType,
+    HypoMap = mHypoMap, CommonStdDev = bCommonStdDev,
     WH = lGraphs$IntersectionWeights, mvtnorm_algo = mvtnorm_algo
   )
   lAllocation <- lPlanned$allocation
@@ -526,22 +526,22 @@ SetupDesign_CER <- function(
   design <- new_cer_design( list(
     nArms = nArms,
     nEps = nEps,
-    SampleSize = SampleSize,
-    EpType = EpType,
-    sigma = sigma,
-    CommonStdDev = isTRUE( CommonStdDev ),
-    prop.ctr = prop.ctr,
-    allocRatio = allocRatio,
-    WI = WI,
-    G = G,
-    test.type = test.type,
-    alpha = alpha,
-    info_frac = info_frac,
-    typeOfDesign = typeOfDesign,
-    deltaWT = deltaWT,
-    deltaPT1 = deltaPT1,
-    gammaA = gammaA,
-    userAlphaSpending = userAlphaSpending,
+    SampleSize = nSampleSize,
+    EpType = lEpTypes,
+    sigma = lSigma,
+    CommonStdDev = isTRUE( bCommonStdDev ),
+    prop.ctr = lCtrlProps,
+    allocRatio = vAllocRatios,
+    WI = vWeights,
+    G = mGMatrix,
+    test.type = strTestType,
+    alpha = dAlpha,
+    info_frac = vInfoFracts,
+    typeOfDesign = strDesignType,
+    deltaWT = dDeltaWT,
+    deltaPT1 = dDeltaPT1,
+    gammaA = dGammaA,
+    userAlphaSpending = vUserAlphaSpending,
     hypothesis_names = vHypotheses,
     hypothesis_map = mHypoMap,
     all_graphs = lGraphs,
@@ -564,11 +564,11 @@ SetupDesign_CER <- function(
     plot_text = getPlotText( mHypoMap )
   ) )
 
-  if( isTRUE( plotGraphs ) )
+  if( isTRUE( bPlotGraphs ) )
   {
     # Plotting is opt-in so design construction remains non-interactive.
     plotGraph(
-      HypothesisName = vHypotheses, w = WI, G = G,
+      HypothesisName = vHypotheses, w = vWeights, G = mGMatrix,
       activeStatus = rep( TRUE, nHypothesis ),
       Title = "Initial Graph", Text = design$plot_text
     )
@@ -578,86 +578,86 @@ SetupDesign_CER <- function(
 
 #' Analyze one formal look of a planned CER design
 #'
-#' Look 1 is called with `state = NULL`; look 2 receives the state returned by
-#' look 1. Stage-2 `p_raw` values are incremental p-values. Selection, sample
+#' Look 1 is called with `cState = NULL`; look 2 receives the state returned by
+#' look 1. Stage-2 `vRawPVals` values are incremental p-values. Selection, sample
 #' size, and strategy changes are applied in that order before CER boundary
 #' recalibration. No console input or output is used.
 #'
-#' @param design A `CERDesign` object.
-#' @param state `NULL` for look 1, otherwise a `CERAnalysisState`.
-#' @param p_raw Named raw p-values for the active hypotheses.
-#' @param look Optional look number, which must match the next look.
-#' @param selection Hypotheses retained for look 2.
-#' @param new_sample_size Cumulative stage-2 sample sizes in control followed
+#' @param cDesign A `CERDesign` object.
+#' @param cState `NULL` for look 1, otherwise a `CERAnalysisState`.
+#' @param vRawPVals Named raw p-values for the active hypotheses.
+#' @param nLook Optional look number, which must match the next look.
+#' @param vSelectHypo Hypotheses retained for look 2.
+#' @param vNewSampleSizes Cumulative stage-2 sample sizes in control followed
 #'   by unique continuing-treatment arm order. Names are ignored. The vector
 #'   must contain exactly one value for the control and each unique treatment
 #'   arm represented by the continuing hypotheses.
-#' @param new_weights New weights for the continuing hypotheses.
-#' @param new_G New transition matrix for the continuing hypotheses.
-#' @param plotGraphs If `TRUE`, plot the graph after analysis.
+#' @param vWeights New weights for the continuing hypotheses.
+#' @param mGMatrix New transition matrix for the continuing hypotheses.
+#' @param bPlotGraphs If `TRUE`, plot the graph after analysis.
 #' @return A `CERAnalysisState` object.
 #' @export
-AnalyzeLook_CER <- function(
-    design, state = NULL, p_raw, look = NULL, selection = NULL,
-    new_sample_size = NULL, new_weights = NULL, new_G = NULL,
-    plotGraphs = FALSE )
+AnalyzeLookCER <- function(
+    cDesign, cState = NULL, vRawPVals, nLook = NULL, vSelectHypo = NULL,
+    vNewSampleSizes = NULL, vWeights = NULL, mGMatrix = NULL,
+    bPlotGraphs = FALSE )
 {
-  if( !inherits( design, "CERDesign" ) )
+  if( !inherits( cDesign, "CERDesign" ) )
   {
     stop( "design must be a CERDesign object." )
   }
-  if( is.null( state ) )
+  if( is.null( cState ) )
   {
     # Look 1 computes the planned stage-1 test and initializes resumable state.
-    if( !is.null( look ) && ( length( look ) != 1L || look != 1L ) )
+    if( !is.null( nLook ) && ( length( nLook ) != 1L || nLook != 1L ) )
     {
       stop( "look must be 1 when state is NULL." )
     }
 
-    # Parameters `selection`, `new_sample_size`, `new_weights`, and `new_G` are not used in look 1.
+    # Look-2 adaptations are not used in look 1.
     # Give warnings if these parameters are provided, as they will be ignored in look 1.
-    if( !is.null( selection ) )
+    if( !is.null( vSelectHypo ) )
     {
-      warning( "Parameter 'selection' is ignored in look 1." )
+      warning( "Parameter 'vSelectHypo' is ignored in look 1." )
     }
-    if( !is.null( new_sample_size ) )
+    if( !is.null( vNewSampleSizes ) )
     {
-      warning( "Parameter 'new_sample_size' is ignored in look 1." )
+      warning( "Parameter 'vNewSampleSizes' is ignored in look 1." )
     }
-    if( !is.null( new_weights ) )
+    if( !is.null( vWeights ) )
     {
-      warning( "Parameter 'new_weights' is ignored in look 1." )
+      warning( "Parameter 'vWeights' is ignored in look 1." )
     }
-    if( !is.null( new_G ) )
+    if( !is.null( mGMatrix ) )
     {
-      warning( "Parameter 'new_G' is ignored in look 1." )
+      warning( "Parameter 'mGMatrix' is ignored in look 1." )
     }
 
-    mcpObj <- .cer_plan_mcp( design )
-    p_stage1 <- validate_p_raw( p_raw, design$hypothesis_names )
+    mcpObj <- .cer_plan_mcp( cDesign )
+    p_stage1 <- validate_p_raw( vRawPVals, cDesign$hypothesis_names )
     mcpObj$CurrentLook <- 1L
-    mcpObj$p_raw <- addNAPvalue( p_stage1, design$hypothesis_names )
+    mcpObj$p_raw <- addNAPvalue( p_stage1, cDesign$hypothesis_names )
     mcpObj$p_raw_stage1 <- mcpObj$p_raw
     lStage1 <- PerformStage1Test(
-      nArms = design$nArms, nEps = design$nEps, EpType = design$EpType,
-      nLooks = 2L, nHypothesis = length( design$hypothesis_names ),
-      sigma = design$sigma, prop.ctr = design$prop.ctr,
-      allocRatio = design$allocRatio, SampleSize = design$SampleSize,
-      alpha = design$alpha, info_frac = design$info_frac,
-      typeOfDesign = design$typeOfDesign, deltaWT = design$deltaWT,
-      deltaPT1 = design$deltaPT1, gammaA = design$gammaA,
-      des.type = "MAMSMEP", test.type = design$test.type,
-      Stage1Pvalues = mcpObj$p_raw, HypoMap = design$hypothesis_map,
-      CommonStdDev = design$CommonStdDev, WH = design$intersection_weights,
-      mvtnorm_algo = design$mvtnorm_algo,
-      userAlphaSpending = design$userAlphaSpending,
-      lPlannedDesign = design$lPlanned
+      nArms = cDesign$nArms, nEps = cDesign$nEps, EpType = cDesign$EpType,
+      nLooks = 2L, nHypothesis = length( cDesign$hypothesis_names ),
+      sigma = cDesign$sigma, prop.ctr = cDesign$prop.ctr,
+      allocRatio = cDesign$allocRatio, SampleSize = cDesign$SampleSize,
+      alpha = cDesign$alpha, info_frac = cDesign$info_frac,
+      typeOfDesign = cDesign$typeOfDesign, deltaWT = cDesign$deltaWT,
+      deltaPT1 = cDesign$deltaPT1, gammaA = cDesign$gammaA,
+      des.type = "MAMSMEP", test.type = cDesign$test.type,
+      Stage1Pvalues = mcpObj$p_raw, HypoMap = cDesign$hypothesis_map,
+      CommonStdDev = cDesign$CommonStdDev, WH = cDesign$intersection_weights,
+      mvtnorm_algo = cDesign$mvtnorm_algo,
+      userAlphaSpending = cDesign$userAlphaSpending,
+      lPlannedDesign = cDesign$lPlanned
     )
     mcpObj$Stage1Obj <- lStage1$Stage1Obj
     mcpObj$AllocSampleSize <- lStage1$Stage1Obj$AllocSampleSize
     mcpObj$Stage2AllocSampleSize <- lStage1$Stage1Obj$AllocSampleSize
     vRejected <- as.logical( unlist( lStage1$Stage1Obj$Stage1Analysis$PrimaryHypoTest[ 1L, ] ) )
-    names( vRejected ) <- design$hypothesis_names
+    names( vRejected ) <- cDesign$hypothesis_names
     if( any( vRejected ) )
     {
       # Remove intersections that depend only on hypotheses already rejected
@@ -669,96 +669,96 @@ AnalyzeLook_CER <- function(
       row.names( mcpObj$WH ) <- NULL
     }
     lCer <- .cer_structured_cer(
-      design = design, wh = mcpObj$WH, p_stage1 = mcpObj$p_raw
+      design = cDesign, wh = mcpObj$WH, p_stage1 = mcpObj$p_raw
     )
-    state <- .cer_new_state( design, mcpObj, lStage1, lCer )
-    if( isTRUE( plotGraphs ) )
+    cState <- .cer_new_state( cDesign, mcpObj, lStage1, lCer )
+    if( isTRUE( bPlotGraphs ) )
     {
-      PlotGraph_CER( design, state = state )
+      PlotGraphCER( cDesign, cState = cState )
     }
-    return( state )
+    return( cState )
   }
 
   # Look 2 resumes the saved state and applies optional adaptations in order.
-  if( !inherits( state, "CERAnalysisState" ) )
+  if( !inherits( cState, "CERAnalysisState" ) )
   {
     stop( "state must be NULL or a CERAnalysisState object." )
   }
-  if( state$completed_looks != 1L )
+  if( cState$completed_looks != 1L )
   {
     stop( "CER analysis requires a Look 1 state before Look 2." )
   }
-  if( isTRUE( state$trial_completed ) )
+  if( isTRUE( cState$trial_completed ) )
   {
     stop( "Trial already concluded - stopping criteria met." )
   }
-  .cer_validate_state_compatibility( design, state )
-  if( !is.null( look ) && ( length( look ) != 1L || look != 2L ) )
+  .cer_validate_state_compatibility( cDesign, cState )
+  if( !is.null( nLook ) && ( length( nLook ) != 1L || nLook != 2L ) )
   {
     stop( "look must be 2 for the second CER look." )
   }
 
-  mcpObj <- .cer_state_mcp( design, state )
+  mcpObj <- .cer_state_mcp( cDesign, cState )
   mcpObj$CurrentLook <- 2L
-  bHasSelection <- !is.null( selection )
+  bHasSelection <- !is.null( vSelectHypo )
   if( bHasSelection )
   {
-    if( !is.character( selection ) )
+    if( !is.character( vSelectHypo ) )
     {
-      stop( "selection must be a character vector." )
+      stop( "vSelectHypo must be a character vector." )
     }
-    if( length( selection ) == 0L )
+    if( length( vSelectHypo ) == 0L )
     {
-      state$trial_completed <- TRUE
-      state$completion_reason <- "all_hypotheses_dropped"
-      state$selected_hypotheses <- character( 0 )
-      state$active_hypotheses <- character( 0 )
-      state$look_history[[ 2L ]] <- list(
-        look = 2L, inputs = list( selection = selection ),
+      cState$trial_completed <- TRUE
+      cState$completion_reason <- "all_hypotheses_dropped"
+      cState$selected_hypotheses <- character( 0 )
+      cState$active_hypotheses <- character( 0 )
+      cState$look_history[[ 2L ]] <- list(
+        look = 2L, inputs = list( selection = vSelectHypo ),
         decisions = list( active_hypotheses = character( 0 ) ),
         results = NULL
       )
-      return( state )
+      return( cState )
     }
 
     # Selection changes the active hypothesis set before sample-size or graph
     # adaptation is evaluated.
-    mcpObj <- applySelection( mcpObj, selected_hyps = selection, look = 2L )
+    mcpObj <- applySelection( mcpObj, selected_hyps = vSelectHypo, look = 2L )
   }
 
-  bHasSampleAdaptation <- !is.null( new_sample_size )
-  mStage2Allocation <- design$allocation$cumulative
+  bHasSampleAdaptation <- !is.null( vNewSampleSizes )
+  mStage2Allocation <- cDesign$allocation$cumulative
   vRequiredArms <- c(
     "Control",
     paste0(
       "Treatment",
       sort( unique(
-        design$hypothesis_map$Treatment[
-          design$hypothesis_map$Hypothesis %in% mcpObj$IndexSet
+        cDesign$hypothesis_map$Treatment[
+          cDesign$hypothesis_map$Hypothesis %in% mcpObj$IndexSet
         ] - 1L
       ) )
     )
   )
   if( bHasSampleAdaptation )
   {
-    if( !is.numeric( new_sample_size ) || anyNA( new_sample_size ) ||
-        any( !is.finite( new_sample_size ) ) || any( new_sample_size <= 0 ) )
+    if( !is.numeric( vNewSampleSizes ) || anyNA( vNewSampleSizes ) ||
+        any( !is.finite( vNewSampleSizes ) ) || any( vNewSampleSizes <= 0 ) )
     {
-      stop( "new_sample_size must be a finite positive numeric vector." )
+      stop( "vNewSampleSizes must be a finite positive numeric vector." )
     }
 
     # Derive incremental stage-2 allocation ratios from cumulative sample sizes;
     # the CER adaptation routines require positive ratios for every continuing arm.
     vArmNames <- colnames( mStage2Allocation )
-    if( length( new_sample_size ) != length( vRequiredArms ) )
+    if( length( vNewSampleSizes ) != length( vRequiredArms ) )
     {
       stop(
-        "new_sample_size must specify exactly one sample size for the control ",
+        "vNewSampleSizes must specify exactly one sample size for the control ",
         "and each unique treatment arm corresponding to the continuing hypotheses."
       )
     }
     vRequiredIndices <- match( vRequiredArms, vArmNames )
-    mStage2Allocation[ 2L, vRequiredIndices ] <- as.numeric( new_sample_size )
+    mStage2Allocation[ 2L, vRequiredIndices ] <- as.numeric( vNewSampleSizes )
     if( any(
       as.numeric( unlist( mStage2Allocation[ 2L, vRequiredIndices ] ) ) <=
         as.numeric( unlist( mStage2Allocation[ 1L, vRequiredIndices ] ) )
@@ -769,9 +769,9 @@ AnalyzeLook_CER <- function(
   }
   if( length( mcpObj$IndexSet ) == 0L )
   {
-    state$trial_completed <- TRUE
-    state$completion_reason <- "all_hypotheses_dropped"
-    return( state )
+    cState$trial_completed <- TRUE
+    cState$completion_reason <- "all_hypotheses_dropped"
+    return( cState )
   }
   if( bHasSelection || bHasSampleAdaptation )
   {
@@ -783,7 +783,7 @@ AnalyzeLook_CER <- function(
     mStage2Increment[ 1L, ]
   mcpObj$Stage2allocRatio <- as.numeric( mStage2Increment[ 2L, ] /
     mStage2Increment[ 2L, 1L ] )
-  names( mcpObj$Stage2allocRatio ) <- names( design$allocRatio )
+  names( mcpObj$Stage2allocRatio ) <- names( cDesign$allocRatio )
   vRequiredRatio <- match( vRequiredArms, names( mcpObj$Stage2allocRatio ) )
   if( any( !is.finite( mcpObj$Stage2allocRatio[ vRequiredRatio ] ) |
            mcpObj$Stage2allocRatio[ vRequiredRatio ] <= 0 ) )
@@ -791,48 +791,48 @@ AnalyzeLook_CER <- function(
     stop( "Stage-2 sample sizes must produce positive allocation ratios." )
   }
 
-  bHasStrategyAdaptation <- !is.null( new_weights ) || !is.null( new_G )
+  bHasStrategyAdaptation <- !is.null( vWeights ) || !is.null( mGMatrix )
   if( bHasStrategyAdaptation )
   {
-    mcpObj <- applyStrategyUpdate( mcpObj, new_weights = new_weights, new_G = new_G )
+    mcpObj <- applyStrategyUpdate( mcpObj, new_weights = vWeights, new_G = mGMatrix )
   }
 
   p_stage2 <- .cer_validate_stage2_pvalues(
-    p_raw = p_raw,
+    p_raw = vRawPVals,
     active_hypotheses = mcpObj$IndexSet,
-    initial_hypotheses = design$hypothesis_names
+    initial_hypotheses = cDesign$hypothesis_names
   )
-  mcpObj$p_raw <- state$p_stage1
+  mcpObj$p_raw <- cState$p_stage1
   bAdapted <- bHasSelection || bHasSampleAdaptation || bHasStrategyAdaptation
   if( bAdapted )
   {
     # Recalibrate boundaries and covariance only when a look-2 adaptation
     # changes the originally planned information structure.
     mcpObj$AdaptObj <- adaptBdryCER(
-      mcpObj = mcpObj, mvtnorm_algo = design$mvtnorm_algo
+      mcpObj = mcpObj, mvtnorm_algo = cDesign$mvtnorm_algo
     )
     mStage2Boundary <- mcpObj$AdaptObj$Stage2AdjBdry
     dAdaptedCovariance <- mcpObj$AdaptObj$Stage2Sigma
   } else
   {
     mStage2Boundary <- .cer_map_boundary_rows(
-      wh = mcpObj$WH, planned_wh = design$intersection_weights,
-      boundary = design$plan_boundary$Stage2Bdry
+      wh = mcpObj$WH, planned_wh = cDesign$intersection_weights,
+      boundary = cDesign$plan_boundary$Stage2Bdry
     )
     dAdaptedCovariance <- NULL
   }
-  mcpObj$p_raw <- addNAPvalue( p_stage2, design$hypothesis_names )
+  mcpObj$p_raw <- addNAPvalue( p_stage2, cDesign$hypothesis_names )
   mIncrement <- mcpObj$Stage2AllocSampleSize
   mIncrement[ 2L, ] <- mIncrement[ 2L, ] - mIncrement[ 1L, ]
-  dInfo <- rep( NA_real_, length( design$hypothesis_names ) )
-  names( dInfo ) <- design$hypothesis_names
-  dCumulative <- rep( NA_real_, length( design$hypothesis_names ) )
-  names( dCumulative ) <- design$hypothesis_names
+  dInfo <- rep( NA_real_, length( cDesign$hypothesis_names ) )
+  names( dInfo ) <- cDesign$hypothesis_names
+  dCumulative <- rep( NA_real_, length( cDesign$hypothesis_names ) )
+  names( dCumulative ) <- cDesign$hypothesis_names
   for( strHypothesis in mcpObj$IndexSet )
   {
-    iHypothesis <- match( strHypothesis, design$hypothesis_names )
-    iRow <- which( design$hypothesis_map$Hypothesis == strHypothesis )
-    iTreatment <- design$hypothesis_map$Treatment[ iRow ]
+    iHypothesis <- match( strHypothesis, cDesign$hypothesis_names )
+    iRow <- which( cDesign$hypothesis_map$Hypothesis == strHypothesis )
+    iTreatment <- cDesign$hypothesis_map$Treatment[ iRow ]
     iArm <- c( 1L, iTreatment )
     dStage1Info <- ( 1 / mIncrement[ 1L, iArm[ 1L ] ] +
       1 / mIncrement[ 1L, iArm[ 2L ] ] )^(-1)
@@ -842,7 +842,7 @@ AnalyzeLook_CER <- function(
     # Combine independent stage-wise z statistics into a cumulative p-value
     # using the information fraction implied by the two-stage allocation.
     dCumulative[ iHypothesis ] <- 1 - pnorm(
-      sqrt( dInfo[ iHypothesis ] ) * qnorm( 1 - state$p_stage1[ iHypothesis ] ) +
+      sqrt( dInfo[ iHypothesis ] ) * qnorm( 1 - cState$p_stage1[ iHypothesis ] ) +
         sqrt( 1 - dInfo[ iHypothesis ] ) * qnorm(
           1 - mcpObj$p_raw[ iHypothesis ]
         )
@@ -851,54 +851,54 @@ AnalyzeLook_CER <- function(
   lStage2 <- closedTest(
     WH = mcpObj$WH, boundary = mStage2Boundary,
     pValues = dCumulative,
-    Stage1RejStatus = state$current_rejection
+    Stage1RejStatus = cState$current_rejection
   )
   vRejected <- as.logical( unlist( lStage2$PrimaryHypoTest[ 1L, ] ) )
-  names( vRejected ) <- design$hypothesis_names
+  names( vRejected ) <- cDesign$hypothesis_names
   vDropped <- mcpObj$DroppedFlag
-  vActive <- design$hypothesis_names[ !vRejected & !vDropped ]
+  vActive <- cDesign$hypothesis_names[ !vRejected & !vDropped ]
   # Persist decisions, adaptations, and derived results so the returned state
   # remains inspectable even though look 2 is the final formal look.
-  state$completed_looks <- 2L
-  state$active_hypotheses <- vActive
-  state$continuing_arms <- sort( unique( c(
-    1L, design$hypothesis_map$Treatment[
-      design$hypothesis_map$Hypothesis %in% vActive
+  cState$completed_looks <- 2L
+  cState$active_hypotheses <- vActive
+  cState$continuing_arms <- sort( unique( c(
+    1L, cDesign$hypothesis_map$Treatment[
+      cDesign$hypothesis_map$Hypothesis %in% vActive
     ]
   ) ) )
-  state$previous_rejection <- state$current_rejection
-  state$current_rejection <- vRejected
-  state$dropped_hypotheses <- vDropped
-  state$selected_hypotheses <- if( bHasSelection ) selection else state$selected_hypotheses
-  state$selection_looks <- if( bHasSelection ) c( state$selection_looks, 2L ) else state$selection_looks
-  state$intersection_weights <- mcpObj$WH
-  state$WH <- mcpObj$WH
-  state$all_graphs_previous <- mcpObj$allGraphsPrev
-  state$all_graphs <- mcpObj$allGraphs
-  state$allGraphs <- mcpObj$allGraphs
+  cState$previous_rejection <- cState$current_rejection
+  cState$current_rejection <- vRejected
+  cState$dropped_hypotheses <- vDropped
+  cState$selected_hypotheses <- if( bHasSelection ) vSelectHypo else cState$selected_hypotheses
+  cState$selection_looks <- if( bHasSelection ) c( cState$selection_looks, 2L ) else cState$selection_looks
+  cState$intersection_weights <- mcpObj$WH
+  cState$WH <- mcpObj$WH
+  cState$all_graphs_previous <- mcpObj$allGraphsPrev
+  cState$all_graphs <- mcpObj$allGraphs
+  cState$allGraphs <- mcpObj$allGraphs
   if( bHasStrategyAdaptation )
   {
-    vFullWeights <- rep( 0, length( design$hypothesis_names ) )
+    vFullWeights <- rep( 0, length( cDesign$hypothesis_names ) )
     vFullWeights[ get_numeric_part( names( mcpObj$newWeights ) ) ] <-
       as.numeric( mcpObj$newWeights )
-    state$current_weights <- vFullWeights
-    names( state$current_weights ) <- design$hypothesis_names
+    cState$current_weights <- vFullWeights
+    names( cState$current_weights ) <- cDesign$hypothesis_names
     mFullGraph <- matrix(
-      0, nrow = length( design$hypothesis_names ),
-      ncol = length( design$hypothesis_names )
+      0, nrow = length( cDesign$hypothesis_names ),
+      ncol = length( cDesign$hypothesis_names )
     )
-    vActiveIndex <- match( mcpObj$IndexSet, design$hypothesis_names )
+    vActiveIndex <- match( mcpObj$IndexSet, cDesign$hypothesis_names )
     mFullGraph[ vActiveIndex, vActiveIndex ] <- mcpObj$newG
-    state$current_G <- mFullGraph
+    cState$current_G <- mFullGraph
   }
-  state$adapted_sample_allocation <- mcpObj$Stage2AllocSampleSize
-  state$adapted_alloc_ratio <- mcpObj$Stage2allocRatio
-  state$adapted_covariance <- dAdaptedCovariance
-  state$stage2_boundary <- mStage2Boundary
-  state$adaptation <- mcpObj$AdaptObj
-  state$incremental_stage2_pvalues <- mcpObj$p_raw
-  state$cumulative_stage2_pvalues <- dCumulative
-  state$results$stage2 <- list(
+  cState$adapted_sample_allocation <- mcpObj$Stage2AllocSampleSize
+  cState$adapted_alloc_ratio <- mcpObj$Stage2allocRatio
+  cState$adapted_covariance <- dAdaptedCovariance
+  cState$stage2_boundary <- mStage2Boundary
+  cState$adaptation <- mcpObj$AdaptObj
+  cState$incremental_stage2_pvalues <- mcpObj$p_raw
+  cState$cumulative_stage2_pvalues <- dCumulative
+  cState$results$stage2 <- list(
     primary_rejection = lStage2$PrimaryHypoTest,
     intersection_rejection = lStage2$IntersectHypoTest,
     incremental_pvalues = mcpObj$p_raw,
@@ -907,65 +907,65 @@ AnalyzeLook_CER <- function(
     adapted_sample_allocation = mcpObj$Stage2AllocSampleSize,
     adapted_covariance = dAdaptedCovariance
   )
-  state$trial_completed <- TRUE
-  state$completion_reason <- if( length( vActive ) == 0L )
+  cState$trial_completed <- TRUE
+  cState$completion_reason <- if( length( vActive ) == 0L )
     "all_hypotheses_dropped" else "final_look"
-  state$look_history[[ 2L ]] <- list(
+  cState$look_history[[ 2L ]] <- list(
     look = 2L,
     inputs = list(
       p_raw = mcpObj$p_raw,
-      selection = selection,
-      new_sample_size = new_sample_size,
-      new_weights = new_weights,
-      new_G = new_G
+      selection = vSelectHypo,
+      new_sample_size = vNewSampleSizes,
+      new_weights = vWeights,
+      new_G = mGMatrix
     ),
     decisions = list(
       rejected = vRejected,
       active_hypotheses = vActive
     ),
-    results = state$results$stage2
+    results = cState$results$stage2
   )
-  if( isTRUE( plotGraphs ) )
+  if( isTRUE( bPlotGraphs ) )
   {
-    PlotGraph_CER( design, state = state )
+    PlotGraphCER( cDesign, cState = cState )
   }
-  return( state )
+  return( cState )
 }
 
 #' Plot a planned or analyzed CER graph
 #'
-#' @param design A `CERDesign` object.
-#' @param state Optional `CERAnalysisState`; `NULL` plots the planned graph.
-#' @param title Optional graph title.
+#' @param cDesign A `CERDesign` object.
+#' @param cState Optional `CERAnalysisState`; `NULL` plots the planned graph.
+#' @param strTitle Optional graph title.
 #' @return A visNetwork widget.
 #' @export
-PlotGraph_CER <- function( design, state = NULL, title = NULL )
+PlotGraphCER <- function( cDesign, cState = NULL, strTitle = NULL )
 {
-  if( !inherits( design, "CERDesign" ) )
+  if( !inherits( cDesign, "CERDesign" ) )
   {
     stop( "design must be a CERDesign object." )
   }
-  if( is.null( state ) )
+  if( is.null( cState ) )
   {
-    vActive <- rep( TRUE, length( design$hypothesis_names ) )
-    vWeights <- design$WI
-    mGraph <- design$G
-    strTitle <- if( is.null( title ) ) "Initial Graph" else title
+    vActive <- rep( TRUE, length( cDesign$hypothesis_names ) )
+    vWeights <- cDesign$WI
+    mGraph <- cDesign$G
+    strTitle <- if( is.null( strTitle ) ) "Initial Graph" else strTitle
   } else
   {
-    if( !inherits( state, "CERAnalysisState" ) )
+    if( !inherits( cState, "CERAnalysisState" ) )
     {
       stop( "state must be NULL or a CERAnalysisState object." )
     }
-    vActive <- !state$current_rejection & !state$dropped_hypotheses
-    vWeights <- state$current_weights
-    mGraph <- state$current_G
-    strTitle <- if( is.null( title ) ) paste(
-      "Graph After Stage", state$completed_looks, "analysis"
-    ) else title
+    vActive <- !cState$current_rejection & !cState$dropped_hypotheses
+    vWeights <- cState$current_weights
+    mGraph <- cState$current_G
+    strTitle <- if( is.null( strTitle ) ) paste(
+      "Graph After Stage", cState$completed_looks, "analysis"
+    ) else strTitle
   }
   return( plotGraph(
-    HypothesisName = design$hypothesis_names, w = vWeights, G = mGraph,
-    activeStatus = vActive, Title = strTitle, Text = design$plot_text
+    HypothesisName = cDesign$hypothesis_names, w = vWeights, G = mGraph,
+    activeStatus = vActive, Title = strTitle, Text = cDesign$plot_text
   ) )
 }

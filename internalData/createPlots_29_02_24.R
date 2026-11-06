@@ -19,7 +19,7 @@ tableTemplate <- read.csv("internalData/TableTemplete_29_02_24.csv",fileEncoding
 PowerType <- 'Disjunctive.Power'
 
 #generate processed table
-processedTables <- genPowerTablePlots(PowerType = PowerType, dfOut = outDF, TableTemDF = tableTemplate)
+processedTables <- GeneratePowerTablePlots(strPowerType = PowerType, dfOutput = outDF, dfTableTemplate = tableTemplate)
 
 
 ########################## Bar charts for the powers ###########################
