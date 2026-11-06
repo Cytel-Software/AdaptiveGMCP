@@ -7,6 +7,10 @@
 
 ## Corrections
 
+* `AnalyzeLook_PC()` now warns and ignores look-1 `selection`, `new_weights`,
+  and `new_G` inputs, using the initial design from `SetupAnalysis_PC()`;
+  adaptation handling from look 2 onward is unchanged.
+
 * Corrected parametric CER covariance calculations for unequal allocation
   ratios so treatment indices consistently skip the leading control ratio.
 

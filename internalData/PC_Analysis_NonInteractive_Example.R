@@ -175,6 +175,8 @@ print("Initial design:")
 print(state)
 
 #--------------Look 1 Analysis-----------------------
+# Look 1 always uses the initial setup design; any selection or strategy
+# adaptation inputs supplied here are ignored with a warning.
 state <- AnalyzeLook_PC(
   state,
   look         = 1,

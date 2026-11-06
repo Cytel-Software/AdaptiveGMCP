@@ -160,6 +160,55 @@ testthat::test_that( "AnalyzeLook_PE_PC derives a generic look-level correlation
   testthat::expect_equal( peState$pe_sample_history[[ 1 ]]$subpop, subpopSampleSizes )
 } )
 
+testthat::test_that( "AnalyzeLook_PE_PC ignores look-1 selection and strategy inputs", {
+  wi <- rep( 1 / 8, 8 )
+  g <- matrix( 0, nrow = 8, ncol = 8 )
+  fullpopSampleSizes <- c( 120, 80, 70 )
+  subpopSampleSizes <- c( 90, 55, 45 )
+  pRaw <- setNames( rep( 0.4, 8 ), paste0( "H", seq_len( 8 ) ) )
+  state0 <- SetupAnalysis_PE_PC(
+    WI = wi,
+    G = g,
+    test.type = "Partly-Parametric",
+    alpha = 0.025,
+    planned_info_frac = c( 0.5, 1 ),
+    typeOfDesign = "asOF",
+    plotGraphs = FALSE
+  )
+
+  testthat::expect_warning(
+    AnalyzeLook_PE_PC(
+      state = state0,
+      p_raw = pRaw,
+      fullpop_sample_sizes = fullpopSampleSizes,
+      subpop_sample_sizes = subpopSampleSizes,
+      selection = "H1",
+      new_weights = wi,
+      new_G = g,
+      plotGraphs = FALSE
+    ),
+    regexp = "Look 1 uses the initial design.*selection, new_weights, new_G will be ignored"
+  )
+
+  peState <- suppressWarnings(
+    AnalyzeLook_PE_PC(
+      state = state0,
+      p_raw = pRaw,
+      fullpop_sample_sizes = fullpopSampleSizes,
+      subpop_sample_sizes = subpopSampleSizes,
+      selection = "H1",
+      new_weights = wi,
+      new_G = g,
+      plotGraphs = FALSE
+    )
+  )
+
+  testthat::expect_equal( peState$mcpObj$IndexSet, paste0( "H", seq_len( 8 ) ) )
+  testthat::expect_length( peState$mcpObj$SelectionLook, 0 )
+  testthat::expect_false( peState$mcpObj$Modify )
+  testthat::expect_length( peState$pe_sample_history, 1 )
+} )
+
 testthat::test_that( "AnalyzeLook_PE_PC validates look-level sample sizes", {
   wi <- rep( 1 / 4, 4 )
   g <- matrix( 0, nrow = 4, ncol = 4 )

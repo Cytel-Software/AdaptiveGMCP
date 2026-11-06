@@ -57,6 +57,9 @@ For detailed usage and arguments of each function, please refer to the help sect
 For automated pipelines, batch processing, or scripted analyses, the non-interactive interface
 avoids R console prompts by accepting all look-level inputs as function arguments.
 The generic PC interface supports one, two, three, or more planned looks.
+Look 1 always uses the initial design from `SetupAnalysis_PC()`. If `selection`,
+`new_weights`, or `new_G` is supplied at look 1, it is ignored with a warning;
+these adaptations may be applied at look 2 or later when enabled in the setup.
 
 **Key functions:**
 - `SetupAnalysis_PC()`: Initialises the analysis state (design parameters, graph, boundaries).

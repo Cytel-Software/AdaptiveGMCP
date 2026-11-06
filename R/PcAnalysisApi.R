@@ -300,7 +300,9 @@ SetupAnalysis_PC <- function(
 #' combination weights and stopping boundary. The caller is responsible for
 #' performing each formal analysis at its scheduled information fraction.
 #' Optional selection / strategy modification / correlation updates may be applied
-#' before the look is analyzed (these represent decisions made after the previous look).
+#' before looks after look 1 are analyzed (these represent decisions made after
+#' the previous look). At look 1, selection and strategy modification inputs
+#' are ignored with a warning because the initial design from setup is used.
 #'
 #' @param state A "PCAnalysisState" object.
 #' @param p_raw Named numeric vector of raw p-values for the current look, for the
@@ -316,10 +318,12 @@ SetupAnalysis_PC <- function(
 #'   (i.e. \code{state$completed_looks + 1}). This argument exists purely for
 #'   readability of user scripts - it does not change program logic.
 #'   If \code{NULL} (default), the look number is inferred from the state.
-#' @param selection Optional character vector of hypotheses to retain for this look
-#'   (only meaningful when look > 1). NULL means no selection.
+#' @param selection Optional character vector of hypotheses to retain for this look.
+#'   Applied only when look > 1; if supplied at look 1, it is ignored with a warning.
 #' @param new_weights Optional numeric vector of new weights for continuing hypotheses.
+#'   Applied only when look > 1; if supplied at look 1, it is ignored with a warning.
 #' @param new_G Optional transition matrix for continuing hypotheses.
+#'   Applied only when look > 1; if supplied at look 1, it is ignored with a warning.
 #' @param plotGraphs Logical; if TRUE, plots graphs at key points.
 #'
 #' @return Updated "PCAnalysisState".
@@ -397,12 +401,23 @@ AnalyzeLook_PC <- function(
       }
     }
   } else {
-    # For look 1, adaptation inputs are invalid and must be rejected.
+    vIgnoredAdaptations <- character()
     if (!is.null(selection)) {
-      stop("selection cannot be applied at look 1.")
+      vIgnoredAdaptations <- c(vIgnoredAdaptations, "selection")
     }
-    if (!is.null(new_weights) || !is.null(new_G)) {
-      stop("new_weights/new_G cannot be applied at look 1.")
+    if (!is.null(new_weights)) {
+      vIgnoredAdaptations <- c(vIgnoredAdaptations, "new_weights")
+    }
+    if (!is.null(new_G)) {
+      vIgnoredAdaptations <- c(vIgnoredAdaptations, "new_G")
+    }
+    if (length(vIgnoredAdaptations) > 0L) {
+      warning(
+        "Look 1 uses the initial design from SetupAnalysis_PC(); ",
+        paste(vIgnoredAdaptations, collapse = ", "),
+        " will be ignored.",
+        call. = FALSE
+      )
     }
   }
 
