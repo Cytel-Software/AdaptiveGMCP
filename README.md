@@ -17,8 +17,8 @@ The following are some of the key functions provided by the AdaptGMCP package:
 - `simMAMSMEP`: Runs simulations for adaptive group sequential multiple testing procedures.
 - `adaptGMCP_CER`: Performs interactive analysis using the CER (Conditional Error Rate) method.
 - `adaptGMCP_PC`: Performs interactive analysis using the p-value combination method.
-- `SetupAnalysis_PC`: Sets up a non-interactive analysis state for the p-value combination method.
-- `AnalyzeLook_PC`: Advances an existing non-interactive PC analysis by one look.
+- `SetupAnalysisPC`: Sets up a non-interactive analysis state for the p-value combination method.
+- `AnalyzeLookPC`: Advances an existing non-interactive PC analysis by one look.
 - `PlotAnalysisGraph`: Plots a graph from a non-interactive PC analysis state object.
 
 For detailed usage and arguments of each function, please refer to the help section in R after installing the package (e.g., `?simMAMSMEP`).
@@ -57,13 +57,14 @@ For detailed usage and arguments of each function, please refer to the help sect
 For automated pipelines, batch processing, or scripted analyses, the non-interactive interface
 avoids R console prompts by accepting all look-level inputs as function arguments.
 The generic PC interface supports one, two, three, or more planned looks.
-Look 1 always uses the initial design from `SetupAnalysis_PC()`. If `selection`,
-`new_weights`, or `new_G` is supplied at look 1, it is ignored with a warning;
+Look 1 always uses the initial design from `SetupAnalysisPC()`. If
+`vSelectHypo`, `vWeights`, or `mGMatrix` is supplied at
+look 1, it is ignored with a warning;
 these adaptations may be applied at look 2 or later when enabled in the setup.
 
 **Key functions:**
-- `SetupAnalysis_PC()`: Initialises the analysis state (design parameters, graph, boundaries).
-- `AnalyzeLook_PC()`: Processes one interim or final look, returning an updated state object.
+- `SetupAnalysisPC()`: Initialises the analysis state (design parameters, graph, boundaries).
+- `AnalyzeLookPC()`: Processes one interim or final look, returning an updated state object.
 - `PlotAnalysisGraph()`: Plots the hypothesis graph at any stage of the analysis.
 
 **Example:**
@@ -87,48 +88,48 @@ Correlation <- matrix(c(
 ), byrow = TRUE, nrow = 4)
 
 # Set up the analysis
-state <- SetupAnalysis_PC(
-  WI           = WI,
-  G            = G,
-  test.type    = "Partly-Parametric",
-  alpha        = 0.025,
-  planned_info_frac = c(0.5, 0.7, 1),
-  typeOfDesign = "asOF",
-  plotGraphs   = FALSE
+state <- SetupAnalysisPC(
+  vWeights       = WI,
+  mGMatrix    = G,
+  strTestType          = "Partly-Parametric",
+  dAlpha               = 0.025,
+  vInfoFracts = c(0.5, 0.7, 1),
+  strDesignType        = "asOF",
+  bPlotGraphs          = FALSE
 )
 
 # Look 1
-state <- AnalyzeLook_PC(
+state <- AnalyzeLookPC(
   state,
-  p_raw      = c(H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30),
-  Correlation = Correlation,
-  plotGraphs = FALSE
+  vRawPVals = c(H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30),
+  mCorrelation = Correlation,
+  bPlotGraphs = FALSE
 )
 
 # Look 2 — with selection of continuing hypotheses
-state <- AnalyzeLook_PC(
+state <- AnalyzeLookPC(
   state,
-  p_raw      = c(H1 = 0.02, H2 = 0.10, H4 = 0.40),
-  selection  = c("H1", "H2", "H4"),
-  plotGraphs = FALSE
+  vRawPVals = c(H1 = 0.02, H2 = 0.10, H4 = 0.40),
+  vSelectHypo = c("H1", "H2", "H4"),
+  bPlotGraphs = FALSE
 )
 
 # Look 3 — final look
-state <- AnalyzeLook_PC(
+state <- AnalyzeLookPC(
   state,
-  p_raw      = c(H2 = 0.005, H4 = 0.10),
-  plotGraphs = FALSE
+  vRawPVals = c(H2 = 0.005, H4 = 0.10),
+  bPlotGraphs = FALSE
 )
 
 # Plot the hypothesis graph after look 2
-PlotAnalysisGraph(state, stage = 2)
+PlotAnalysisGraph(state, nStage = 2)
 ```
 
 - **Example script:** [internalData/PC_Analysis_NonInteractive_Example.R](internalData/PC_Analysis_NonInteractive_Example.R)
 - **Documentation:** For detailed documentation on all arguments, run:
   ```R
-  ?SetupAnalysis_PC
-  ?AnalyzeLook_PC
+  ?SetupAnalysisPC
+  ?AnalyzeLookPC
   ?PlotAnalysisGraph
   ```
 
@@ -139,14 +140,14 @@ Use its two wrapper functions when hypotheses are defined for a full population
 and a nested subgroup. PE-PC currently supports one-look or two-look designs
 and derives each look's correlation matrix from the cumulative full-population
 and subgroup sample sizes supplied at that look. This two-look restriction does
-not apply to the generic `SetupAnalysis_PC()`/`AnalyzeLook_PC()` interface.
+not apply to the generic `SetupAnalysisPC()`/`AnalyzeLookPC()` interface.
 
 ```R
 library( AdaptGMCP )
 
-state <- SetupAnalysis_PE_PC(
-  WI = c( 0.5, 0.5, 0, 0 ),
-  G = matrix(
+state <- SetupAnalysisPEPC(
+  vWeights = c( 0.5, 0.5, 0, 0 ),
+  mGMatrix = matrix(
     c( 0, 0.5, 0.5, 0,
        0.5, 0, 0, 0.5,
        0, 1, 0, 0,
@@ -154,29 +155,29 @@ state <- SetupAnalysis_PE_PC(
     byrow = TRUE,
     nrow = 4
   ),
-  test.type = "Partly-Parametric",
-  planned_info_frac = c( 0.5, 1 ),
-  typeOfDesign = "asOF",
-  plotGraphs = FALSE
+  strTestType = "Partly-Parametric",
+  vInfoFracts = c( 0.5, 1 ),
+  strDesignType = "asOF",
+  bPlotGraphs = FALSE
 )
 
-state <- AnalyzeLook_PE_PC(
-  state = state,
-  look = 1,
-  p_raw = c( H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30 ),
-  fullpop_sample_sizes = c( 70, 105, 84 ),
-  subpop_sample_sizes = c( 35, 56, 49 ),
-  plotGraphs = FALSE
+state <- AnalyzeLookPEPC(
+  cState = state,
+  nLook = 1,
+  vRawPVals = c( H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30 ),
+  vFullPopulationSampleSizes = c( 70, 105, 84 ),
+  vSubpopulationSampleSizes = c( 35, 56, 49 ),
+  bPlotGraphs = FALSE
 )
 
-state <- AnalyzeLook_PE_PC(
-  state = state,
-  look = 2,
-  p_raw = c( H1 = 0.02, H2 = 0.10, H4 = 0.40 ),
-  selection = c( "H1", "H2", "H4" ),
-  fullpop_sample_sizes = c( 100, 140, 123 ),
-  subpop_sample_sizes = c( 48, 80, 70 ),
-  plotGraphs = FALSE
+state <- AnalyzeLookPEPC(
+  cState = state,
+  nLook = 2,
+  vRawPVals = c( H1 = 0.02, H2 = 0.10, H4 = 0.40 ),
+  vSelectHypo = c( "H1", "H2", "H4" ),
+  vFullPopulationSampleSizes = c( 100, 140, 123 ),
+  vSubpopulationSampleSizes = c( 48, 80, 70 ),
+  bPlotGraphs = FALSE
 )
 
 state$mcpObj$AdjPValues
@@ -184,7 +185,7 @@ state$mcpObj$CombinedPValuesTable
 state$mcpObj$rej_flag_Curr
 ```
 
-`planned_info_frac` controls the planned look schedule and boundaries; the
+`vInfoFracts` controls the planned look schedule and boundaries; the
 sample-size vectors are cumulative observed counts used to derive the
 look-specific correlation. Use `(control, treatment 1, treatment 2, ...)` in
 every vector, keep subgroup counts no greater than full-population counts, and

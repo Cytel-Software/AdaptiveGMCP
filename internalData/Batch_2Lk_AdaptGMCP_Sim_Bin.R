@@ -1074,7 +1074,7 @@
   #
 
   # ###################################################
-  # We will use the function simMAMSMEP_Wrapper() for executing a batch.
+  # We will use the function SimulateMAMSMEPWrapper() for executing a batch.
 
   # dfInput <- read_csv("internalData/CER_Inp_1ep5arms - Continuous.csv")
   # dfInput <- read_csv("internalData/InputScenarios_2ep5arm.csv")
@@ -1126,9 +1126,9 @@
   sTimeNow <- format(tStartTime, "%d%h%y-%H_%M")
   sOutPath <- paste0(sOutPath, sOutFilePrefix, "_", sTimeNow, ".csv")
 
-  dfOutput <- simMAMSMEP_Wrapper(InputDF = dfInput %>%
+  dfOutput <- SimulateMAMSMEPWrapper(dfInput = dfInput %>%
                                    filter(ModelID %in% nModelsToRun),
-                                 sOutPath = sOutPath
+                                 strOutputPath = sOutPath
                                  # Uncomment the following line if you want to dump
                                  # simulation output to RDS files.
                                  # , DumpSimOutToRDS = TRUE

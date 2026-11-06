@@ -45,7 +45,7 @@ start.time <- Sys.time()
 
 #Run Simulation Batches
 
-outDF <- simMAMSMEP_Wrapper(InputDF = InputDF %>% filter(ModelID %in% modelsToRun))
+outDF <- SimulateMAMSMEPWrapper(dfInput = InputDF %>% filter(ModelID %in% modelsToRun))
 
 #Elapsed Time
 elapsed.time <- Sys.time()-start.time

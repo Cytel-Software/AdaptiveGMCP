@@ -38,36 +38,36 @@ corr_ex1 <- matrix(
 )
 
 # Setting up the design
-state_ex1 <- SetupAnalysis_PC(
-  WI = wi_ex1,
-  G = g_ex1,
-  test.type = "Partly-Parametric",
-  alpha = 0.025,
-  planned_info_frac = c(0.5, 1.0),
-  typeOfDesign = "asOF",
-  MultipleWinners = TRUE,
-  plotGraphs = FALSE
+state_ex1 <- SetupAnalysisPC(
+  vWeights = wi_ex1,
+  mGMatrix = g_ex1,
+  strTestType = "Partly-Parametric",
+  dAlpha = 0.025,
+  vInfoFracts = c(0.5, 1.0),
+  strDesignType = "asOF",
+  bMultipleWinners = TRUE,
+  bPlotGraphs = FALSE
 )
 
 print("Example 1: Design")
 print(state_ex1)
 
-state_ex1 <- AnalyzeLook_PC(
-  state = state_ex1,
-  look = 1,
-  p_raw = c(H1 = 0.0001, H2 = 0.40, H3 = 0.40),
-  Correlation = corr_ex1,
-  plotGraphs = FALSE
+state_ex1 <- AnalyzeLookPC(
+  cState = state_ex1,
+  nLook = 1,
+  vRawPVals = c(H1 = 0.0001, H2 = 0.40, H3 = 0.40),
+  mCorrelation = corr_ex1,
+  bPlotGraphs = FALSE
 )
 
 print("EXAMPLE 1 - Look-1 analysis output")
 print(state_ex1)
 
-state_ex1 <- AnalyzeLook_PC(
-  state = state_ex1,
-  look = 2,
-  p_raw = c(H2 = 0.0001, H3 = 0.40),
-  plotGraphs = FALSE
+state_ex1 <- AnalyzeLookPC(
+  cState = state_ex1,
+  nLook = 2,
+  vRawPVals = c(H2 = 0.0001, H3 = 0.40),
+  bPlotGraphs = FALSE
 )
 
 print("EXAMPLE 1 - Look-2 analysis output")
@@ -105,36 +105,36 @@ corr_ex2 <- matrix(
 )
 
 # Setting up the design
-state_ex2 <- SetupAnalysis_PC(
-  WI = wi_ex2,
-  G = g_ex2,
-  test.type = "Partly-Parametric",
-  alpha = 0.025,
-  planned_info_frac = c(0.5, 1.0),
-  typeOfDesign = "asOF",
-  plotGraphs = FALSE
+state_ex2 <- SetupAnalysisPC(
+  vWeights = wi_ex2,
+  mGMatrix = g_ex2,
+  strTestType = "Partly-Parametric",
+  dAlpha = 0.025,
+  vInfoFracts = c(0.5, 1.0),
+  strDesignType = "asOF",
+  bPlotGraphs = FALSE
 )
 
 print("Example 2: Design")
 print(state_ex2)
 
-state_ex2 <- AnalyzeLook_PC(
-  state = state_ex2,
-  look = 1,
-  p_raw = c(H1 = 0.10, H2 = 0.20, H3 = 0.15, H4 = 0.30),
-  Correlation = corr_ex2,
-  plotGraphs = FALSE
+state_ex2 <- AnalyzeLookPC(
+  cState = state_ex2,
+  nLook = 1,
+  vRawPVals = c(H1 = 0.10, H2 = 0.20, H3 = 0.15, H4 = 0.30),
+  mCorrelation = corr_ex2,
+  bPlotGraphs = FALSE
 )
 
 print("EXAMPLE 2 - Look-1 analysis output")
 print(state_ex2)
 
-state_ex2 <- AnalyzeLook_PC(
-  state = state_ex2,
-  look = 2,
-  p_raw = c(H1 = 0.02, H3 = 0.04),
-  selection = c("H1", "H3"),
-  plotGraphs = FALSE
+state_ex2 <- AnalyzeLookPC(
+  cState = state_ex2,
+  nLook = 2,
+  vRawPVals = c(H1 = 0.02, H3 = 0.04),
+  vSelectHypo = c("H1", "H3"),
+  bPlotGraphs = FALSE
 )
 
 print("EXAMPLE 2 - Look-2 analysis output")
@@ -164,25 +164,25 @@ g_ex3 <- matrix(
 corr_ex3 <- corr_ex2
 
 # Setting up the design
-state_ex3 <- SetupAnalysis_PC(
-  WI = wi_ex3,
-  G = g_ex3,
-  test.type = "Partly-Parametric",
-  alpha = 0.025,
-  planned_info_frac = c(0.5, 1.0),
-  typeOfDesign = "asOF",
-  plotGraphs = FALSE
+state_ex3 <- SetupAnalysisPC(
+  vWeights = wi_ex3,
+  mGMatrix = g_ex3,
+  strTestType = "Partly-Parametric",
+  dAlpha = 0.025,
+  vInfoFracts = c(0.5, 1.0),
+  strDesignType = "asOF",
+  bPlotGraphs = FALSE
 )
 
 print("Example 3: Design")
 print(state_ex3)
 
-state_ex3 <- AnalyzeLook_PC(
-  state = state_ex3,
-  look = 1,
-  p_raw = c(H1 = 0.04, H2 = 0.18, H3 = 0.12, H4 = 0.22),
-  Correlation = corr_ex3,
-  plotGraphs = FALSE
+state_ex3 <- AnalyzeLookPC(
+  cState = state_ex3,
+  nLook = 1,
+  vRawPVals = c(H1 = 0.04, H2 = 0.18, H3 = 0.12, H4 = 0.22),
+  mCorrelation = corr_ex3,
+  bPlotGraphs = FALSE
 )
 
 print("EXAMPLE 3 - Look-1 analysis output")
@@ -209,15 +209,15 @@ print("EXAMPLE 3 - New graph weights and transition matrix before look 2:")
 print(new_w_ex3)
 print(new_g_ex3)
 
-state_ex3 <- AnalyzeLook_PC(
-  state = state_ex3,
-  look = 2,
-  p_raw = c(H1 = 0.03, H2 = 0.10, H3 = 0.08),
-  selection = c("H1", "H2", "H3"),
-  new_weights = new_w_ex3,
-  new_G = new_g_ex3,
-  Correlation = corr_l2_ex3,
-  plotGraphs = FALSE
+state_ex3 <- AnalyzeLookPC(
+  cState = state_ex3,
+  nLook = 2,
+  vRawPVals = c(H1 = 0.03, H2 = 0.10, H3 = 0.08),
+  vSelectHypo = c("H1", "H2", "H3"),
+  vWeights = new_w_ex3,
+  mGMatrix = new_g_ex3,
+  mCorrelation = corr_l2_ex3,
+  bPlotGraphs = FALSE
 )
 
 print("EXAMPLE 3 - analysis output for look 2")

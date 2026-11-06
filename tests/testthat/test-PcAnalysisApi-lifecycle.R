@@ -9,27 +9,27 @@ testthat::test_that("completion_reason: final_look when all planned looks are an
   # 3-look, 2-hypothesis fixed-effect design with p-values too weak to reject at any look.
   state <- pc_fixture_2h(planned_info_frac = c(0.5, 0.75, 1.0))
 
-  state <- AnalyzeLook_PC_TestWrapper(state, p_raw = c(H1 = 0.40, H2 = 0.40), plotGraphs = FALSE)
+  state <- AnalyzeLook_PC_TestWrapper(state, vRawPVals = c(H1 = 0.40, H2 = 0.40), bPlotGraphs = FALSE)
   expect_pc_state_invariants(state, completed_looks = 1L, trial_completed = FALSE)
   testthat::expect_null(state$completion_reason)
 
-  state <- AnalyzeLook_PC_TestWrapper(state, p_raw = c(H1 = 0.40, H2 = 0.40), plotGraphs = FALSE)
+  state <- AnalyzeLook_PC_TestWrapper(state, vRawPVals = c(H1 = 0.40, H2 = 0.40), bPlotGraphs = FALSE)
   expect_pc_state_invariants(state, completed_looks = 2L, trial_completed = FALSE)
   testthat::expect_null(state$completion_reason)
 
-  state <- AnalyzeLook_PC_TestWrapper(state, p_raw = c(H1 = 0.40, H2 = 0.40), plotGraphs = FALSE)
+  state <- AnalyzeLook_PC_TestWrapper(state, vRawPVals = c(H1 = 0.40, H2 = 0.40), bPlotGraphs = FALSE)
   expect_pc_state_invariants(state, completed_looks = 3L, trial_completed = TRUE)
   testthat::expect_identical(state$completion_reason, "final_look")
 })
 
 testthat::test_that("completion_reason: early_stop_efficacy when a hypothesis is rejected before the final look", {
   # 2-look design, MultipleWinners = FALSE: stopping as soon as any hypothesis is rejected.
-  state <- pc_fixture_2h(planned_info_frac = c(0.5, 1.0), MultipleWinners = FALSE)
+  state <- pc_fixture_2h(planned_info_frac = c(0.5, 1.0), bMultipleWinners = FALSE)
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.0001, H2 = 0.40),
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.0001, H2 = 0.40),
+    bPlotGraphs = FALSE
   )
 
   expect_pc_state_invariants(state, completed_looks = 1L, trial_completed = TRUE)
@@ -39,13 +39,13 @@ testthat::test_that("completion_reason: early_stop_efficacy when a hypothesis is
 })
 
 testthat::test_that("completion_reason: all_hypotheses_dropped short-circuits and does not advance completed_looks", {
-  # AnalyzeLook_PC() short-circuits with completion_reason = "all_hypotheses_dropped"
+  # AnalyzeLookPC() short-circuits with completion_reason = "all_hypotheses_dropped"
   # whenever it observes an empty active IndexSet on entry (see PcAnalysisApi.R). Since
   # applySelection() always requires retaining at least one hypothesis, this path is
   # exercised here the same way Test 4 ("look argument validation") simulates an
   # already-concluded trial: by directly constructing that state on the object.
   state <- pc_fixture_2h(planned_info_frac = c(0.5, 1.0))
-  state <- AnalyzeLook_PC_TestWrapper(state, p_raw = c(H1 = 0.40, H2 = 0.40), plotGraphs = FALSE)
+  state <- AnalyzeLook_PC_TestWrapper(state, vRawPVals = c(H1 = 0.40, H2 = 0.40), bPlotGraphs = FALSE)
   testthat::expect_false(state$trial_completed)
 
   state_dropped <- state
@@ -53,8 +53,8 @@ testthat::test_that("completion_reason: all_hypotheses_dropped short-circuits an
 
   state_dropped <- AnalyzeLook_PC_TestWrapper(
     state_dropped,
-    p_raw = c(H1 = 0.40, H2 = 0.40),
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.40, H2 = 0.40),
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_s3_class(state_dropped, "PCAnalysisState")
@@ -73,9 +73,9 @@ testthat::test_that("look_history: a snapshot is stored for every completed look
   p_raw_l2 <- c(H1 = 0.28, H2 = 0.32)
   p_raw_l3 <- c(H1 = 0.20, H2 = 0.45)
 
-  state <- AnalyzeLook_PC_TestWrapper(state, p_raw = p_raw_l1, plotGraphs = FALSE)
-  state <- AnalyzeLook_PC_TestWrapper(state, p_raw = p_raw_l2, plotGraphs = FALSE)
-  state <- AnalyzeLook_PC_TestWrapper(state, p_raw = p_raw_l3, plotGraphs = FALSE)
+  state <- AnalyzeLook_PC_TestWrapper(state, vRawPVals = p_raw_l1, bPlotGraphs = FALSE)
+  state <- AnalyzeLook_PC_TestWrapper(state, vRawPVals = p_raw_l2, bPlotGraphs = FALSE)
+  state <- AnalyzeLook_PC_TestWrapper(state, vRawPVals = p_raw_l3, bPlotGraphs = FALSE)
 
   testthat::expect_true(state$trial_completed)
   testthat::expect_length(state$look_history, 3L)
@@ -100,17 +100,17 @@ testthat::test_that("look_history: selection/strategy/correlation inputs are rec
 
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30),
-    Correlation = corr,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30),
+    mCorrelation = corr,
+    bPlotGraphs = FALSE
   )
 
   selection <- c("H1", "H2", "H4")
   state <- AnalyzeLook_PC_TestWrapper(
     state,
-    p_raw = c(H1 = 0.02, H2 = 0.10, H4 = 0.40),
-    selection = selection,
-    plotGraphs = FALSE
+    vRawPVals = c(H1 = 0.02, H2 = 0.10, H4 = 0.40),
+    vSelectHypo = selection,
+    bPlotGraphs = FALSE
   )
 
   testthat::expect_equal(state$look_history[[2]]$inputs$selection, selection)
@@ -122,22 +122,22 @@ testthat::test_that("look_history: selection/strategy/correlation inputs are rec
 testthat::test_that("post-completion behavior: 'Trial already concluded' error is stable across every completion pathway", {
   # Pathway 1: final_look
   state_final <- pc_fixture_2h(planned_info_frac = c(0.5, 1.0))
-  state_final <- AnalyzeLook_PC_TestWrapper(state_final, p_raw = c(H1 = 0.40, H2 = 0.40), plotGraphs = FALSE)
-  state_final <- AnalyzeLook_PC_TestWrapper(state_final, p_raw = c(H1 = 0.40, H2 = 0.40), plotGraphs = FALSE)
+  state_final <- AnalyzeLook_PC_TestWrapper(state_final, vRawPVals = c(H1 = 0.40, H2 = 0.40), bPlotGraphs = FALSE)
+  state_final <- AnalyzeLook_PC_TestWrapper(state_final, vRawPVals = c(H1 = 0.40, H2 = 0.40), bPlotGraphs = FALSE)
   testthat::expect_identical(state_final$completion_reason, "final_look")
-  expect_pc_look_error(state_final, "Trial already concluded", p_raw = c(H1 = 0.40, H2 = 0.40))
+  expect_pc_look_error(state_final, "Trial already concluded", vRawPVals = c(H1 = 0.40, H2 = 0.40))
 
   # Pathway 2: early_stop_efficacy
-  state_early <- pc_fixture_2h(planned_info_frac = c(0.5, 1.0), MultipleWinners = FALSE)
-  state_early <- AnalyzeLook_PC_TestWrapper(state_early, p_raw = c(H1 = 0.0001, H2 = 0.40), plotGraphs = FALSE)
+  state_early <- pc_fixture_2h(planned_info_frac = c(0.5, 1.0), bMultipleWinners = FALSE)
+  state_early <- AnalyzeLook_PC_TestWrapper(state_early, vRawPVals = c(H1 = 0.0001, H2 = 0.40), bPlotGraphs = FALSE)
   testthat::expect_identical(state_early$completion_reason, "early_stop_efficacy")
-  expect_pc_look_error(state_early, "Trial already concluded", p_raw = c(H1 = 0.40, H2 = 0.40))
+  expect_pc_look_error(state_early, "Trial already concluded", vRawPVals = c(H1 = 0.40, H2 = 0.40))
 
   # Pathway 3: all_hypotheses_dropped (simulated empty IndexSet, as above)
   state_dropped <- pc_fixture_2h(planned_info_frac = c(0.5, 1.0))
-  state_dropped <- AnalyzeLook_PC_TestWrapper(state_dropped, p_raw = c(H1 = 0.40, H2 = 0.40), plotGraphs = FALSE)
+  state_dropped <- AnalyzeLook_PC_TestWrapper(state_dropped, vRawPVals = c(H1 = 0.40, H2 = 0.40), bPlotGraphs = FALSE)
   state_dropped$mcpObj$IndexSet <- character(0)
-  state_dropped <- AnalyzeLook_PC_TestWrapper(state_dropped, p_raw = c(H1 = 0.40, H2 = 0.40), plotGraphs = FALSE)
+  state_dropped <- AnalyzeLook_PC_TestWrapper(state_dropped, vRawPVals = c(H1 = 0.40, H2 = 0.40), bPlotGraphs = FALSE)
   testthat::expect_identical(state_dropped$completion_reason, "all_hypotheses_dropped")
-  expect_pc_look_error(state_dropped, "Trial already concluded", p_raw = c(H1 = 0.40, H2 = 0.40))
+  expect_pc_look_error(state_dropped, "Trial already concluded", vRawPVals = c(H1 = 0.40, H2 = 0.40))
 })

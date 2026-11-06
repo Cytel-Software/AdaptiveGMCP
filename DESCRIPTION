@@ -1,7 +1,7 @@
 Package: AdaptGMCP
 Type: Package
 Title: Graph Based, Adaptive, Multi-Arm, Multi-Endpoint Designs
-Version: 2.2.3
+Version: 2.2.4
 Authors@R: c(
     person("Ajoy", "Mukhopadhyay", role = "aut"),
     person("Anoop Singh", "Rawat", role = "aut"),
@@ -24,3 +24,4 @@ Suggests: future, ggplot2, gridExtra, lintr, promises, reshape2,
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 Config/roxygen2/version: 8.1.0
+RoxygenNote: 7.3.3

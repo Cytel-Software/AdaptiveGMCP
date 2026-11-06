@@ -2,13 +2,29 @@
 
 ## New Features
 
+* Renamed `SetupDesign_CER()`, `AnalyzeLook_CER()`, `PlotGraph_CER()`,
+  `SetupAnalysis_PC()`, `AnalyzeLook_PC()`, `SetupAnalysis_PE_PC()`,
+  `AnalyzeLook_PE_PC()`, `genPowerTablePlots()`, and `simMAMSMEP_Wrapper()`
+  to `SetupDesignCER()`, `AnalyzeLookCER()`, `PlotGraphCER()`,
+  `SetupAnalysisPC()`, `AnalyzeLookPC()`, `SetupAnalysisPEPC()`,
+  `AnalyzeLookPEPC()`, `GeneratePowerTablePlots()`, and
+  `SimulateMAMSMEPWrapper()`, respectively. Their formal parameters now follow
+  the documented naming conventions. `PlotAnalysisGraph()` keeps its function
+  name but uses convention-aligned parameters. The legacy `adaptGMCP_CER()`,
+  `adaptGMCP_PC()`, `simMAMSMEP()`, and `plotGraph()` APIs remain unchanged.
+
 * Added fixture-driven CER simulation/API equivalence coverage using incremental
   stage-wise raw p-values, selection, and adapted sample-size inputs.
 
 ## Corrections
 
-* `AnalyzeLook_PC()` now warns and ignores look-1 `selection`, `new_weights`,
-  and `new_G` inputs, using the initial design from `SetupAnalysis_PC()`;
+* `PlotAnalysisGraph()` renames its `stage` parameter to `nStage` to follow the
+  documented integer naming convention; callers using the named `stage`
+  argument must update their calls.
+
+* `AnalyzeLookPC()` now warns and ignores look-1 `vSelectHypo`,
+  `vWeights`, and `mGMatrix` inputs, using the initial design
+  from `SetupAnalysisPC()`;
   adaptation handling from look 2 onward is unchanged.
 
 * Corrected parametric CER covariance calculations for unequal allocation
@@ -20,16 +36,16 @@
   and unique continuing-treatment arm order, regardless of names, and must
   specify exactly that number of arms.
 
-* Removed the redundant `strategy_update` argument from `AnalyzeLook_CER()`;
-  strategy adaptations are supplied directly through `new_weights` and
-  `new_G`.
+* Removed the redundant strategy-update argument from `AnalyzeLookCER()`;
+  strategy adaptations are supplied directly through `vWeights` and
+  `mGMatrix`.
 
-* Removed the duplicate `stage2_cumulative_sample_size` argument from
-  `AnalyzeLook_CER()`; cumulative Look 2 sample-size adaptations now use
-  `new_sample_size` exclusively.
+* Removed the duplicate stage-2 cumulative sample-size argument from
+  `AnalyzeLookCER()`; cumulative Look 2 sample-size adaptations now use
+  `vNewSampleSizes` exclusively.
 
 * Non-interactive CER Look 1 analysis now reuses the planned design computed by
-  `SetupDesign_CER()` instead of recalculating it; the legacy interactive CER
+  `SetupDesignCER()` instead of recalculating it; the legacy interactive CER
   API retains its existing planning behavior.
 
 * Improved `print.PCAnalysisState()` output so setup states show the design
@@ -42,12 +58,12 @@
 * CER stage-2 analysis marks arms without continuing hypotheses unavailable
   after selection or sample-size adaptation, preserving simulation compatibility.
 
-* `SetupAnalysis_PC()` now initializes the hypothesis map used to validate
+* `SetupAnalysisPC()` now initializes the hypothesis map used to validate
   interim hypothesis selection.
 
 ### Non-Interactive Conditional Error Rate Analysis
 
-* Added `SetupDesign_CER()`, `AnalyzeLook_CER()`, and `PlotGraph_CER()` for
+* Added `SetupDesignCER()`, `AnalyzeLookCER()`, and `PlotGraphCER()` for
   deterministic two-look CER analyses.
 * Added design/state S3 objects, structured look history and CER/PCER results,
   deterministic selection, sample-size, and strategy adaptations, validation,
@@ -58,10 +74,10 @@
 ## Quality Improvements
 
 * Added fixture-driven numerical equivalence tests between `adaptGMCP_CER()`
-  and the non-interactive `SetupDesign_CER()`/`AnalyzeLook_CER()` workflow
+  and the non-interactive `SetupDesignCER()`/`AnalyzeLookCER()` workflow
   across all shared CER regression scenarios.
 * Added reusable PC API test fixtures/assertion helpers and expanded
-  `SetupAnalysis_PC()`/`AnalyzeLook_PC()`/`PlotAnalysisGraph()` test coverage:
+  `SetupAnalysisPC()`/`AnalyzeLookPC()`/`PlotAnalysisGraph()` test coverage:
   state-transition and completion-semantics tests (`completion_reason`,
   `look_history` integrity, post-completion error stability), remaining
   `typeOfDesign` and `chooseMVTAlgo()` branch coverage, and `PlotAnalysisGraph()`

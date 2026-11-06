@@ -4,7 +4,7 @@ These instructions make AI agents immediately productive in this R package. They
 
 ## Overview
 - Purpose: Graph-based, adaptive multi-arm, multi-endpoint clinical trial methods with simulation and analysis.
-- Key exports: `simMAMSMEP`, `adaptGMCP_CER`, `adaptGMCP_PC`, `plotGraph`, `genPowerTablePlots`, `AdaptGMCPSimApp` (Shiny).
+- Key exports: `simMAMSMEP`, `adaptGMCP_CER`, `adaptGMCP_PC`, `plotGraph`, `GeneratePowerTablePlots`, `AdaptGMCPSimApp` (Shiny).
 - See exports in [NAMESPACE](../NAMESPACE) and package metadata in [DESCRIPTION](../DESCRIPTION).
 
 ## Architecture & Data Conventions

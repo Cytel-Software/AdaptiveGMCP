@@ -15,7 +15,7 @@ Use package-aware test runners by default.
 ## Why
 
 - `testthat::test_file()` can run a test file without the normal package-loading context.
-- In this repository that can produce false failures such as `could not find function "SetupAnalysis_PE_PC"` even when the implementation and tests are correct.
+- In this repository that can produce false failures such as `could not find function "SetupAnalysisPEPC"` even when the implementation and tests are correct.
 
 ## Expected Workflow
 

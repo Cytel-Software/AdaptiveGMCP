@@ -17,35 +17,35 @@ The API will separate the immutable planned trial design from the evolving
 analysis state:
 
 ```r
-design <- SetupDesign_CER(...)
+design <- SetupDesignCER(...)
 
-state <- AnalyzeLook_CER(
-  design = design,
-  state = NULL,
-  p_raw = look1_pvalues
+state <- AnalyzeLookCER(
+  cDesign = design,
+  cState = NULL,
+  vRawPVals = look1_pvalues
 )
 
-state <- AnalyzeLook_CER(
-  design = design,
-  state = state,
-  p_raw = look2_pvalues,
-  selection = ...,
-  new_sample_size = ...,
-  new_weights = ...,
-  new_G = ...
+state <- AnalyzeLookCER(
+  cDesign = design,
+  cState = state,
+  vRawPVals = look2_pvalues,
+  vSelectHypo = ...,
+  vNewSampleSizes = ...,
+  vWeights = ...,
+  mGMatrix = ...
 )
 ```
 
 The new API is restricted to two-look CER trials. It must not prompt for input,
 depend on hidden session state, or require console output for downstream use.
-Strategy adaptations are supplied directly through `new_weights` and `new_G`;
-there is no nested strategy-update argument.
+Strategy adaptations are supplied directly through `vWeights` and
+`mGMatrix`; there is no nested strategy-update argument.
 
 ## Architecture
 
 ### CERDesign
 
-`SetupDesign_CER()` will return an S3 object with class
+`SetupDesignCER()` will return an S3 object with class
 `CERDesign`. It will contain only normalized planning inputs and
 precomputed design artifacts:
 
@@ -68,7 +68,7 @@ multiple independent analyses.
 
 ### CERAnalysisState
 
-`AnalyzeLook_CER()` will return an S3 object with class
+`AnalyzeLookCER()` will return an S3 object with class
 `CERAnalysisState`. It will contain only information for one evolving analysis:
 
 - Number of completed looks
@@ -86,13 +86,13 @@ It will not contain a copy of `CERDesign`, the original design-parameter
 list, or a setup-state snapshot.
 
 No public empty-state constructor is planned. For Look 1,
-`AnalyzeLook_CER(design, state = NULL, ...)` creates the initial state. Look 2
+`AnalyzeLookCER(design, cState = NULL, ...)` creates the initial state. Look 2
 requires the state returned by Look 1.
 
 ### Internal Execution Context
 
 Existing CER computational helpers expect a combined `mcpObj`. To avoid a
-risky rewrite, each call to `AnalyzeLook_CER()` may construct a temporary
+risky rewrite, each call to `AnalyzeLookCER()` may construct a temporary
 internal execution context from:
 
 1. Immutable planned artifacts from `design`
@@ -116,13 +116,13 @@ the initial implementation shows that stronger binding is necessary.
 
 ### Decoupled Plotting
 
-`PlotGraph_CER(design, state = NULL)` reconstructs and plots the
+`PlotGraphCER(design, cState = NULL)` reconstructs and plots the
 intersection-hypothesis graph for a given point in the analysis: the initial
 planned graph when `state` is `NULL`, or the graph as of the most recently
 completed look otherwise. It is a thin wrapper around the existing
 `plotGraph()` helper and has no effect on any analysis result. This lets a
 caller regenerate any graph on demand instead of relying solely on the inline
-`plotGraphs` argument of `AnalyzeLook_CER()`.
+`bPlotGraphs` argument of `AnalyzeLookCER()`.
 
 ## Compatibility Requirements
 
@@ -208,7 +208,7 @@ will pause for clarification rather than inventing inputs.
 7. Add tests for `adaptGMCP_CER()` for any new scenarios discovered while doing 1 to 5. Done — 4 new scenarios and `test_that()` blocks added.
 8. Add corresponding tests for the new non-interactive CER analysis API using
    the same scenarios as for `adaptGMCP_CER()`. Done in issue #190 by running
-   all 10 shared scenarios through `SetupDesign_CER()` and `AnalyzeLook_CER()`
+   all 10 shared scenarios through `SetupDesignCER()` and `AnalyzeLookCER()`
    in a dedicated test file.
 9. Make sure that the new non-interactive API gives the same output as
    `adaptGMCP_CER()` for the same scenario. Done using the existing per-look
@@ -269,7 +269,7 @@ Issues: #55 and #57.
    without p-values.
 4. Route the interactive implementation through the extracted helper without
    changing its numerical behavior.
-5. Write failing `SetupDesign_CER()` tests for every fixture design and for:
+5. Write failing `SetupDesignCER()` tests for every fixture design and for:
    - Invalid arm and endpoint counts
    - Invalid endpoint-specific `sigma` and `prop.ctr`
    - Invalid sample sizes and allocation ratios
@@ -289,7 +289,7 @@ function without explicit approval.
 
 Issue: #60.
 
-1. Implement `SetupDesign_CER()`.
+1. Implement `SetupDesignCER()`.
 2. Validate and normalize all planning inputs.
 3. Build the hypothesis map and all intersection graphs and weights.
 4. Compute the planned sample allocation, covariance, and CER boundaries.
@@ -298,7 +298,7 @@ Issue: #60.
 7. Return only `CERDesign`.
 8. Prove that setup is non-interactive and does not mutate caller inputs.
 9. Make the setup tests green and rerun the CER regression suite.
-10. Confirm issue wording still matches `SetupDesign_CER()` naming (already
+10. Confirm issue wording still matches `SetupDesignCER()` naming (already
     aligned per Known Risk #6); correct any newly discovered drift before the
     affected issues are closed.
 
@@ -309,7 +309,7 @@ shape, numerical parity, validation behavior, and test results.
 
 Issues: #58 and #61.
 
-1. Write failing tests for `AnalyzeLook_CER(design, state = NULL, ...)`.
+1. Write failing tests for `AnalyzeLookCER(design, cState = NULL, ...)`.
 2. Cover look sequencing, named p-values, Stage 1 closed testing, active-set
    updates, retained intersections, CER/PCER results, history, graph state, and
    early efficacy stopping.
@@ -333,7 +333,7 @@ fixture-equivalent. Do not begin Stage 2 work without explicit approval.
 
 Issues: #59 and #62.
 
-1. Write failing tests for `AnalyzeLook_CER(design, state, ...)` covering:
+1. Write failing tests for `AnalyzeLookCER(cDesign = design, cState = state, ...)` covering:
    - As-planned and adapted Stage 2 paths
    - No-op adaptation
    - Selection and empty selection
@@ -374,7 +374,7 @@ Issue: #64.
    remain untouched.
 2. Harden validation and verify state/history invariants for the new API.
 3. Complete print methods for both new classes.
-4. Implement `PlotGraph_CER(design, state = NULL)` for initial, Look 1, and
+4. Implement `PlotGraphCER(design, cState = NULL)` for initial, Look 1, and
    Look 2 graph reconstruction (see "Decoupled Plotting" in Architecture),
    without coupling plots to analysis.
 5. Run targeted CER tests after every refactor.
@@ -389,11 +389,11 @@ focused refactor summary.
 Issues: #63 and #54.
 
 1. Complete roxygen documentation and examples for:
-   - `SetupDesign_CER()`
-   - `AnalyzeLook_CER()`
+   - `SetupDesignCER()`
+   - `AnalyzeLookCER()`
    - `print.CERDesign()`
    - `print.CERAnalysisState()`
-   - `PlotGraph_CER()`
+   - `PlotGraphCER()`
 2. Explain design/state separation, `state = NULL` at Look 1, incremental Stage
    2 p-values, two-look enforcement, adaptation timing, history, and errors.
 3. Add a fully non-interactive `internalData/CER_Analysis_NonInteractive_Example.R` showing
@@ -440,7 +440,7 @@ numerical tolerance.
 
 - `R/CERDesign.R`: design constructor and S3 methods
 - `R/CERAnalysisState.R`: analysis-state constructor and S3 methods
-- `R/CERAnalysisApi.R`: `SetupDesign_CER()`, `AnalyzeLook_CER()`, and `PlotGraph_CER()`
+- `R/CERAnalysisApi.R`: `SetupDesignCER()`, `AnalyzeLookCER()`, and `PlotGraphCER()`
 - `tests/testthat/test-CERAnalysisApi.R`: setup and analysis tests
 - `internalData/CER_Analysis_NonInteractive_Example.R`: worked example
 
@@ -484,7 +484,7 @@ if a single file becomes difficult to review.
    design to pass structural compatibility checks. Revisit this if testing or
    usage demonstrates a practical risk.
 6. Resolved 2026-09-09: issues #54, #55, #57–#64 were rewritten to match this
-   living plan's `CERDesign`/`CERAnalysisState` split and `SetupDesign_CER()`
+   living plan's `CERDesign`/`CERAnalysisState` split and `SetupDesignCER()`
    naming (previously they described a single combined state object and
    `SetupAnalysis_CER()`, mirrored from the PC method). Issue #56 was left
    unchanged because it is closed and only concerns `adaptGMCP_CER()`

@@ -5,15 +5,15 @@
 # --------------------------------------------------------------------------------------------------
 
 #' Wrapper function that takes all inputs through a single R dataframe
-#' Ani: Added sOutPath so that output can be written to the CSV file after every scenario
+#' Ani: Added strOutputPath so that output can be written to the CSV file after every scenario
 #' is simulated rather than at the end of all scenarios.
-#' @param InputDF R Dataframe: This is the csv/excel input data in the R dataframe format
-#' @param sOutPath String: File path to save the output csv file
+#' @param dfInput R Dataframe: This is the csv/excel input data in the R dataframe format
+#' @param strOutputPath String: File path to save the output csv file
 #' @example ./internalData/RunBatches12-04-24.R
 #' @importFrom dplyr select mutate relocate rename bind_rows left_join everything
 #' @importFrom tidyr pivot_wider pivot_longer
 #' @export
-simMAMSMEP_Wrapper <- function(InputDF, sOutPath
+SimulateMAMSMEPWrapper <- function(dfInput, strOutputPath
                                # Uncomment the following line if you want to enable 
                                # dumping simulation output to RDS files.
                                # , DumpSimOutToRDS = FALSE
@@ -24,19 +24,19 @@ simMAMSMEP_Wrapper <- function(InputDF, sOutPath
   allRawPValues <- data.frame() # Initialize dataframe to collect raw p-values
 
   # Open file connection for the entire batch
-  fileConn <- file(sOutPath, "w")  # Open in write mode
+  fileConn <- file(strOutputPath, "w")  # Open in write mode
   on.exit(close(fileConn))  # Ensure connection is closed when function exits
 
-  for (nModelNum in 1:nrow(InputDF)) {
+  for (nModelNum in 1:nrow(dfInput)) {
     # Start timer for this iteration
     start_time <- Sys.time()
 
-    print(paste0("Running Model ", nModelNum, " out of ", nrow(InputDF),
-                 ": ModelID = ", InputDF[nModelNum, "ModelID"]))
+    print(paste0("Running Model ", nModelNum, " out of ", nrow(dfInput),
+                 ": ModelID = ", dfInput[nModelNum, "ModelID"]))
 
     out <- tryCatch(
       {
-        run1TestCase(InputDF = InputDF[nModelNum, ], ModelID = InputDF[nModelNum, "ModelID"]
+        run1TestCase(InputDF = dfInput[nModelNum, ], ModelID = dfInput[nModelNum, "ModelID"]
                      # Uncomment the following line if you want to enable 
                      # dumping simulation output to RDS files.
                      # , DumpSimOutToRDS = DumpSimOutToRDS
@@ -72,7 +72,7 @@ simMAMSMEP_Wrapper <- function(InputDF, sOutPath
         mutate(Sno = nModelNum) %>%
         relocate(Sno, .before = everything())
       # Model ID and Seed Number to reproduce
-      mInfo <- data.frame("ModelID" = InputDF[nModelNum, "ModelID"], "seed" = out$Seed)
+      mInfo <- data.frame("ModelID" = dfInput[nModelNum, "ModelID"], "seed" = out$Seed)
 
       # Output Table
       OutTab <- cbind(mInfo, data.frame(dfOverall_Powers_wide[, -1]))
@@ -89,8 +89,8 @@ simMAMSMEP_Wrapper <- function(InputDF, sOutPath
 
       # Combining input and output for this model
       dfInpSep <- data.frame(Input = ">>>", stringsAsFactors = FALSE)
-      dfCombined <- cbind(OutTab, dfInpSep, InputDF[nModelNum,
-                                          !(names(InputDF) %in% "ModelID")])
+      dfCombined <- cbind(OutTab, dfInpSep, dfInput[nModelNum,
+                                          !(names(dfInput) %in% "ModelID")])
 
       # Reorder columns to put Scenario right after ModelID
       col_order <- c("ModelID", "Scenario",
@@ -107,11 +107,11 @@ simMAMSMEP_Wrapper <- function(InputDF, sOutPath
         # Add model number column
         modelRawPValues <- out$rawPValues
         modelRawPValues$ModelNum <- nModelNum
-        modelRawPValues$ModelID <- InputDF[nModelNum, "ModelID"]
+        modelRawPValues$ModelID <- dfInput[nModelNum, "ModelID"]
 
         # InputDF[nModelNum, "info_frac"]
         modelRawPValues$Look <- rep(1:length(eval(
-          parse(text = InputDF[nModelNum, ]$info_frac)
+          parse(text = dfInput[nModelNum, ]$info_frac)
           )), length.out = nrow(out$rawPValues))
 
         dfTemp <- modelRawPValues %>% select(-c(ModelNum, ModelID, Look))
@@ -144,7 +144,7 @@ simMAMSMEP_Wrapper <- function(InputDF, sOutPath
 
   # rbind power tables for each iteration to produce a single table
   dfOut <- do.call(rbind, lOut)
-  dfOut <- dplyr::left_join(dfOut, InputDF, by = "ModelID")
+  dfOut <- dplyr::left_join(dfOut, dfInput, by = "ModelID")
 
   ## Uncomment this code block to save raw p-values to a CSV file
   # Save combined raw p-values to CSV if we have data
@@ -231,36 +231,36 @@ run1TestCase <- function(InputDF, ModelID = NA
 
 
 #' Create table and plots of given format
-#' @param PowerType : Type of power to be extracted from the output dataframe. Must be one of "Global.Power", "Conjunctive.Power", "Disjunctive.Power", "FWER".
-#' @param dfOut : output from simMAMSMEP_Wrapper
-#' @param TableTemDF : Template table dataframe specifying the scenarios and treatment selection rules
+#' @param strPowerType : Type of power to be extracted from the output dataframe. Must be one of "Global.Power", "Conjunctive.Power", "Disjunctive.Power", "FWER".
+#' @param dfOutput : output from SimulateMAMSMEPWrapper
+#' @param dfTableTemplate : Template table dataframe specifying the scenarios and treatment selection rules
 #' @export
-genPowerTablePlots <- function(PowerType, dfOut, TableTemDF) {
+GeneratePowerTablePlots <- function(strPowerType, dfOutput, dfTableTemplate) {
   library(ggplot2)
   library(gridExtra)
 
-  p <- sapply(TableTemDF$ModelID, function(mID) {
-    p <- dfOut[dfOut$ModelID == mID, PowerType]
+  p <- sapply(dfTableTemplate$ModelID, function(mID) {
+    p <- dfOutput[dfOutput$ModelID == mID, strPowerType]
     if (length(p) == 0) {
       p <- NA
     }
     p
   })
-  tab1 <- TableTemDF[, -which(names(TableTemDF) == "ModelID")]
-  tab1[PowerType] <- p
+  tab1 <- dfTableTemplate[, -which(names(dfTableTemplate) == "ModelID")]
+  tab1[strPowerType] <- p
   scenarios <- unique(tab1$Level1)
   plots <- list()
 
   tab3 <- reshape(
     data = tab1, idvar = c("Level1", "Level2"),
-    v.names = PowerType, timevar = "Method", direction = "wide"
+    v.names = strPowerType, timevar = "Method", direction = "wide"
   )
   tab3$Difference <- tab3[, 4] - tab3[, 3]
 
   colnames(tab3) <- c(
     "Scenario",
     "Treatment Selection Rule",
-    gsub(paste0("^", PowerType, "\\."), "", names(tab3)[3:4]),
+    gsub(paste0("^", strPowerType, "\\."), "", names(tab3)[3:4]),
     "Difference"
   )
   SelectionRuleOrder <- c("Conservative", "Normal", "Aggressive", "Ultra")

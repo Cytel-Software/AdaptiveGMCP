@@ -46,18 +46,18 @@ Correlation2 <- matrix(c(
 plotGraphs2 <- TRUE
 
 #--------------Setup Analysis------------------------
-state2 <- SetupAnalysis_PC(
-  WI            = WI2,
-  G             = G2,
-  test.type     = test.type2,
-  alpha         = alpha2,
-  planned_info_frac = info_frac2,
-  typeOfDesign  = typeOfDesign2,
-  plotGraphs    = plotGraphs2
+state2 <- SetupAnalysisPC(
+  vWeights            = WI2,
+  mGMatrix             = G2,
+  strTestType     = test.type2,
+  dAlpha         = alpha2,
+  vInfoFracts = info_frac2,
+  strDesignType  = typeOfDesign2,
+  bPlotGraphs    = plotGraphs2
 )
 
 # Computed stopping boundaries from the planned design
-print("EXAMPLE 2 - Computed stopping boundaries after SetupAnalysis_PC():")
+print("EXAMPLE 2 - Computed stopping boundaries after SetupAnalysisPC():")
 print(state2)
 
 #===================================================================================
@@ -67,23 +67,23 @@ state2_s1 <- state2
 
 #--------------Look 1 Analysis-----------------------
 # p1 is far below the look-1 efficacy boundary, so H1 is rejected.
-state2_s1 <- AnalyzeLook_PC(
+state2_s1 <- AnalyzeLookPC(
   state2_s1,
-  look          = 1,
-  p_raw         = c(H1 = 0.00001, H2 = 0.40),
-  Correlation   = Correlation2,
-  plotGraphs    = plotGraphs2
+  nLook          = 1,
+  vRawPVals         = c(H1 = 0.00001, H2 = 0.40),
+  mCorrelation   = Correlation2,
+  bPlotGraphs    = plotGraphs2
 )
 print("SCENARIO (1) - State after look 1 (expect H1 rejected):")
 print(state2_s1)
 
 #--------------Look 2 Analysis-----------------------
 # H1 has been rejected, so only H2 remains active; supply p_raw for H2 only.
-state2_s1 <- AnalyzeLook_PC(
+state2_s1 <- AnalyzeLookPC(
   state2_s1,
-  look          = 2,
-  p_raw         = c(H2 = 0.20),
-  plotGraphs    = plotGraphs2
+  nLook          = 2,
+  vRawPVals         = c(H2 = 0.20),
+  bPlotGraphs    = plotGraphs2
 )
 print("SCENARIO (1) - Pre-specified stopping boundaries:")
 print(state2_s1)
@@ -95,24 +95,24 @@ state2_s2 <- state2
 
 #--------------Look 1 Analysis-----------------------
 # Both p-values are above the look-1 efficacy boundary, so nothing is rejected.
-state2_s2 <- AnalyzeLook_PC(
+state2_s2 <- AnalyzeLookPC(
   state2_s2,
-  look          = 1,
-  p_raw         = c(H1 = 0.10, H2 = 0.20),
-  Correlation   = Correlation2,
-  plotGraphs    = plotGraphs2
+  nLook          = 1,
+  vRawPVals         = c(H1 = 0.10, H2 = 0.20),
+  mCorrelation   = Correlation2,
+  bPlotGraphs    = plotGraphs2
 )
 print("SCENARIO (2) - State after look 1 (expect no rejection):")
 print(state2_s2)
 
 #--------------Look 2 Analysis (with selection)------
 # H2 is dropped, leaving only H1 for stage 2 (a 2-arm design going forward).
-state2_s2 <- AnalyzeLook_PC(
+state2_s2 <- AnalyzeLookPC(
   state2_s2,
-  look          = 2,
-  p_raw         = c(H1 = 0.03),
-  selection     = c("H1"),
-  plotGraphs    = plotGraphs2
+  nLook          = 2,
+  vRawPVals         = c(H1 = 0.03),
+  vSelectHypo     = c("H1"),
+  bPlotGraphs    = plotGraphs2
 )
 print("SCENARIO (2) - Analysis output:")
 print(state2_s2)
@@ -161,14 +161,14 @@ Correlation <- matrix(c(
 plotGraphs <- TRUE
 
 #--------------Setup Analysis------------------------
-state <- SetupAnalysis_PC(
-  WI           = WI,
-  G            = G,
-  test.type    = test.type,
-  alpha        = alpha,
-  planned_info_frac    = info_frac,
-  typeOfDesign = typeOfDesign,
-  plotGraphs   = plotGraphs
+state <- SetupAnalysisPC(
+  vWeights           = WI,
+  mGMatrix            = G,
+  strTestType    = test.type,
+  dAlpha        = alpha,
+  vInfoFracts    = info_frac,
+  strDesignType = typeOfDesign,
+  bPlotGraphs   = plotGraphs
 )
 
 print("Initial design:")
@@ -177,37 +177,37 @@ print(state)
 #--------------Look 1 Analysis-----------------------
 # Look 1 always uses the initial setup design; any selection or strategy
 # adaptation inputs supplied here are ignored with a warning.
-state <- AnalyzeLook_PC(
+state <- AnalyzeLookPC(
   state,
-  look         = 1,
-  p_raw        = c(H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30),
-  Correlation  = Correlation,
-  plotGraphs = plotGraphs
+  nLook         = 1,
+  vRawPVals        = c(H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30),
+  mCorrelation  = Correlation,
+  bPlotGraphs = plotGraphs
 )
 print(state)
 
 #--------------Look 2 Analysis (with selection)------
 # H3 is dropped; remaining hypotheses are H1, H2, H4
-state <- AnalyzeLook_PC(
+state <- AnalyzeLookPC(
   state,
-  look         = 2,
-  p_raw        = c(H1 = 0.02, H2 = 0.10, H4 = 0.40),
-  selection    = c("H1", "H2", "H4"),
-  plotGraphs = plotGraphs
+  nLook         = 2,
+  vRawPVals        = c(H1 = 0.02, H2 = 0.10, H4 = 0.40),
+  vSelectHypo    = c("H1", "H2", "H4"),
+  bPlotGraphs = plotGraphs
 )
 print(state)
 
 #--------------Look 3 Analysis (final look)----------
-state <- AnalyzeLook_PC(
+state <- AnalyzeLookPC(
   state,
-  look         = 3,
-  p_raw        = c(H2 = 0.005, H4 = 0.10),
-  plotGraphs = plotGraphs
+  nLook         = 3,
+  vRawPVals        = c(H2 = 0.005, H4 = 0.10),
+  bPlotGraphs = plotGraphs
 )
 print(state)
 
 #--------------Plot Graphs at Each Stage-------------
-PlotAnalysisGraph(state, stage = 1)
-PlotAnalysisGraph(state, stage = 2)
-PlotAnalysisGraph(state, stage = 3)
+PlotAnalysisGraph(state, nStage = 1)
+PlotAnalysisGraph(state, nStage = 2)
+PlotAnalysisGraph(state, nStage = 3)
 ###################################################################################

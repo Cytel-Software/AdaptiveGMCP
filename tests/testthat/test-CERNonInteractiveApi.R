@@ -2,7 +2,7 @@
 
 #' Extract fixture-compatible outputs from a non-interactive CER analysis state
 #'
-#' @param lState A `CERAnalysisState` returned by `AnalyzeLook_CER()`.
+#' @param lState A `CERAnalysisState` returned by `AnalyzeLookCER()`.
 #' @return A named list matching the legacy CER regression fixture structure.
 ExtractCerRegressionState <- function( lState )
 {
@@ -65,22 +65,22 @@ ExtractCerRegressionState <- function( lState )
 #' @return A named list of fixture-compatible outputs for each completed look.
 CaptureNonInteractiveCerRegressionOutputs <- function( lScenario )
 {
-  lDesign <- SetupDesign_CER(
+  lDesign <- SetupDesignCER(
     nArms = lScenario$nArms,
     nEps = lScenario$nEps,
-    SampleSize = lScenario$sampleSize,
-    EpType = lScenario$epType,
-    sigma = lScenario$sigma,
-    CommonStdDev = lScenario$CommonStdDev,
-    prop.ctr = lScenario$prop.ctr,
-    allocRatio = lScenario$allocRatio,
-    WI = lScenario$WI,
-    G = lScenario$G,
-    test.type = lScenario$testType,
-    alpha = lScenario$alpha,
-    info_frac = lScenario$infoFrac,
-    typeOfDesign = lScenario$typeOfDesign,
-    plotGraphs = FALSE
+    nSampleSize = lScenario$sampleSize,
+    lEpTypes = lScenario$epType,
+    lSigma = lScenario$sigma,
+    bCommonStdDev = lScenario$CommonStdDev,
+    lCtrlProps = lScenario$prop.ctr,
+    vAllocRatios = lScenario$allocRatio,
+    vWeights = lScenario$WI,
+    mGMatrix = lScenario$G,
+    strTestType = lScenario$testType,
+    dAlpha = lScenario$alpha,
+    vInfoFracts = lScenario$infoFrac,
+    strDesignType = lScenario$typeOfDesign,
+    bPlotGraphs = FALSE
   )
   lState <- NULL
   lLooks <- list()
@@ -89,17 +89,17 @@ CaptureNonInteractiveCerRegressionOutputs <- function( lScenario )
   {
     lLookInput <- lScenario$lookInputs[[ iLook ]]
     lArguments <- list(
-      design = lDesign,
-      state = lState,
-      p_raw = lLookInput$p_raw,
-      look = iLook,
-      selection = lLookInput$selection,
-      new_sample_size = lLookInput$new_sample_size,
-      new_weights = lLookInput$new_weights,
-      new_G = lLookInput$new_G,
-      plotGraphs = FALSE
+      cDesign = lDesign,
+      cState = lState,
+      vRawPVals = lLookInput$p_raw,
+      nLook = iLook,
+      vSelectHypo = lLookInput$selection,
+      vNewSampleSizes = lLookInput$new_sample_size,
+      vWeights = lLookInput$new_weights,
+      mGMatrix = lLookInput$new_G,
+      bPlotGraphs = FALSE
     )
-    lState <- try( do.call( AnalyzeLook_CER, lArguments ), silent = TRUE )
+    lState <- try( do.call( AnalyzeLookCER, lArguments ), silent = TRUE )
     if( inherits( lState, "try-error" ) )
     {
       stop(

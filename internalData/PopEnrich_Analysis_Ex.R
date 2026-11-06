@@ -36,22 +36,22 @@ t <- c(0.5, 1)
 des <- "asOF"
 
 # Setting up the design first
-design <- SetupAnalysis_PE_PC(
-  WI = wi,
-  G = g,
-  test.type = test,
-  alpha = alp,
-  planned_info_frac = t,
-  typeOfDesign = des,
-  plotGraphs = FALSE)
+design <- SetupAnalysisPEPC(
+  vWeights = wi,
+  mGMatrix = g,
+  strTestType = test,
+  dAlpha = alp,
+  vInfoFracts = t,
+  strDesignType = des,
+  bPlotGraphs = FALSE)
 
 print(design)
 
 # Performing analysis at look 1
-look1_out <- AnalyzeLook_PE_PC(
+look1_out <- AnalyzeLookPEPC(
   design,
-  p_raw = c(H1 = 0.00045, H2 = 0.0952, H3 = 0.0225, H4 = 0.1104),
-  fullpop_sample_sizes = c(50, 50, 50), # Sample sizes: first for control and then for treatment arms
+  vRawPVals = c(H1 = 0.00045, H2 = 0.0952, H3 = 0.0225, H4 = 0.1104),
+  vFullPopulationSampleSizes = c(50, 50, 50), # Sample sizes: first for control and then for treatment arms
   subpop_sample_sizes = c(25, 25, 25)) # Sample sizes: first for control and then for treatment arms
 
 print(look1_out$mcpObj$Correlation)
@@ -60,11 +60,11 @@ print(look1_out)
 # No hypotheses are rejected at look 1
 
 # Performing analysis at look 2
-look2_out <- AnalyzeLook_PE_PC(
+look2_out <- AnalyzeLookPEPC(
   look1_out,
-  p_raw = c(H1 = 0.00045, H2 = 0.1121, H3 = 0.0112),
-  selection = c("H1", "H2", "H3"),
-  fullpop_sample_sizes = c(100, 100, 100), # Sample sizes: first for control and then for treatment arms
+  vRawPVals = c(H1 = 0.00045, H2 = 0.1121, H3 = 0.0112),
+  vSelectHypo = c("H1", "H2", "H3"),
+  vFullPopulationSampleSizes = c(100, 100, 100), # Sample sizes: first for control and then for treatment arms
   subpop_sample_sizes = c(50, 50, 50)) # Sample sizes: first for control and then for treatment arms
 
 print(look2_out$mcpObj$Correlation)
@@ -106,22 +106,22 @@ t <- c(0.7, 1)
 des <- "asOF"
 
 # Setting up the design first
-design <- SetupAnalysis_PE_PC(
-  WI = wi,
-  G = g,
-  test.type = test,
-  alpha = alp,
-  planned_info_frac = t,
-  typeOfDesign = des,
-  plotGraphs = FALSE)
+design <- SetupAnalysisPEPC(
+  vWeights = wi,
+  mGMatrix = g,
+  strTestType = test,
+  dAlpha = alp,
+  vInfoFracts = t,
+  strDesignType = des,
+  bPlotGraphs = FALSE)
 
 print(design)
 
 # Performing analysis at look 1
-look1_out <- AnalyzeLook_PE_PC(
+look1_out <- AnalyzeLookPEPC(
   design,
-  p_raw = c(H1 = 0.00045, H2 = 0.0952, H3 = 0.0225, H4 = 0.1104),
-  fullpop_sample_sizes = c(50, 50, 50), # Sample sizes: first for control and then for treatment arms
+  vRawPVals = c(H1 = 0.00045, H2 = 0.0952, H3 = 0.0225, H4 = 0.1104),
+  vFullPopulationSampleSizes = c(50, 50, 50), # Sample sizes: first for control and then for treatment arms
   subpop_sample_sizes = c(25, 25, 25)) # Sample sizes: first for control and then for treatment arms
 
 print(look1_out$mcpObj$Correlation)
@@ -130,10 +130,10 @@ print(look1_out)
 # H1 is rejected at look 1.
 
 # Performing analysis at look 2
-look2_out <- AnalyzeLook_PE_PC(
+look2_out <- AnalyzeLookPEPC(
   look1_out,
-  p_raw = c(H2 = 0.1121, H3 = 0.0112, H4 = 0.1153),
-  fullpop_sample_sizes = c(100, 100, 100), # Sample sizes: first for control and then for treatment arms
+  vRawPVals = c(H2 = 0.1121, H3 = 0.0112, H4 = 0.1153),
+  vFullPopulationSampleSizes = c(100, 100, 100), # Sample sizes: first for control and then for treatment arms
   subpop_sample_sizes = c(50, 50, 50)) # Sample sizes: first for control and then for treatment arms
 
 print(look2_out$mcpObj$Correlation)
@@ -173,22 +173,22 @@ t <- c(0.5, 1)
 des <- "asOF"
 
 # Setting up the design first
-design <- SetupAnalysis_PE_PC(
-  WI = wi,
-  G = g,
-  test.type = test,
-  alpha = alp,
-  planned_info_frac = t,
-  typeOfDesign = des,
-  plotGraphs = FALSE)
+design <- SetupAnalysisPEPC(
+  vWeights = wi,
+  mGMatrix = g,
+  strTestType = test,
+  dAlpha = alp,
+  vInfoFracts = t,
+  strDesignType = des,
+  bPlotGraphs = FALSE)
 
 print(design)
 
 # Performing analysis at look 1
-look1_out <- AnalyzeLook_PE_PC(
+look1_out <- AnalyzeLookPEPC(
   design,
-  p_raw = c(H1 = 0.00025, H2 = 0.0952, H3 = 0.0245, H4 = 0.1104),
-  fullpop_sample_sizes = c(50, 50, 50), # Sample sizes: first for control and then for treatment arms
+  vRawPVals = c(H1 = 0.00025, H2 = 0.0952, H3 = 0.0245, H4 = 0.1104),
+  vFullPopulationSampleSizes = c(50, 50, 50), # Sample sizes: first for control and then for treatment arms
   subpop_sample_sizes = c(25, 25, 25)) # Sample sizes: first for control and then for treatment arms
 
 print(look1_out$mcpObj$Correlation)
@@ -212,32 +212,32 @@ tt <- "Partly-Parametric"
 des <- "asOF"
 
 # Setting up the design first
-design <- SetupAnalysis_PE_PC(
-  WI = wi,
-  G = g,
-  test.type = tt,
-  alpha = alp,
-  planned_info_frac = t,
-  typeOfDesign = des,
-  plotGraphs = FALSE)
+design <- SetupAnalysisPEPC(
+  vWeights = wi,
+  mGMatrix = g,
+  strTestType = tt,
+  dAlpha = alp,
+  vInfoFracts = t,
+  strDesignType = des,
+  bPlotGraphs = FALSE)
 
 print(design)
 
 # Performing analysis at look 1
-look1_out <- AnalyzeLook_PE_PC(
+look1_out <- AnalyzeLookPEPC(
   design,
-  p_raw = c(H1 = 0.03, H2 = 0.20, H3 = 0.10, H4 = 0.25),
-  fullpop_sample_sizes = c(50, 75, 60), # Sample sizes: first for control and then for treatment arms
+  vRawPVals = c(H1 = 0.03, H2 = 0.20, H3 = 0.10, H4 = 0.25),
+  vFullPopulationSampleSizes = c(50, 75, 60), # Sample sizes: first for control and then for treatment arms
   subpop_sample_sizes = c(25, 40, 35)) # Sample sizes: first for control and then for treatment arms
 
 print(look1_out$mcpObj$Correlation)
 print(look1_out)
 
 # Performing analysis at look 2
-look2_out <- AnalyzeLook_PE_PC(
+look2_out <- AnalyzeLookPEPC(
   look1_out,
-  p_raw = c(H1 = 0.003, H2 = 0.10, H3 = 0.08, H4 = 0.15),
-  fullpop_sample_sizes = c(100, 140, 123), # Sample sizes: first for control and then for treatment arms
+  vRawPVals = c(H1 = 0.003, H2 = 0.10, H3 = 0.08, H4 = 0.15),
+  vFullPopulationSampleSizes = c(100, 140, 123), # Sample sizes: first for control and then for treatment arms
   subpop_sample_sizes = c(48, 80, 70)) # Sample sizes: first for control and then for treatment arms
 
 print(look2_out$mcpObj$Correlation)
@@ -264,28 +264,28 @@ test <- "Partly-Parametric"
 des <- "asOF"
 
 # Setting up the design first
-design <- SetupAnalysis_PE_PC(
-  WI = wi, G = g, test.type = test, alpha = alp, planned_info_frac = t, typeOfDesign = des,
-  plotGraphs = FALSE)
+design <- SetupAnalysisPEPC(
+  vWeights = wi, mGMatrix = g, strTestType = test, dAlpha = alp, vInfoFracts = t, strDesignType = des,
+  bPlotGraphs = FALSE)
 
 print(design)
 
 # Performing analysis at look 1
-look1_out <- AnalyzeLook_PE_PC(
+look1_out <- AnalyzeLookPEPC(
   design,
-  p_raw = c(H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30),
-  fullpop_sample_sizes = c(70, 105, 84), # Sample sizes: first for control and then for treatment arms
+  vRawPVals = c(H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30),
+  vFullPopulationSampleSizes = c(70, 105, 84), # Sample sizes: first for control and then for treatment arms
   subpop_sample_sizes = c(35, 56, 49)) # Sample sizes: first for control and then for treatment arms
 
 print(look1_out$mcpObj$Correlation)
 print(look1_out)
 
 # Performing analysis at look 2
-look2_out <- AnalyzeLook_PE_PC(
+look2_out <- AnalyzeLookPEPC(
   look1_out,
-  p_raw = c(H1 = 0.02, H2 = 0.10, H4 = 0.40),
-  selection = c("H1", "H2", "H4"),
-  fullpop_sample_sizes = c(100, 140, 123), # Sample sizes: first for control and then for treatment arms
+  vRawPVals = c(H1 = 0.02, H2 = 0.10, H4 = 0.40),
+  vSelectHypo = c("H1", "H2", "H4"),
+  vFullPopulationSampleSizes = c(100, 140, 123), # Sample sizes: first for control and then for treatment arms
   subpop_sample_sizes = c(48, 80, 70)) # Sample sizes: first for control and then for treatment arms
 
 print(look2_out$mcpObj$Correlation)
@@ -340,17 +340,17 @@ t <- 1 # c(0.5, 1)
 des <- "asOF"
 
 # Setting up the design first
-design <- SetupAnalysis_PE_PC(WI = wi, G = G, test.type = test, alpha = alp, 
-                              planned_info_frac = t, typeOfDesign = des,
-                              plotGraphs = FALSE)
+design <- SetupAnalysisPEPC(vWeights = wi, mGMatrix = G, strTestType = test, dAlpha = alp,
+                              vInfoFracts = t, strDesignType = des,
+                              bPlotGraphs = FALSE)
 
 print(design)
 
 # Performing analysis at look 1
-look1_out <- AnalyzeLook_PE_PC(
+look1_out <- AnalyzeLookPEPC(
   design,
-  p_raw = c(0.21, 0.04, 0.01, 0.0155, 0.02, 0.01, 0.009, 0.003),
-  fullpop_sample_sizes = c(100, 100, 100), # Sample sizes: first for control and then for treatment arms
+  vRawPVals = c(0.21, 0.04, 0.01, 0.0155, 0.02, 0.01, 0.009, 0.003),
+  vFullPopulationSampleSizes = c(100, 100, 100), # Sample sizes: first for control and then for treatment arms
   subpop_sample_sizes = c(50, 50, 50)) # Sample sizes: first for control and then for treatment arms
 
 print(look1_out$mcpObj$Correlation)
@@ -360,11 +360,11 @@ print(look1_out)
 # FINAL NON-INTERACTIVE PE-PC WORKFLOW ##################
 #
 # PE-PC is the population-enrichment specialization of the generic PC
-# analysis interface. Unlike SetupAnalysis_PC()/AnalyzeLook_PC(), the PE-PC
+# analysis interface. Unlike SetupAnalysisPC()/AnalyzeLookPC(), the PE-PC
 # wrapper currently supports one-look or two-look designs only.
 #
 # planned_info_frac defines the planned look schedule and boundaries. The
-# cumulative sample-size vectors supplied to each AnalyzeLook_PE_PC() call
+# cumulative sample-size vectors supplied to each AnalyzeLookPEPC() call
 # define that look's population correlation matrix and may differ from the
 # nominal information fractions.
 
@@ -386,42 +386,42 @@ G <- matrix(
   nrow = 8
 )
 
-pe_state <- SetupAnalysis_PE_PC(
-  WI = wi,
-  G = G,
-  test.type = "Partly-Parametric",
-  alpha = 0.025,
-  planned_info_frac = c( 0.5, 1.0 ),
-  typeOfDesign = "asOF",
-  plotGraphs = FALSE
+pe_state <- SetupAnalysisPEPC(
+  vWeights = wi,
+  mGMatrix = G,
+  strTestType = "Partly-Parametric",
+  dAlpha = 0.025,
+  vInfoFracts = c( 0.5, 1.0 ),
+  strDesignType = "asOF",
+  bPlotGraphs = FALSE
 )
 
 # Hypotheses are endpoint-major and treatment-minor, with the full-population
 # block followed by the subgroup block. Sample-size vectors use
 # (control, treatment 1, treatment 2, ...).
-pe_state <- AnalyzeLook_PE_PC(
-  state = pe_state,
-  look = 1,
-  p_raw = c(
+pe_state <- AnalyzeLookPEPC(
+  cState = pe_state,
+  nLook = 1,
+  vRawPVals = c(
     H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30,
     H5 = 0.02, H6 = 0.25, H7 = 0.10, H8 = 0.40
   ),
-  fullpop_sample_sizes = c( 70, 105, 84 ),
-  subpop_sample_sizes = c( 35, 56, 49 ),
-  plotGraphs = FALSE
+  vFullPopulationSampleSizes = c( 70, 105, 84 ),
+  vSubpopulationSampleSizes = c( 35, 56, 49 ),
+  bPlotGraphs = FALSE
 )
 
 print( pe_state$mcpObj$AdjPValues )
 
 # Counts are cumulative and must be non-decreasing from look 1 to look 2.
-pe_state <- AnalyzeLook_PE_PC(
-  state = pe_state,
-  look = 2,
-  p_raw = c( H1 = 0.02, H2 = 0.10, H4 = 0.40, H5 = 0.01, H6 = 0.15 ),
-  selection = c( "H1", "H2", "H4", "H5", "H6" ),
-  fullpop_sample_sizes = c( 100, 140, 123 ),
-  subpop_sample_sizes = c( 48, 80, 70 ),
-  plotGraphs = FALSE
+pe_state <- AnalyzeLookPEPC(
+  cState = pe_state,
+  nLook = 2,
+  vRawPVals = c( H1 = 0.02, H2 = 0.10, H4 = 0.40, H5 = 0.01, H6 = 0.15 ),
+  vSelectHypo = c( "H1", "H2", "H4", "H5", "H6" ),
+  vFullPopulationSampleSizes = c( 100, 140, 123 ),
+  vSubpopulationSampleSizes = c( 48, 80, 70 ),
+  bPlotGraphs = FALSE
 )
 
 # AdjPValues contains look-specific adjusted p-values and the combined
@@ -464,21 +464,21 @@ alp <- 0.025
 t <- 1
 
 # Setting up the design first
-design <- SetupAnalysis_PE_PC(
-  WI = wi,
-  G = g,
-  test.type = test,
-  alpha = alp,
-  planned_info_frac = t,
-  plotGraphs = FALSE)
+design <- SetupAnalysisPEPC(
+  vWeights = wi,
+  mGMatrix = g,
+  strTestType = test,
+  dAlpha = alp,
+  vInfoFracts = t,
+  bPlotGraphs = FALSE)
 
 print(design)
 
 # Performing analysis
-look1_out <- AnalyzeLook_PE_PC(
+look1_out <- AnalyzeLookPEPC(
   design,
-  p_raw = c(H1 = 0.1, H2 = 0.0025),
-  fullpop_sample_sizes = c(100, 100), # Sample sizes are specified first for control and then for treatment arm
+  vRawPVals = c(H1 = 0.1, H2 = 0.0025),
+  vFullPopulationSampleSizes = c(100, 100), # Sample sizes are specified first for control and then for treatment arm
   subpop_sample_sizes = c(50, 50)) # Sample sizes are specified first for control and then for treatment arm
 
 print(look1_out$mcpObj$Correlation)
@@ -508,36 +508,35 @@ t <- c(0.5, 1)
 des <- "asOF"
 
 # Setting up the design first
-design <- SetupAnalysis_PE_PC(
-  WI = wi,
-  G = g,
-  test.type = test,
-  alpha = alp,
-  planned_info_frac = t,
-  typeOfDesign = des,
-  plotGraphs = FALSE
+design <- SetupAnalysisPEPC(
+  vWeights = wi,
+  mGMatrix = g,
+  strTestType = test,
+  dAlpha = alp,
+  vInfoFracts = t,
+  strDesignType = des,
+  bPlotGraphs = FALSE
   )
 
 print(design)
 
 # Performing analysis for look 1
-look1_out <- AnalyzeLook_PE_PC(
+look1_out <- AnalyzeLookPEPC(
   design,
-  p_raw = c(H1 = 0.1, H2 = 0.075),
-  fullpop_sample_sizes = c(48, 53), # Sample sizes are specified first for control and then for treatment arm
+  vRawPVals = c(H1 = 0.1, H2 = 0.075),
+  vFullPopulationSampleSizes = c(48, 53), # Sample sizes are specified first for control and then for treatment arm
   subpop_sample_sizes = c(26, 24)) # Sample sizes are specified first for control and then for treatment arm
 
 print(look1_out$mcpObj$Correlation)
 print(look1_out)
 
 # Performing analysis for look 2
-look2_out <- AnalyzeLook_PE_PC(
+look2_out <- AnalyzeLookPEPC(
   look1_out,
-  p_raw = c(H1 = 0.08, H2 = 0.003),
-  fullpop_sample_sizes = c(100, 100), # Sample sizes are specified first for control and then for treatment arm
+  vRawPVals = c(H1 = 0.08, H2 = 0.003),
+  vFullPopulationSampleSizes = c(100, 100), # Sample sizes are specified first for control and then for treatment arm
   subpop_sample_sizes = c(53, 49)) # Sample sizes are specified first for control and then for treatment arm
 
 print(look2_out$mcpObj$Correlation)
 print(look2_out)
 #########################################################
-
