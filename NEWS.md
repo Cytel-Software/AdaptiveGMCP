@@ -18,6 +18,10 @@
 
 ## Corrections
 
+* `PlotAnalysisGraph()` renames its `stage` parameter to `nStage` to follow the
+  documented integer naming convention; callers using the named `stage`
+  argument must update their calls.
+
 * `AnalyzeLookPC()` now warns and ignores look-1 `vSelectHypo`,
   `vWeights`, and `mGMatrix` inputs, using the initial design
   from `SetupAnalysisPC()`;

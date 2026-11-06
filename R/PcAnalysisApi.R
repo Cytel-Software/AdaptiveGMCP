@@ -500,7 +500,7 @@ AnalyzeLookPC <- function(
 #' Plot analysis graph from a PCAnalysisState object
 #'
 #' @param cState A "PCAnalysisState" object.
-#' @param stage Which stage to plot.
+#' @param nStage Which stage to plot.
 #'   - NULL: plot the current (latest) graph
 #'   - 0 or "initial": plot the initial graph
 #'   - positive integer k: plot graph snapshot after look k analysis
@@ -508,10 +508,10 @@ AnalyzeLookPC <- function(
 #'
 #' @return A visNetwork widget.
 #' @export
-PlotAnalysisGraph <- function(cState, stage = NULL, strTitle = NULL) {
+PlotAnalysisGraph <- function(cState, nStage = NULL, strTitle = NULL) {
   if (!inherits(cState, "PCAnalysisState")) stop("state must be a PCAnalysisState object")
 
-  if (is.null(stage)) {
+  if (is.null(nStage)) {
     if (cState$completed_looks == 0) {
       mcpObj <- cState$setup_mcpObj
       default_title <- "Initial Graph"
@@ -519,21 +519,21 @@ PlotAnalysisGraph <- function(cState, stage = NULL, strTitle = NULL) {
       mcpObj <- cState$look_history[[cState$completed_looks]]$mcpObj
       default_title <- paste("Graph After Stage", cState$completed_looks, "analysis")
     }
-  } else if (identical(stage, 0L) || identical(stage, 0) || identical(stage, "initial")) {
+  } else if (identical(nStage, 0L) || identical(nStage, 0) || identical(nStage, "initial")) {
     mcpObj <- cState$setup_mcpObj
     default_title <- "Initial Graph"
-  } else if (is.numeric(stage) && length(stage) == 1) {
-    if (stage != as.integer(stage)) {
-      stop("stage must be a whole number (integer-valued)")
+  } else if (is.numeric(nStage) && length(nStage) == 1) {
+    if (nStage != as.integer(nStage)) {
+      stop("nStage must be a whole number (integer-valued)")
     }
-    stage <- as.integer(stage)
-    if (stage < 1 || stage > cState$completed_looks) {
-      stop("stage must be between 1 and completed_looks")
+    nStage <- as.integer(nStage)
+    if (nStage < 1 || nStage > cState$completed_looks) {
+      stop("nStage must be between 1 and completed_looks")
     }
-    mcpObj <- cState$look_history[[stage]]$mcpObj
-    default_title <- paste("Graph After Stage", stage, "analysis")
+    mcpObj <- cState$look_history[[nStage]]$mcpObj
+    default_title <- paste("Graph After Stage", nStage, "analysis")
   } else {
-    stop("Unsupported stage value")
+    stop("Unsupported nStage value")
   }
 
   if (is.null(strTitle)) strTitle <- default_title

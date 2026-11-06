@@ -37,7 +37,6 @@ test_that("renamed exported APIs follow the R naming conventions", {
   for (function_name in expected_names) {
     parameter_names <- names(formals(getExportedValue("AdaptGMCP", function_name)))
     conforms <- grepl("^(n|d|b|v|m|df|l|c|str)[A-Z][A-Za-z0-9]*$", parameter_names)
-    conforms[parameter_names == "stage"] <- TRUE
     expect_true(all(conforms), info = function_name)
   }
 })

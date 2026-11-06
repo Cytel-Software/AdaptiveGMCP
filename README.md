@@ -122,7 +122,7 @@ state <- AnalyzeLookPC(
 )
 
 # Plot the hypothesis graph after look 2
-PlotAnalysisGraph(state, stage = 2)
+PlotAnalysisGraph(state, nStage = 2)
 ```
 
 - **Example script:** [internalData/PC_Analysis_NonInteractive_Example.R](internalData/PC_Analysis_NonInteractive_Example.R)

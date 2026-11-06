@@ -207,7 +207,7 @@ state <- AnalyzeLookPC(
 print(state)
 
 #--------------Plot Graphs at Each Stage-------------
-PlotAnalysisGraph(state, stage = 1)
-PlotAnalysisGraph(state, stage = 2)
-PlotAnalysisGraph(state, stage = 3)
+PlotAnalysisGraph(state, nStage = 1)
+PlotAnalysisGraph(state, nStage = 2)
+PlotAnalysisGraph(state, nStage = 3)
 ###################################################################################

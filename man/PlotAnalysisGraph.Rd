@@ -4,12 +4,12 @@
 \alias{PlotAnalysisGraph}
 \title{Plot analysis graph from a PCAnalysisState object}
 \usage{
-PlotAnalysisGraph(cState, stage = NULL, strTitle = NULL)
+PlotAnalysisGraph(cState, nStage = NULL, strTitle = NULL)
 }
 \arguments{
 \item{cState}{A "PCAnalysisState" object.}
 
-\item{stage}{Which stage to plot.
+\item{nStage}{Which stage to plot.
 - NULL: plot the current (latest) graph
 - 0 or "initial": plot the initial graph
 - positive integer k: plot graph snapshot after look k analysis}

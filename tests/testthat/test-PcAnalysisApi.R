@@ -92,7 +92,7 @@ testthat::test_that("Test 1: PC analysis API scaffolds", {
   testthat::expect_true(state$trial_completed)
 
   # Plot helper should run
-  g <- PlotAnalysisGraph(state, stage = 1)
+  g <- PlotAnalysisGraph(state, nStage = 1)
   testthat::expect_true(!is.null(g))
 
   # print() should not error
@@ -207,7 +207,7 @@ testthat::test_that("Test 2: PC analysis API scaffolds (strategy modification)",
   testthat::expect_equal(state$mcpObj$IndexSet, exp_out)
 
   # Plot helper should run
-  g <- PlotAnalysisGraph(state, stage = 2)
+  g <- PlotAnalysisGraph(state, nStage = 2)
   testthat::expect_true(!is.null(g))
 })
 
@@ -292,7 +292,7 @@ testthat::test_that("Test 3: PC analysis API scaffolds (full transition at look 
   exp_out <- readRDS(testthat::test_path("t3.l2.AdjPValues.rds"))
   testthat::expect_equal(state$mcpObj$AdjPValues, exp_out)
 
-  g <- PlotAnalysisGraph(state, stage = 2)
+  g <- PlotAnalysisGraph(state, nStage = 2)
   testthat::expect_true(!is.null(g))
 })
 
