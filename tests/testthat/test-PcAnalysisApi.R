@@ -1862,7 +1862,7 @@ testthat::test_that("AnalyzeLook_PC: p_raw contract validation", {
   )
 })
 
-testthat::test_that("AnalyzeLook_PC: look 1 adaptation prohibition and correlation requirement", {
+testthat::test_that("AnalyzeLook_PC: look 1 adaptations are ignored with a warning", {
   wi <- c(0.5, 0.5, 0, 0)
   g <- matrix(
     c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
@@ -1887,25 +1887,71 @@ testthat::test_that("AnalyzeLook_PC: look 1 adaptation prohibition and correlati
     regexp = "Correlation must be provided at look 1"
   )
 
-  # selection at look 1 must error
-  testthat::expect_error(
+  testthat::expect_warning(
     AnalyzeLook_PC_TestWrapper(
       state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
       Correlation = corr,
       selection = c("H1", "H2"), plotGraphs = FALSE
     ),
-    regexp = "selection cannot be applied at look 1"
+    regexp = "Look 1 uses the initial design.*selection.*ignored"
   )
+  state_selection <- suppressWarnings(
+    AnalyzeLook_PC_TestWrapper(
+      state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
+      Correlation = corr,
+      selection = c("H1", "H2"), plotGraphs = FALSE
+    )
+  )
+  testthat::expect_identical(state_selection$mcpObj$IndexSet, state0$mcpObj$IndexSet)
+  testthat::expect_length(state_selection$mcpObj$SelectionLook, 0)
 
-  # new_weights/new_G at look 1 must error
-  testthat::expect_error(
+  testthat::expect_warning(
     AnalyzeLook_PC_TestWrapper(
       state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
       Correlation = corr,
       new_weights = c(H1 = 0.5, H2 = 0.5, H3 = 0, H4 = 0),
+      plotGraphs = FALSE
+    ),
+    regexp = "Look 1 uses the initial design.*new_weights.*ignored"
+  )
+  state_weights <- suppressWarnings(
+    AnalyzeLook_PC_TestWrapper(
+      state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
+      Correlation = corr,
+      new_weights = c(H1 = 0.5, H2 = 0.5, H3 = 0, H4 = 0),
+      plotGraphs = FALSE
+    )
+  )
+  testthat::expect_false(state_weights$mcpObj$Modify)
+  testthat::expect_equal(state_weights$mcpObj$newWeights, state0$mcpObj$newWeights)
+
+  testthat::expect_warning(
+    AnalyzeLook_PC_TestWrapper(
+      state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
+      Correlation = corr,
       new_G = g, plotGraphs = FALSE
     ),
-    regexp = "new_weights/new_G cannot be applied at look 1"
+    regexp = "Look 1 uses the initial design.*new_G.*ignored"
+  )
+  state_graph <- suppressWarnings(
+    AnalyzeLook_PC_TestWrapper(
+      state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
+      Correlation = corr,
+      new_G = g, plotGraphs = FALSE
+    )
+  )
+  testthat::expect_false(state_graph$mcpObj$Modify)
+  testthat::expect_equal(state_graph$mcpObj$newG, state0$mcpObj$newG)
+
+  testthat::expect_warning(
+    AnalyzeLook_PC_TestWrapper(
+      state0, p_raw = c(H1 = 0.1, H2 = 0.2, H3 = 0.3, H4 = 0.4),
+      Correlation = corr,
+      selection = c("H1", "H2"),
+      new_weights = c(H1 = 0.5, H2 = 0.5, H3 = 0, H4 = 0),
+      new_G = g, plotGraphs = FALSE
+    ),
+    regexp = "selection, new_weights, new_G will be ignored"
   )
 
   # Correlation at look 1 is valid

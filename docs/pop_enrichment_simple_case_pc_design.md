@@ -176,9 +176,10 @@ The D1 design sign-off is accepted only if all thresholds below are met.
    any NA off-diagonal pair.
 
 6. Look-1 adaptation guardrail threshold
-- Adaptation arguments are not allowed at look 1.
-- Acceptance criterion: look-1 calls with selection/new_weights/new_G/
-   new_correlation must fail deterministically with explicit validation errors.
+- Look 1 always uses the initial design created during setup.
+- Acceptance criterion: look-1 calls that supply selection, new_weights, or
+   new_G must warn that those inputs are ignored and continue with the initial
+   design. Correlation handling remains unchanged.
 
 7. End-to-end scenario reproducibility threshold
 - Each T1 seed scenario must produce stable state transitions for active set,
@@ -223,13 +224,15 @@ Impact:
 
 ### D1-DEC-003 (2026-07-25)
 Decision: For look > 1, allow both continuation paths (keep both populations
-or enrich to subgroup-only) while rejecting any adaptation inputs at look 1.
+or enrich to subgroup-only). At look 1, selection and strategy adaptation
+inputs are ignored with a warning because the initial design is used.
 
-Rationale: Matches current non-interactive API constraints and avoids
-ambiguity at the first look.
+Rationale: The initial design governs the first analysis; selection and strategy
+updates remain decisions made after that analysis.
 
 Impact:
-- Validation tests must include look-1 adaptation guardrail coverage.
+- Validation tests must verify look-1 adaptation warnings and that the initial
+  design remains unchanged.
 - Selection/strategy update behaviors remain post-look-1 only.
 
 ### D1-DEC-004 (2026-07-25)
@@ -247,6 +250,6 @@ Impact:
 
 1. Baseline continuation: H1/H2 both continue to look 2.
 2. Enrichment continuation: H1 dropped after look 1, H2 continues.
-3. Guardrail: adaptation arguments at look 1 must error.
+3. Guardrail: selection and strategy inputs at look 1 warn and are ignored.
 4. Correlation robustness: NA patterns that require clique partitioning still
    produce valid adjusted p-value flow.
