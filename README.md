@@ -12,14 +12,21 @@ This will download and install the latest version of the package from the master
 
 ## Important Functions
 
-The following are some of the key functions provided by the AdaptGMCP package:
+The package provides APIs for interactive analyses, scripted look-by-look
+analyses, simulation, and graph visualization:
 
-- `simMAMSMEP`: Runs simulations for adaptive group sequential multiple testing procedures.
-- `adaptGMCP_CER`: Performs interactive analysis using the CER (Conditional Error Rate) method.
-- `adaptGMCP_PC`: Performs interactive analysis using the p-value combination method.
-- `SetupAnalysisPC`: Sets up a non-interactive analysis state for the p-value combination method.
-- `AnalyzeLookPC`: Advances an existing non-interactive PC analysis by one look.
-- `PlotAnalysisGraph`: Plots a graph from a non-interactive PC analysis state object.
+- **Interactive analyses:** `adaptGMCP_CER` (Conditional Error Rate) and
+  `adaptGMCP_PC` (p-value combination).
+- **Non-interactive CER analysis:** `SetupAnalysisCER` initializes a design,
+  `AnalyzeLookCER` analyzes each look, and `PlotGraphCER` displays its graph.
+- **Non-interactive PC analysis:** `SetupAnalysisPC` initializes a design,
+  `AnalyzeLookPC` analyzes each look, and `PlotAnalysisGraph` displays its
+  graph. `SetupAnalysisPEPC` and `AnalyzeLookPEPC` provide the population-
+  enrichment specialization.
+- **Simulation:** `simMAMSMEP` runs adaptive multi-arm, multi-stage,
+  multi-endpoint simulations; `GeneratePowerTablePlots` summarizes power
+  results.
+- **Graph visualization:** `plotGraph` displays a hypothesis graph.
 
 For detailed usage and arguments of each function, please refer to the help section in R after installing the package (e.g., `?simMAMSMEP`).
 
@@ -29,9 +36,12 @@ For detailed usage and arguments of each function, please refer to the help sect
 
 - **Example script:** [internalData/MAMSMEP_Simulation_Example.R](internalData/MAMSMEP_Simulation_Example.R)
 - **How to use:** Open and run the script in R to see a typical workflow.
+- **Power summaries:** Use `GeneratePowerTablePlots` to create power tables
+  and plots from simulation results.
 - **Documentation:** For detailed documentation on all arguments, run:
   ```R
   ?simMAMSMEP
+  ?GeneratePowerTablePlots
   ```
 
 ### `adaptGMCP_CER`
@@ -41,6 +51,22 @@ For detailed usage and arguments of each function, please refer to the help sect
 - **Documentation:** For detailed documentation on all arguments, run:
   ```R
   ?adaptGMCP_CER
+  ```
+
+### Non-Interactive Analysis Interface (Conditional Error Rate Method)
+
+For scripted CER analyses without console prompts, use `SetupAnalysisCER`
+to create the design state and call `AnalyzeLookCER` once for each formal
+look. The returned state carries the analysis forward; `PlotGraphCER` plots
+the planned or analyzed hypothesis graph. This interface supports two-look
+designs.
+
+- **Example script:** [internalData/CER_Analysis_NonInteractive_Example.R](internalData/CER_Analysis_NonInteractive_Example.R)
+- **Documentation:** For detailed documentation on all arguments, run:
+  ```R
+  ?SetupAnalysisCER
+  ?AnalyzeLookCER
+  ?PlotGraphCER
   ```
 
 ### `adaptGMCP_PC`
@@ -193,14 +219,11 @@ keep counts non-decreasing across looks. The complete runnable workflow,
 including interpretation and troubleshooting notes, is in
 `internalData/PopEnrich_Analysis_Ex.R`.
 
-### `AdaptGMCPSimApp` (Shiny App)
-
-- **How to launch:**
+- **Documentation:** For detailed documentation on the PE-PC functions, run:
   ```R
-  library(AdaptGMCP)
-  AdaptGMCPSimApp()
+  ?SetupAnalysisPEPC
+  ?AnalyzeLookPEPC
   ```
-- **Description:** Interactive Shiny application for configuring and running adaptive GMCP simulations without writing code. Provides UI modules for hypothesis graphs, correlation/transition matrices, and interim analysis settings.
 
 ## Note
 
