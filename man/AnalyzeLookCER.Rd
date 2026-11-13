@@ -5,8 +5,7 @@
 \title{Analyze one formal look of a planned CER design}
 \usage{
 AnalyzeLookCER(
-  cDesign,
-  cState = NULL,
+  cState,
   vRawPVals,
   nLook = NULL,
   vSelectHypo = NULL,
@@ -17,9 +16,8 @@ AnalyzeLookCER(
 )
 }
 \arguments{
-\item{cDesign}{A `CERDesign` object.}
-
-\item{cState}{`NULL` for look 1, otherwise a `CERAnalysisState`.}
+\item{cState}{A `CERAnalysisState` returned by `SetupAnalysisCER()` or a
+preceding `AnalyzeLookCER()` call.}
 
 \item{vRawPVals}{Named raw p-values for the active hypotheses.}
 
@@ -42,8 +40,8 @@ arm represented by the continuing hypotheses.}
 A `CERAnalysisState` object.
 }
 \description{
-Look 1 is called with `cState = NULL`; look 2 receives the state returned by
-look 1. Stage-2 `vRawPVals` values are incremental p-values. Selection, sample
-size, and strategy changes are applied in that order before CER boundary
-recalibration. No console input or output is used.
+Pass the initial state from `SetupAnalysisCER()` for look 1 and the returned
+state from look 1 for look 2. Stage-2 `vRawPVals` values are incremental
+p-values. Selection, sample size, and strategy changes are applied in that
+order before CER boundary recalibration. No console input or output is used.
 }

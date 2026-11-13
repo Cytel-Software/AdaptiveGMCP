@@ -35,7 +35,19 @@ print.CERAnalysisState <- function( x, ... )
   cat( "- Active hypotheses:",
        if( length( x$active_hypotheses ) == 0 ) "none" else
          paste( x$active_hypotheses, collapse = ", " ), "\n" )
-  if( isTRUE( x$trial_completed ) )
+  if( x$completed_looks == 0L )
+  {
+    cat( "- Status: initial setup\n" )
+    cat( "- Arms:", x$nArms, "\n" )
+    cat( "- Endpoints:", x$nEps, "\n" )
+    cat( "- Test:", x$test.type, "\n" )
+    cat( "- Alpha:", x$alpha, "\n" )
+    cat( "\nPlanned cumulative sample allocation:\n" )
+    print( x$allocation$cumulative )
+    cat( "\nPlanned stopping boundary:\n" )
+    print( x$planned_boundary$PlanBdryTable$Stage1_Boundary )
+    print( x$planned_boundary$PlanBdryTable$Stage2_Boundary )
+  } else if( isTRUE( x$trial_completed ) )
   {
     cat( "- Status:", x$completion_reason, "\n" )
   } else

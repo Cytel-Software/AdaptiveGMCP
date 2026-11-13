@@ -4,8 +4,8 @@
 #
 # --------------------------------------------------------------------------------------------------
 
-testthat::test_that( "SetupDesignCER creates a design-only object", {
-  d <- SetupDesignCER(
+testthat::test_that( "SetupAnalysisCER creates the initial analysis state", {
+  d <- SetupAnalysisCER(
     nArms = 3,
     nEps = 1,
     nSampleSize = 300,
@@ -19,15 +19,16 @@ testthat::test_that( "SetupDesignCER creates a design-only object", {
     strTestType = "Parametric"
   )
 
-  testthat::expect_s3_class( d, "CERDesign" )
+  testthat::expect_s3_class( d, "CERAnalysisState" )
   testthat::expect_equal( dim( d$plan_boundary$Stage1Bdry ), c( 3L, 2L ) )
   testthat::expect_identical( d$lPlanned$plan_boundary, d$plan_boundary )
-  testthat::expect_false( "completed_looks" %in% names( d ) )
+  testthat::expect_equal( d$completed_looks, 0L )
+  testthat::expect_equal( d$look_history, list() )
   testthat::expect_false( "p_raw" %in% names( d ) )
 } )
 
-testthat::test_that( "SetupDesignCER names arm-specific endpoint inputs", {
-  d <- SetupDesignCER(
+testthat::test_that( "SetupAnalysisCER names arm-specific endpoint inputs", {
+  d <- SetupAnalysisCER(
     nArms = 3,
     nEps = 1,
     nSampleSize = 300,
@@ -45,12 +46,53 @@ testthat::test_that( "SetupDesignCER names arm-specific endpoint inputs", {
   testthat::expect_named( d$sigma$EP1, vArmNames )
 } )
 
+testthat::test_that( "CER plotting uses metadata in the analysis state", {
+  cState <- SetupAnalysisCER(
+    nArms = 3,
+    nEps = 1,
+    nSampleSize = 300,
+    lEpTypes = list( EP1 = "Continuous" ),
+    lSigma = list( EP1 = c( 1, 1, 1 ) ),
+    bCommonStdDev = TRUE,
+    lCtrlProps = list( EP1 = NA ),
+    vAllocRatios = c( 1, 1, 1 ),
+    vWeights = c( 0.5, 0.5 ),
+    mGMatrix = matrix( c( 0, 1, 1, 0 ), nrow = 2, byrow = TRUE ),
+    strTestType = "Parametric"
+  )
+
+  lInitialGraph <- testthat::with_mocked_bindings(
+    PlotGraphCER( cState ),
+    plotGraph = function( ... ) list( ... )
+  )
+  testthat::expect_equal( lInitialGraph$HypothesisName, cState$hypothesis_names )
+  testthat::expect_equal( lInitialGraph$w, cState$WI )
+  testthat::expect_equal( lInitialGraph$G, cState$G )
+  testthat::expect_equal( lInitialGraph$Text, cState$plot_text )
+  testthat::expect_equal( lInitialGraph$Title, "Initial Graph" )
+
+  cLook1State <- AnalyzeLookCER(
+    cState, vRawPVals = c( H1 = 0.1, H2 = 0.2 )
+  )
+  lLook1Graph <- testthat::with_mocked_bindings(
+    PlotGraphCER( cLook1State ),
+    plotGraph = function( ... ) list( ... )
+  )
+  testthat::expect_equal(
+    lLook1Graph$Title, "Graph After Stage 1 analysis"
+  )
+  testthat::expect_equal( lLook1Graph$G, cLook1State$current_G )
+  testthat::expect_equal( cState$completed_looks, 0L )
+  testthat::expect_false( "cDesign" %in% names( formals( AnalyzeLookCER ) ) )
+  testthat::expect_false( "cDesign" %in% names( formals( PlotGraphCER ) ) )
+} )
+
 testthat::test_that( "AnalyzeLookCER exposes direct strategy adaptation arguments", {
   testthat::expect_false( "strategy_update" %in% names( formals( AnalyzeLookCER ) ) )
 })
 
-testthat::test_that( "CER Look 1 reuses the planned design", {
-  d <- SetupDesignCER(
+testthat::test_that( "CER Look 1 reuses the planned setup state", {
+  d <- SetupAnalysisCER(
     nArms = 3,
     nEps = 1,
     nSampleSize = 300,
@@ -68,7 +110,7 @@ testthat::test_that( "CER Look 1 reuses the planned design", {
     AnalyzeLookCER( d, vRawPVals = c( H1 = 0.1, H2 = 0.2 ) ),
     ComputeCERPlannedDesign = function( ... )
     {
-      stop( "ComputeCERPlannedDesign should not be called for a CERDesign." )
+      stop( "ComputeCERPlannedDesign should not be called during Look 1." )
     }
   )
 
@@ -76,7 +118,7 @@ testthat::test_that( "CER Look 1 reuses the planned design", {
 } )
 
 testthat::test_that( "CER API advances two looks without console input", {
-  d <- SetupDesignCER(
+  d <- SetupAnalysisCER(
     nArms = 3,
     nEps = 1,
     nSampleSize = 300,
@@ -90,7 +132,7 @@ testthat::test_that( "CER API advances two looks without console input", {
     strTestType = "Parametric"
   )
   state1 <- AnalyzeLookCER( d, vRawPVals = c( H1 = 0.1, H2 = 0.2 ) )
-  state2 <- AnalyzeLookCER( d, state1, vRawPVals = c( H1 = 0.0001, H2 = 0.2 ) )
+  state2 <- AnalyzeLookCER( state1, vRawPVals = c( H1 = 0.0001, H2 = 0.2 ) )
 
   testthat::expect_s3_class( state1, "CERAnalysisState" )
   testthat::expect_equal( state1$completed_looks, 1L )
@@ -111,7 +153,7 @@ testthat::test_that( "CER API advances two looks without console input", {
 } )
 
 testthat::test_that( "CER API applies selection, sample size, and strategy updates", {
-  d <- SetupDesignCER(
+  d <- SetupAnalysisCER(
     nArms = 3,
     nEps = 2,
     nSampleSize = 210,
@@ -131,14 +173,14 @@ testthat::test_that( "CER API applies selection, sample size, and strategy updat
   )
   testthat::expect_error(
     AnalyzeLookCER(
-      d, state1, vRawPVals = c( H2 = .0299, H4 = .0586 ),
+      state1, vRawPVals = c( H2 = .0299, H4 = .0586 ),
       vSelectHypo = c( "H2", "H4" ),
       vNewSampleSizes = c( 88, 87, 86 )
     ),
     "exactly one sample size"
   )
   state2 <- AnalyzeLookCER(
-    d, state1, vRawPVals = c( H2 = .0299, H4 = .0586 ),
+    state1, vRawPVals = c( H2 = .0299, H4 = .0586 ),
     vSelectHypo = c( "H2", "H4" ),
     vNewSampleSizes = c( ignored1 = 88, ignored2 = 87 ),
     vWeights = c( H2 = .5, H4 = .5 ),
@@ -177,7 +219,7 @@ testthat::test_that( "CER API applies selection, sample size, and strategy updat
 } )
 
 testthat::test_that( "CER API ignores sample-size adaptation names", {
-  d <- SetupDesignCER(
+  d <- SetupAnalysisCER(
     nArms = 3,
     nEps = 1,
     nSampleSize = 300,
@@ -192,11 +234,11 @@ testthat::test_that( "CER API ignores sample-size adaptation names", {
   )
   state1 <- AnalyzeLookCER( d, vRawPVals = c( H1 = .1, H2 = .2 ) )
   state2Unnamed <- AnalyzeLookCER(
-    d, state1, vRawPVals = c( H1 = .01, H2 = .02 ),
+    state1, vRawPVals = c( H1 = .01, H2 = .02 ),
     vNewSampleSizes = c( 175, 180, 185 )
   )
   state2Named <- AnalyzeLookCER(
-    d, state1, vRawPVals = c( H1 = .01, H2 = .02 ),
+    state1, vRawPVals = c( H1 = .01, H2 = .02 ),
     vNewSampleSizes = c( Treatment2 = 175, Control = 180, Treatment1 = 185 )
   )
 
@@ -210,14 +252,14 @@ testthat::test_that( "CER API ignores sample-size adaptation names", {
   )
   testthat::expect_error(
     AnalyzeLookCER(
-      d, state1, vRawPVals = c( H1 = .01, H2 = .02 ),
+      state1, vRawPVals = c( H1 = .01, H2 = .02 ),
       vNewSampleSizes = c( 175, 175 )
     ),
     "exactly one sample size"
   )
   testthat::expect_error(
     AnalyzeLookCER(
-      d, state1, vRawPVals = c( H1 = .01, H2 = .02 ),
+      state1, vRawPVals = c( H1 = .01, H2 = .02 ),
       vNewSampleSizes = c( 175, 175, 175, 175 )
     ),
     "exactly one sample size"
@@ -225,7 +267,7 @@ testthat::test_that( "CER API ignores sample-size adaptation names", {
 } )
 
 testthat::test_that( "CER API supports non-parametric designs", {
-  d <- SetupDesignCER(
+  d <- SetupAnalysisCER(
     nArms = 3, nEps = 1, nSampleSize = 300,
     lEpTypes = list( EP1 = "Binary" ),
     lSigma = list( EP1 = rep( NA_real_, 3 ) ),
@@ -239,7 +281,7 @@ testthat::test_that( "CER API supports non-parametric designs", {
   testthat::expect_true( is.list( d$Sigma ) )
   state1 <- AnalyzeLookCER( d, vRawPVals = c( H1 = 0.03, H2 = 0.2 ) )
   state2 <- AnalyzeLookCER(
-    d, state1, vRawPVals = c( H1 = 0.01, H2 = 0.1 )
+    state1, vRawPVals = c( H1 = 0.01, H2 = 0.1 )
   )
 
   testthat::expect_s3_class( state2, "CERAnalysisState" )
@@ -255,7 +297,7 @@ testthat::test_that( "CER API supports non-parametric designs", {
 } )
 
 testthat::test_that( "CER API supports binary-first mixed endpoints", {
-  d <- SetupDesignCER(
+  d <- SetupAnalysisCER(
     nArms = 3, nEps = 2, nSampleSize = 300,
     lEpTypes = list( EP1 = "Binary", EP2 = "Continuous" ),
     lSigma = list( EP1 = NA, EP2 = rep( 1, 3 ) ),
@@ -273,7 +315,7 @@ testthat::test_that( "CER API supports binary-first mixed endpoints", {
     d, vRawPVals = c( H1 = 0.03, H2 = 0.2, H3 = 0.04, H4 = 0.3 )
   )
   state2 <- AnalyzeLookCER(
-    d, state1, vRawPVals = c( H1 = 0.01, H2 = 0.1, H3 = 0.02, H4 = 0.2 )
+    state1, vRawPVals = c( H1 = 0.01, H2 = 0.1, H3 = 0.02, H4 = 0.2 )
   )
 
   testthat::expect_equal(
@@ -293,7 +335,7 @@ testthat::test_that( "CER API supports binary-first mixed endpoints", {
 } )
 
 testthat::test_that( "CER computes later endpoint covariance rows within group", {
-  d <- SetupDesignCER(
+  d <- SetupAnalysisCER(
     nArms = 4, nEps = 2, nSampleSize = 400,
     lEpTypes = list( EP1 = "Continuous", EP2 = "Continuous" ),
     lSigma = list( EP1 = rep( 1, 4 ), EP2 = rep( 1, 4 ) ),
@@ -316,7 +358,7 @@ testthat::test_that( "CER computes later endpoint covariance rows within group",
 } )
 
 testthat::test_that( "CER indexes non-parametric PCER by hypothesis", {
-  d <- SetupDesignCER(
+  d <- SetupAnalysisCER(
     nArms = 3, nEps = 2, nSampleSize = 300,
     lEpTypes = list( EP1 = "Binary", EP2 = "Continuous" ),
     lSigma = list( EP1 = rep( NA_real_, 3 ), EP2 = rep( 1, 3 ) ),
@@ -339,7 +381,7 @@ testthat::test_that( "CER indexes non-parametric PCER by hypothesis", {
 } )
 
 testthat::test_that( "CER API accepts full Look 2 p-value vectors after Look 1 rejection", {
-  d <- SetupDesignCER(
+  d <- SetupAnalysisCER(
     nArms = 3,
     nEps = 1,
     nSampleSize = 300,
@@ -353,7 +395,7 @@ testthat::test_that( "CER API accepts full Look 2 p-value vectors after Look 1 r
     strTestType = "Parametric"
   )
   state1 <- AnalyzeLookCER( d, vRawPVals = c( H1 = 0.00001, H2 = 0.02 ) )
-  state2 <- AnalyzeLookCER( d, state1, vRawPVals = c( H1 = 0.0001, H2 = 0.01 ) )
+  state2 <- AnalyzeLookCER( state1, vRawPVals = c( H1 = 0.0001, H2 = 0.01 ) )
 
   testthat::expect_equal( state1$active_hypotheses, "H2" )
   testthat::expect_equal( state2$completed_looks, 2L )
@@ -361,14 +403,14 @@ testthat::test_that( "CER API accepts full Look 2 p-value vectors after Look 1 r
 
 testthat::test_that( "CER API rejects invalid design and look inputs", {
   testthat::expect_error(
-    SetupDesignCER( vInfoFracts = c( .5, .75, 1 ) ),
+    SetupAnalysisCER( vInfoFracts = c( .5, .75, 1 ) ),
     "two"
   )
   testthat::expect_error(
-    SetupDesignCER( dAlpha = 1 ),
+    SetupAnalysisCER( dAlpha = 1 ),
     "alpha"
   )
-  d <- SetupDesignCER( nEps = 1, lEpTypes = list( EP1 = "Continuous" ),
+  d <- SetupAnalysisCER( nEps = 1, lEpTypes = list( EP1 = "Continuous" ),
                         lSigma = list( EP1 = c( 1, 1, 1 ) ),
                         lCtrlProps = list( EP1 = NA ), bPlotGraphs = FALSE )
   testthat::expect_error(
@@ -377,7 +419,7 @@ testthat::test_that( "CER API rejects invalid design and look inputs", {
   )
   state <- AnalyzeLookCER( d, vRawPVals = c( H1 = .1, H2 = .2 ) )
   testthat::expect_error(
-    AnalyzeLookCER( d, state, vRawPVals = c( H1 = .1, H2 = .2 ),
+    AnalyzeLookCER( state, vRawPVals = c( H1 = .1, H2 = .2 ),
                      vNewSampleSizes = c( Control = 1, Treatment1 = 1,
                                           Treatment2 = 1 ) ),
     "Look 1"
@@ -388,7 +430,7 @@ testthat::test_that( "CER API rejects invalid design and look inputs", {
   state$planned_sample_allocation <- state$planned_sample_allocation[ , -1L,
                                                                        drop = FALSE ]
   testthat::expect_error(
-    AnalyzeLookCER( d, state, vRawPVals = c( H1 = .1, H2 = .2 ) ),
+    AnalyzeLookCER( state, vRawPVals = c( H1 = .1, H2 = .2 ) ),
     "sample allocations"
   )
 } )

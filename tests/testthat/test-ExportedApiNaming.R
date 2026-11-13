@@ -8,7 +8,7 @@ test_that("renamed exported APIs follow the R naming conventions", {
     "PlotGraphCER",
     "SetupAnalysisPC",
     "SetupAnalysisPEPC",
-    "SetupDesignCER",
+    "SetupAnalysisCER",
     "GeneratePowerTablePlots",
     "SimulateMAMSMEPWrapper"
   )
@@ -21,6 +21,7 @@ test_that("renamed exported APIs follow the R naming conventions", {
     "PlotGraph_CER",
     "SetupAnalysis_PC",
     "SetupAnalysis_PE_PC",
+    "SetupDesignCER",
     "SetupDesign_CER",
     "genPowerTablePlots",
     "simMAMSMEP_Wrapper"

@@ -4,12 +4,11 @@
 \alias{PlotGraphCER}
 \title{Plot a planned or analyzed CER graph}
 \usage{
-PlotGraphCER(cDesign, cState = NULL, strTitle = NULL)
+PlotGraphCER(cState, strTitle = NULL)
 }
 \arguments{
-\item{cDesign}{A `CERDesign` object.}
-
-\item{cState}{Optional `CERAnalysisState`; `NULL` plots the planned graph.}
+\item{cState}{A `CERAnalysisState` returned by `SetupAnalysisCER()` or
+`AnalyzeLookCER()`.}
 
 \item{strTitle}{Optional graph title.}
 }
