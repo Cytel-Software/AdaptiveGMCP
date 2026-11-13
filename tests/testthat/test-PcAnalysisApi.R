@@ -951,8 +951,6 @@ testthat::test_that("PC equivalence M07: asP design", {
     vInfoFracts = c(0.5, 1.0),
     strDesignType = "asP",
     bMultipleWinners = TRUE,
-    bSelection = FALSE,
-    bUpdateStrategy = FALSE,
     bPlotGraphs = FALSE
   )
 
@@ -1012,8 +1010,6 @@ testthat::test_that("PC equivalence M11: asHSD design", {
     strDesignType = "asHSD",
     dGammaA = 2.5,
     bMultipleWinners = TRUE,
-    bSelection = FALSE,
-    bUpdateStrategy = FALSE,
     bPlotGraphs = FALSE
   )
 
@@ -1073,8 +1069,6 @@ testthat::test_that("PC equivalence M12: asKD design", {
     strDesignType = "asKD",
     dGammaA = 2.5,
     bMultipleWinners = TRUE,
-    bSelection = FALSE,
-    bUpdateStrategy = FALSE,
     bPlotGraphs = FALSE
   )
 
@@ -1144,8 +1138,6 @@ testthat::test_that("PC equivalence M19: correlation-only adaptation", {
     vInfoFracts = c(0.5, 1.0),
     strDesignType = "asOF",
     bMultipleWinners = TRUE,
-    bSelection = FALSE,
-    bUpdateStrategy = FALSE,
     bPlotGraphs = FALSE
   )
 
@@ -1205,8 +1197,6 @@ testthat::test_that("PC equivalence M22: early-stop efficacy path", {
     vInfoFracts = c(0.5, 1.0),
     strDesignType = "asOF",
     bMultipleWinners = FALSE,
-    bSelection = FALSE,
-    bUpdateStrategy = FALSE,
     bPlotGraphs = FALSE
   )
 
@@ -1258,8 +1248,6 @@ testthat::test_that("PC equivalence M24: MultipleWinners FALSE", {
     vInfoFracts = c(0.5, 1.0),
     strDesignType = "asOF",
     bMultipleWinners = FALSE,
-    bSelection = FALSE,
-    bUpdateStrategy = FALSE,
     bPlotGraphs = FALSE
   )
 
@@ -1319,8 +1307,6 @@ testthat::test_that("PC equivalence M09: WT design", {
     strDesignType = "WT",
     dDeltaWT = 0.25,
     bMultipleWinners = TRUE,
-    bSelection = FALSE,
-    bUpdateStrategy = FALSE,
     bPlotGraphs = FALSE
   )
 
@@ -1380,8 +1366,6 @@ testthat::test_that("PC equivalence M13: asUser design", {
     strDesignType = "asUser",
     vUserAlphaSpending = c(0.008, 0.025),
     bMultipleWinners = TRUE,
-    bSelection = FALSE,
-    bUpdateStrategy = FALSE,
     bPlotGraphs = FALSE
   )
 
@@ -1440,8 +1424,6 @@ testthat::test_that("PC equivalence M17: selection-only adaptation", {
     vInfoFracts = c(0.5, 1.0),
     strDesignType = "asOF",
     bMultipleWinners = TRUE,
-    bSelection = TRUE,
-    bUpdateStrategy = FALSE,
     bPlotGraphs = FALSE
   )
 
@@ -1501,8 +1483,6 @@ testthat::test_that("PC equivalence M08: noEarlyEfficacy design", {
     vInfoFracts = c(0.5, 1.0),
     strDesignType = "noEarlyEfficacy",
     bMultipleWinners = TRUE,
-    bSelection = FALSE,
-    bUpdateStrategy = FALSE,
     bPlotGraphs = FALSE
   )
 
@@ -1550,8 +1530,6 @@ testthat::test_that("PC equivalence M02: Sidak baseline", {
     vInfoFracts = c(1.0),
     strDesignType = "asOF",
     bMultipleWinners = TRUE,
-    bSelection = FALSE,
-    bUpdateStrategy = FALSE,
     bPlotGraphs = FALSE
   )
 
@@ -1964,10 +1942,10 @@ testthat::test_that("AnalyzeLookPC: look 1 adaptations are ignored with a warnin
 })
 
 ############################################################################
-# Issue #69 Phase 3: look > 1 adaptation gate and mutation-validation tests
+# Issue #69 Phase 3: look > 1 adaptation and mutation-validation tests
 ############################################################################
 
-testthat::test_that("AnalyzeLookPC: feature-flag gates at look > 1", {
+testthat::test_that("AnalyzeLookPC: look-level inputs request adaptations", {
   wi <- c(0.5, 0.5, 0, 0)
   g <- matrix(
     c(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0),
@@ -1978,40 +1956,39 @@ testthat::test_that("AnalyzeLookPC: feature-flag gates at look > 1", {
     nrow = 4
   )
 
-  # Both feature flags disabled
-  stateNoAdapt <- SetupAnalysisPC(
+  testthat::expect_false("bSelection" %in% names(formals(SetupAnalysisPC)))
+  testthat::expect_false("bUpdateStrategy" %in% names(formals(SetupAnalysisPC)))
+  testthat::expect_false("bSelection" %in% names(formals(SetupAnalysisPEPC)))
+  testthat::expect_false("bUpdateStrategy" %in% names(formals(SetupAnalysisPEPC)))
+
+  state <- SetupAnalysisPC(
     vWeights = wi, mGMatrix = g, strTestType = "Dunnett",
     dAlpha = 0.025, vInfoFracts = c(0.5, 1.0),
-    bSelection = FALSE, bUpdateStrategy = FALSE,
     bPlotGraphs = FALSE
   )
-  stateNoAdapt <- AnalyzeLook_PC_TestWrapper(
-    stateNoAdapt,
+  state <- AnalyzeLook_PC_TestWrapper(
+    state,
     vRawPVals = c(H1 = 0.30, H2 = 0.35, H3 = 0.40, H4 = 0.45),
     mCorrelation = corr,
     bPlotGraphs = FALSE
   )
 
-  # Selection = FALSE: providing selection must error
-  testthat::expect_error(
-    AnalyzeLook_PC_TestWrapper(
-      stateNoAdapt,
-      vRawPVals = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      vSelectHypo = c("H1", "H2"), bPlotGraphs = FALSE
-    ),
-    regexp = "selection was disabled"
+  mNewG <- matrix(c(0, 1, 1, 0), byrow = TRUE, nrow = 2)
+  vNewWeights <- c(H1 = 0.5, H2 = 0.5)
+  state <- AnalyzeLook_PC_TestWrapper(
+    state,
+    vRawPVals = c(H1 = 0.10, H2 = 0.15),
+    vSelectHypo = c("H1", "H2"),
+    vWeights = vNewWeights,
+    mGMatrix = mNewG,
+    bPlotGraphs = FALSE
   )
 
-  # UpdateStrategy = FALSE: providing new_weights/new_G must error
-  testthat::expect_error(
-    AnalyzeLook_PC_TestWrapper(
-      stateNoAdapt,
-      vRawPVals = c(H1 = 0.10, H2 = 0.15, H3 = 0.20, H4 = 0.25),
-      vWeights = c(H1 = 0.5, H2 = 0.5, H3 = 0, H4 = 0),
-      mGMatrix = g, bPlotGraphs = FALSE
-    ),
-    regexp = "strategy updates were disabled"
-  )
+  testthat::expect_identical(state$mcpObj$IndexSet, c("H1", "H2"))
+  testthat::expect_identical(state$mcpObj$SelectionLook, 2L)
+  testthat::expect_identical(state$mcpObj$ModificationLook, 1L)
+  testthat::expect_equal(unname(state$mcpObj$newWeights), unname(vNewWeights))
+  testthat::expect_equal(unname(state$mcpObj$newG), unname(mNewG))
 })
 
 testthat::test_that("AnalyzeLookPC: selection validity at look > 1", {
@@ -2028,7 +2005,6 @@ testthat::test_that("AnalyzeLookPC: selection validity at look > 1", {
   state1 <- SetupAnalysisPC(
     vWeights = wi, mGMatrix = g, strTestType = "Dunnett",
     dAlpha = 0.025, vInfoFracts = c(0.5, 1.0),
-    bSelection = TRUE, bUpdateStrategy = FALSE,
     bPlotGraphs = FALSE
   )
   state1 <- AnalyzeLook_PC_TestWrapper(
@@ -2092,7 +2068,6 @@ testthat::test_that("AnalyzeLookPC: strategy update validity at look > 1", {
   state1 <- SetupAnalysisPC(
     vWeights = wi, mGMatrix = g, strTestType = "Dunnett",
     dAlpha = 0.025, vInfoFracts = c(0.5, 1.0),
-    bSelection = FALSE, bUpdateStrategy = TRUE,
     bPlotGraphs = FALSE
   )
   state1 <- AnalyzeLook_PC_TestWrapper(
@@ -2239,7 +2214,6 @@ testthat::test_that("AnalyzeLookPC: correlation update validity at look > 1", {
   state1 <- SetupAnalysisPC(
     vWeights = wi, mGMatrix = g, strTestType = "Dunnett",
     dAlpha = 0.025, vInfoFracts = c(0.5, 1.0),
-    bSelection = FALSE, bUpdateStrategy = FALSE,
     bPlotGraphs = FALSE
   )
   state1 <- AnalyzeLook_PC_TestWrapper(
@@ -2344,7 +2318,6 @@ testthat::test_that("AnalyzeLookPC: look-level sized correlation update maps to 
   state <- SetupAnalysisPC(
     vWeights = wi, mGMatrix = g, strTestType = "Dunnett",
     dAlpha = 0.025, vInfoFracts = c(0.5, 1.0),
-    bSelection = TRUE, bUpdateStrategy = TRUE,
     bPlotGraphs = FALSE
   )
 
@@ -2405,7 +2378,6 @@ testthat::test_that("AnalyzeLookPC: Dunnett stays Dunnett when updated correlati
   state1 <- SetupAnalysisPC(
     vWeights = wi, mGMatrix = g, strTestType = "Dunnett",
     dAlpha = 0.025, vInfoFracts = c(0.5, 1.0),
-    bSelection = FALSE, bUpdateStrategy = FALSE,
     bPlotGraphs = FALSE
   )
   state1 <- AnalyzeLook_PC_TestWrapper(

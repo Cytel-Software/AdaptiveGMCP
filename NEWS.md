@@ -27,10 +27,11 @@
   documented integer naming convention; callers using the named `stage`
   argument must update their calls.
 
-* `AnalyzeLookPC()` now warns and ignores look-1 `vSelectHypo`,
-  `vWeights`, and `mGMatrix` inputs, using the initial design
-  from `SetupAnalysisPC()`;
-  adaptation handling from look 2 onward is unchanged.
+* Removed `bSelection` and `bUpdateStrategy` from the non-interactive
+  `SetupAnalysisPC()` and `SetupAnalysisPEPC()` APIs. Selection and strategy
+  changes are requested directly through look-level inputs; strategy changes
+  require both `vWeights` and `mGMatrix`. Look-1 adaptation inputs continue to
+  be ignored with a warning while the initial design is used.
 
 * Corrected parametric CER covariance calculations for unequal allocation
   ratios so treatment indices consistently skip the leading control ratio.

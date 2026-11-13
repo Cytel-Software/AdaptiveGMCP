@@ -122,8 +122,6 @@
 #' @param vUserAlphaSpending Alpha spending values for strDesignType = "asUser".
 #' @param bMultipleWinners Logical; TRUE means reject as many hypotheses as possible,
 #'        FALSE means reject at most one hypothesis
-#' @param bSelection Logical; TRUE if selection of hypotheses is allowed at interim looks
-#' @param bUpdateStrategy Logical; TRUE if the graphical test strategy can be modified at interim looks
 #' @param bPlotGraphs Logical; if TRUE, plots the initial graph.
 #'
 #' @return An object of class "PCAnalysisState".
@@ -147,8 +145,6 @@ SetupAnalysisPC <- function(
     dGammaA = 2,
     vUserAlphaSpending = NULL,
     bMultipleWinners = TRUE,
-    bSelection = TRUE, # TODO: Check if Selection parameter is really required at setup stage.
-    bUpdateStrategy = TRUE, # TODO: Check if UpdateStrategy parameter is really required at setup stage.
     bPlotGraphs = TRUE) {
   if (!is.numeric(vWeights) || anyNA(vWeights) || any(vWeights < 0)) stop("vWeights must be numeric, non-negative, and non-NA")
   if (sum(vWeights) > 1) stop("Sum of vWeights must be less than or equal to 1")
@@ -270,9 +266,7 @@ SetupAnalysisPC <- function(
     deltaPT1 = dDeltaPT1,
     gammaA = dGammaA,
     userAlphaSpending = vUserAlphaSpending,
-    MultipleWinners = bMultipleWinners,
-    Selection = bSelection,
-    UpdateStrategy = bUpdateStrategy
+    MultipleWinners = bMultipleWinners
   )
 
   state <- new_pc_analysis_state(
@@ -301,8 +295,10 @@ SetupAnalysisPC <- function(
 #' performing each formal analysis at its scheduled information fraction.
 #' Optional hypothesis selection, strategy modification, and correlation updates
 #' may be applied before looks after look 1 are analyzed (these represent
-#' decisions made after the previous look). At look 1, selection and strategy modification inputs
-#' are ignored with a warning because the initial design from setup is used.
+#' decisions made after the previous look). Supply both \code{vWeights} and
+#' \code{mGMatrix} together to update the graph strategy. At look 1, selection
+#' and strategy modification inputs are ignored with a warning because the
+#' initial design from setup is used.
 #'
 #' @param cState A "PCAnalysisState" object.
 #' @param vRawPVals Named numeric vector of raw p-values for the current look,
@@ -376,9 +372,6 @@ AnalyzeLookPC <- function(
   # Apply optional changes before analyzing look > 1
   if (next_look > 1) {
     if (!is.null(vSelectHypo)) {
-      if (!isTRUE(cState$design_params$Selection)) {
-        stop("vSelectHypo cannot be applied: selection was disabled in SetupAnalysisPC()")
-      }
       mcpObj <- applySelection(mcpObj, vSelectHypo, look = next_look)
       if (isTRUE(bPlotGraphs)) {
         plot_graph_after_selection(mcpObj, title = "Graph After Selection")
@@ -386,9 +379,6 @@ AnalyzeLookPC <- function(
     }
 
     if (!is.null(vWeights) || !is.null(mGMatrix)) {
-      if (!isTRUE(cState$design_params$UpdateStrategy)) {
-        stop("vWeights/mGMatrix cannot be applied: strategy updates were disabled in SetupAnalysisPC()")
-      }
       mcpObj$ModificationLook <- c(mcpObj$ModificationLook, as.integer(cState$completed_looks))
       mcpObj <- applyStrategyUpdate(mcpObj, vWeights, mGMatrix)
       if (isTRUE(bPlotGraphs)) {

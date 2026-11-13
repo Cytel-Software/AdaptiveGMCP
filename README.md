@@ -86,7 +86,9 @@ The generic PC interface supports one, two, three, or more planned looks.
 Look 1 always uses the initial design from `SetupAnalysisPC()`. If
 `vSelectHypo`, `vWeights`, or `mGMatrix` is supplied at
 look 1, it is ignored with a warning;
-these adaptations may be applied at look 2 or later when enabled in the setup.
+these adaptations may be applied at look 2 or later by supplying the corresponding
+look-level arguments. Supply both `vWeights` and `mGMatrix` to update the graph
+strategy.
 
 **Key functions:**
 - `SetupAnalysisPC()`: Initialises the analysis state (design parameters, graph, boundaries).

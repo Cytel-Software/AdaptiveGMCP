@@ -35,9 +35,10 @@ looks and the same length at every look.}
 look (only meaningful when look > 1).}
 
 \item{vWeights}{Optional numeric vector of new weights for continuing
-hypotheses.}
+hypotheses. Supply this together with \code{mGMatrix} to update the graph.}
 
-\item{mGMatrix}{Optional transition matrix for continuing hypotheses.}
+\item{mGMatrix}{Optional transition matrix for continuing hypotheses. Supply
+this together with \code{vWeights} to update the graph.}
 
 \item{bPlotGraphs}{Logical; if TRUE, plots graphs at key points.}
 }

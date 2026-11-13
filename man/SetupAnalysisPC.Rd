@@ -17,8 +17,6 @@ SetupAnalysisPC(
   dGammaA = 2,
   vUserAlphaSpending = NULL,
   bMultipleWinners = TRUE,
-  bSelection = TRUE,
-  bUpdateStrategy = TRUE,
   bPlotGraphs = TRUE
 )
 }
@@ -53,10 +51,6 @@ Supported values: "OF" (O'Brien & Fleming), "P" (Pocock), "WT" (Wang & Tsiatis D
 
 \item{bMultipleWinners}{Logical; TRUE means reject as many hypotheses as possible,
 FALSE means reject at most one hypothesis}
-
-\item{bSelection}{Logical; TRUE if selection of hypotheses is allowed at interim looks}
-
-\item{bUpdateStrategy}{Logical; TRUE if the graphical test strategy can be modified at interim looks}
 
 \item{bPlotGraphs}{Logical; if TRUE, plots the initial graph.}
 }

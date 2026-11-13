@@ -55,6 +55,8 @@ combination weights and stopping boundary. The caller is responsible for
 performing each formal analysis at its scheduled information fraction.
 Optional hypothesis selection, strategy modification, and correlation updates
 may be applied before looks after look 1 are analyzed (these represent
-decisions made after the previous look). At look 1, selection and strategy modification inputs
-are ignored with a warning because the initial design from setup is used.
+decisions made after the previous look). Supply both \code{vWeights} and
+\code{mGMatrix} together to update the graph strategy. At look 1, selection
+and strategy modification inputs are ignored with a warning because the
+initial design from setup is used.
 }
