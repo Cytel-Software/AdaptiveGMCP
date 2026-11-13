@@ -24,8 +24,8 @@ analyses, simulation, and graph visualization:
   graph. `SetupAnalysisPEPC` and `AnalyzeLookPEPC` provide the population-
   enrichment specialization.
 - **Simulation:** `simMAMSMEP` runs adaptive multi-arm, multi-stage,
-  multi-endpoint simulations; `GeneratePowerTablePlots` summarizes power
-  results.
+  multi-endpoint simulations; `GeneratePowerTablePlots` returns wide and long
+  power-summary tables.
 - **Graph visualization:** `plotGraph` displays a hypothesis graph.
 
 For detailed usage and arguments of each function, please refer to the help section in R after installing the package (e.g., `?simMAMSMEP`).
@@ -36,8 +36,8 @@ For detailed usage and arguments of each function, please refer to the help sect
 
 - **Example script:** [internalData/MAMSMEP_Simulation_Example.R](internalData/MAMSMEP_Simulation_Example.R)
 - **How to use:** Open and run the script in R to see a typical workflow.
-- **Power summaries:** Use `GeneratePowerTablePlots` to create power tables
-  and plots from simulation results.
+- **Power summaries:** Use `GeneratePowerTablePlots` to return wide and long
+  power tables from simulation results.
 - **Documentation:** For detailed documentation on all arguments, run:
   ```R
   ?simMAMSMEP
