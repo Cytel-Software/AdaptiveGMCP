@@ -249,10 +249,6 @@ BuildPECorrelationMatrix <- function(
 #' @param vUserAlphaSpending Alpha spending values for strDesignType = "asUser".
 #' @param bMultipleWinners Logical; TRUE means reject as many hypotheses as
 #' possible, FALSE means reject at most one hypothesis.
-#' @param bSelection Logical; TRUE if selection of hypotheses is allowed at
-#' interim looks.
-#' @param bUpdateStrategy Logical; TRUE if the graphical test strategy can be
-#' modified at interim looks.
 #' @param bPlotGraphs Logical; if TRUE, plots the initial graph.
 #'
 #' @return An object of class "PCAnalysisState".
@@ -269,8 +265,6 @@ SetupAnalysisPEPC <- function(
     dGammaA = 2,
     vUserAlphaSpending = NULL,
     bMultipleWinners = TRUE,
-    bSelection = TRUE,
-    bUpdateStrategy = TRUE,
     bPlotGraphs = TRUE )
 {
   if( !is.numeric( vInfoFracts ) || length( vInfoFracts ) < 1L ||
@@ -309,8 +303,6 @@ SetupAnalysisPEPC <- function(
     dGammaA = dGammaA,
     vUserAlphaSpending = vUserAlphaSpending,
     bMultipleWinners = bMultipleWinners,
-    bSelection = bSelection,
-    bUpdateStrategy = bUpdateStrategy,
     bPlotGraphs = bPlotGraphs
   )
 
@@ -349,8 +341,9 @@ SetupAnalysisPEPC <- function(
 #' @param vSelectHypo Optional character vector of hypotheses to retain for this
 #' look (only meaningful when look > 1).
 #' @param vWeights Optional numeric vector of new weights for continuing
-#' hypotheses.
-#' @param mGMatrix Optional transition matrix for continuing hypotheses.
+#' hypotheses. Supply this together with \code{mGMatrix} to update the graph.
+#' @param mGMatrix Optional transition matrix for continuing hypotheses. Supply
+#' this together with \code{vWeights} to update the graph.
 #' @param bPlotGraphs Logical; if TRUE, plots graphs at key points.
 #'
 #' @return Updated "PCAnalysisState" object.
