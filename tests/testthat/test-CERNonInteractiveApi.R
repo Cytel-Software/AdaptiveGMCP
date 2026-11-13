@@ -2,7 +2,8 @@
 
 #' Extract fixture-compatible outputs from a non-interactive CER analysis state
 #'
-#' @param lState A `CERAnalysisState` returned by `AnalyzeLookCER()`.
+#' @param lState A `CERAnalysisState` returned by `SetupAnalysisCER()` or
+#'   `AnalyzeLookCER()`.
 #' @return A named list matching the legacy CER regression fixture structure.
 ExtractCerRegressionState <- function( lState )
 {
@@ -65,7 +66,7 @@ ExtractCerRegressionState <- function( lState )
 #' @return A named list of fixture-compatible outputs for each completed look.
 CaptureNonInteractiveCerRegressionOutputs <- function( lScenario )
 {
-  lDesign <- SetupDesignCER(
+  lState <- SetupAnalysisCER(
     nArms = lScenario$nArms,
     nEps = lScenario$nEps,
     nSampleSize = lScenario$sampleSize,
@@ -82,14 +83,12 @@ CaptureNonInteractiveCerRegressionOutputs <- function( lScenario )
     strDesignType = lScenario$typeOfDesign,
     bPlotGraphs = FALSE
   )
-  lState <- NULL
   lLooks <- list()
 
   for( iLook in seq_along( lScenario$lookInputs ) )
   {
     lLookInput <- lScenario$lookInputs[[ iLook ]]
     lArguments <- list(
-      cDesign = lDesign,
       cState = lState,
       vRawPVals = lLookInput$p_raw,
       nLook = iLook,

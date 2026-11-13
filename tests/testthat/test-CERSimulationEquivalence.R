@@ -46,7 +46,7 @@ BuildCerDesignFromSimulationRow <- function( input_row )
   })
   names(prop.ctr) <- names(lEpType)
 
-  SetupDesignCER(
+  SetupAnalysisCER(
     nArms = input_row$nArms,
     nEps = input_row$nEps,
     nSampleSize = input_row$SampleSize,
@@ -114,7 +114,7 @@ RunCerSimulationEquivalence <- function(fixture_path, input_data)
 
   stage1_p_values <- BuildNamedIncrementalPValues(sim_out$IncrRawPVals$stage1)
   cer_state <- AnalyzeLookCER(
-    cDesign = design,
+    cState = design,
     vRawPVals = stage1_p_values,
     nLook = 1L
   )
@@ -162,7 +162,6 @@ RunCerSimulationEquivalence <- function(fixture_path, input_data)
   )
   stage2_intersection_weights <- cer_state$WH
   stage2_arguments <- list(
-    cDesign = design,
     cState = cer_state,
     vRawPVals = stage2_p_values,
     nLook = 2L
@@ -185,7 +184,9 @@ RunCerSimulationEquivalence <- function(fixture_path, input_data)
       collapse = ""
     )
     planned_intersection_keys <- apply(
-      design$intersection_weights[, design$hypothesis_names, drop = FALSE],
+      design$planned_intersection_weights[
+        , design$hypothesis_names, drop = FALSE
+      ],
       1L,
       paste0,
       collapse = ""

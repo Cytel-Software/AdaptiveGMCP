@@ -1,4 +1,4 @@
-# AdaptGMCP (development version)
+# AdaptGMCP 2.3.0 (development version)
 
 ## New Features
 
@@ -17,6 +17,11 @@
   stage-wise raw p-values, selection, and adapted sample-size inputs.
 
 ## Corrections
+
+* Unified the non-interactive CER setup and analysis lifecycle: `SetupAnalysisCER()`
+  returns the initial `CERAnalysisState`, `AnalyzeLookCER()` advances that state
+  without a separate design argument, and `PlotGraphCER()` reads plotting
+  metadata from the state. Removed the `CERDesign` class.
 
 * `PlotAnalysisGraph()` renames its `stage` parameter to `nStage` to follow the
   documented integer naming convention; callers using the named `stage`

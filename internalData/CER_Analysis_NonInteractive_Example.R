@@ -1,7 +1,7 @@
 # Non-interactive CER analysis example
 
 # EXAMPLE 1 #########################################################
-design <- SetupDesignCER(
+design <- SetupAnalysisCER(
   nArms = 3,
   nEps = 1,
   nSampleSize = 300,
@@ -20,7 +20,7 @@ cat("\nDesign:")
 print(design)
 
 look1_analysis <- AnalyzeLookCER(
-  cDesign = design,
+  cState = design,
   vRawPVals = c( H1 = .1, H2 = .2 )
 )
 
@@ -28,7 +28,6 @@ cat("\nLook 1 output:")
 print(look1_analysis)
 
 look2_analysis <- AnalyzeLookCER(
-  cDesign = design,
   cState = look1_analysis,
   vRawPVals = c( H1 = .0001, H2 = .2 )
 )
@@ -38,7 +37,7 @@ print(look2_analysis)
 #####################################################################
 
 # EXAMPLE 2 #########################################################
-design <- SetupDesignCER(
+design <- SetupAnalysisCER(
   nArms = 3, nEps = 1, nSampleSize = 300,
   lEpTypes = list( EP1 = "Continuous" ),
   lSigma = list( EP1 = c( 1, 1, 1 ) ), bCommonStdDev = TRUE,
@@ -57,7 +56,7 @@ cat("\nLook 1 output:")
 print(look1_analysis)
 
 look2_analysis <- AnalyzeLookCER(
-  design, cState = look1_analysis, vSelectHypo = "H2",
+  look1_analysis, vSelectHypo = "H2",
   vRawPVals = c( H1 = NA, H2 = 0.02 )
 )
 
@@ -66,7 +65,7 @@ print(look2_analysis)
 #####################################################################
 
 # EXAMPLE 3 #########################################################
-design <- SetupDesignCER(
+design <- SetupAnalysisCER(
   nArms = 3, nEps = 1, nSampleSize = 300,
   lEpTypes = list( EP1 = "Continuous" ),
   lSigma = list( EP1 = c( 1, 1, 1 ) ), bCommonStdDev = TRUE,
@@ -87,7 +86,7 @@ cat("\nLook 1 output:")
 print(look1_analysis)
 
 look2_analysis <- AnalyzeLookCER(
-  design, cState = look1_analysis,
+  look1_analysis,
   vNewSampleSizes = c( 125, 125 ),
   vRawPVals = c( H1 = NA, H2 = 0.01 )
 )
@@ -97,7 +96,7 @@ print(look2_analysis)
 #####################################################################
 
 # EXAMPLE 4 #########################################################
-design <- SetupDesignCER(
+design <- SetupAnalysisCER(
   nArms = 3, nEps = 2, nSampleSize = 400,
   lEpTypes = list( EP1 = "Continuous", EP2 = "Continuous" ),
   lSigma = list( EP1 = c( 1, 1, 1 ), EP2 = c( 1, 1, 1 ) ),
@@ -118,7 +117,7 @@ look1_analysis <- AnalyzeLookCER( design,
 cat("\nLook 1 output:")
 print(look1_analysis)
 
-look2_analysis <- AnalyzeLookCER( design, cState = look1_analysis,
+look2_analysis <- AnalyzeLookCER( look1_analysis,
   vRawPVals = c( H1 = .05, H2 = .10, H3 = .03, H4 = .12 ) )
   
 cat("\nLook 2 output:")
@@ -129,7 +128,7 @@ print(look2_analysis)
 mGraph <- matrix( c( 0, .5, .5, 0, .5, 0, 0, .5, 0, 1, 0, 0, 1, 0, 0, 0 ),
   4, 4, byrow = TRUE )
 
-design <- SetupDesignCER(
+design <- SetupAnalysisCER(
   nArms = 3, nEps = 2, nSampleSize = 210,
   lEpTypes = list( EP1 = "Continuous", EP2 = "Continuous" ),
   lSigma = list( EP1 = c( 1, 1, 1 ), EP2 = c( 1, 1, 1 ) ),
@@ -148,7 +147,7 @@ look1_analysis <- AnalyzeLookCER( design,
 cat("\nLook 1 output:")
 print(look1_analysis)
 
-look2_analysis <- AnalyzeLookCER( design, cState = look1_analysis,
+look2_analysis <- AnalyzeLookCER( look1_analysis,
   vSelectHypo = c( "H2", "H4" ),
   vNewSampleSizes = c( 88, 87 ),
   vWeights = c( H2 = .5, H4 = .5 ),
