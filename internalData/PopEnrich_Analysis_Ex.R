@@ -52,7 +52,7 @@ look1_out <- AnalyzeLookPEPC(
   design,
   vRawPVals = c(H1 = 0.00045, H2 = 0.0952, H3 = 0.0225, H4 = 0.1104),
   vFullPopulationSampleSizes = c(50, 50, 50), # Sample sizes: first for control and then for treatment arms
-  subpop_sample_sizes = c(25, 25, 25)) # Sample sizes: first for control and then for treatment arms
+  vSubpopulationSampleSizes = c(25, 25, 25)) # Sample sizes: first for control and then for treatment arms
 
 print(look1_out$mcpObj$Correlation)
 print(look1_out)
@@ -65,7 +65,7 @@ look2_out <- AnalyzeLookPEPC(
   vRawPVals = c(H1 = 0.00045, H2 = 0.1121, H3 = 0.0112),
   vSelectHypo = c("H1", "H2", "H3"),
   vFullPopulationSampleSizes = c(100, 100, 100), # Sample sizes: first for control and then for treatment arms
-  subpop_sample_sizes = c(50, 50, 50)) # Sample sizes: first for control and then for treatment arms
+  vSubpopulationSampleSizes = c(50, 50, 50)) # Sample sizes: first for control and then for treatment arms
 
 print(look2_out$mcpObj$Correlation)
 print(look2_out)
@@ -122,7 +122,7 @@ look1_out <- AnalyzeLookPEPC(
   design,
   vRawPVals = c(H1 = 0.00045, H2 = 0.0952, H3 = 0.0225, H4 = 0.1104),
   vFullPopulationSampleSizes = c(50, 50, 50), # Sample sizes: first for control and then for treatment arms
-  subpop_sample_sizes = c(25, 25, 25)) # Sample sizes: first for control and then for treatment arms
+  vSubpopulationSampleSizes = c(25, 25, 25)) # Sample sizes: first for control and then for treatment arms
 
 print(look1_out$mcpObj$Correlation)
 print(look1_out)
@@ -134,7 +134,7 @@ look2_out <- AnalyzeLookPEPC(
   look1_out,
   vRawPVals = c(H2 = 0.1121, H3 = 0.0112, H4 = 0.1153),
   vFullPopulationSampleSizes = c(100, 100, 100), # Sample sizes: first for control and then for treatment arms
-  subpop_sample_sizes = c(50, 50, 50)) # Sample sizes: first for control and then for treatment arms
+  vSubpopulationSampleSizes = c(50, 50, 50)) # Sample sizes: first for control and then for treatment arms
 
 print(look2_out$mcpObj$Correlation)
 print(look2_out)
@@ -189,7 +189,7 @@ look1_out <- AnalyzeLookPEPC(
   design,
   vRawPVals = c(H1 = 0.00025, H2 = 0.0952, H3 = 0.0245, H4 = 0.1104),
   vFullPopulationSampleSizes = c(50, 50, 50), # Sample sizes: first for control and then for treatment arms
-  subpop_sample_sizes = c(25, 25, 25)) # Sample sizes: first for control and then for treatment arms
+  vSubpopulationSampleSizes = c(25, 25, 25)) # Sample sizes: first for control and then for treatment arms
 
 print(look1_out$mcpObj$Correlation)
 print(look1_out)
@@ -228,7 +228,7 @@ look1_out <- AnalyzeLookPEPC(
   design,
   vRawPVals = c(H1 = 0.03, H2 = 0.20, H3 = 0.10, H4 = 0.25),
   vFullPopulationSampleSizes = c(50, 75, 60), # Sample sizes: first for control and then for treatment arms
-  subpop_sample_sizes = c(25, 40, 35)) # Sample sizes: first for control and then for treatment arms
+  vSubpopulationSampleSizes = c(25, 40, 35)) # Sample sizes: first for control and then for treatment arms
 
 print(look1_out$mcpObj$Correlation)
 print(look1_out)
@@ -238,7 +238,7 @@ look2_out <- AnalyzeLookPEPC(
   look1_out,
   vRawPVals = c(H1 = 0.003, H2 = 0.10, H3 = 0.08, H4 = 0.15),
   vFullPopulationSampleSizes = c(100, 140, 123), # Sample sizes: first for control and then for treatment arms
-  subpop_sample_sizes = c(48, 80, 70)) # Sample sizes: first for control and then for treatment arms
+  vSubpopulationSampleSizes = c(48, 80, 70)) # Sample sizes: first for control and then for treatment arms
 
 print(look2_out$mcpObj$Correlation)
 print(look2_out)
@@ -275,7 +275,7 @@ look1_out <- AnalyzeLookPEPC(
   design,
   vRawPVals = c(H1 = 0.01, H2 = 0.20, H3 = 0.15, H4 = 0.30),
   vFullPopulationSampleSizes = c(70, 105, 84), # Sample sizes: first for control and then for treatment arms
-  subpop_sample_sizes = c(35, 56, 49)) # Sample sizes: first for control and then for treatment arms
+  vSubpopulationSampleSizes = c(35, 56, 49)) # Sample sizes: first for control and then for treatment arms
 
 print(look1_out$mcpObj$Correlation)
 print(look1_out)
@@ -286,7 +286,7 @@ look2_out <- AnalyzeLookPEPC(
   vRawPVals = c(H1 = 0.02, H2 = 0.10, H4 = 0.40),
   vSelectHypo = c("H1", "H2", "H4"),
   vFullPopulationSampleSizes = c(100, 140, 123), # Sample sizes: first for control and then for treatment arms
-  subpop_sample_sizes = c(48, 80, 70)) # Sample sizes: first for control and then for treatment arms
+  vSubpopulationSampleSizes = c(48, 80, 70)) # Sample sizes: first for control and then for treatment arms
 
 print(look2_out$mcpObj$Correlation)
 print(look2_out)
@@ -351,7 +351,7 @@ look1_out <- AnalyzeLookPEPC(
   design,
   vRawPVals = c(0.21, 0.04, 0.01, 0.0155, 0.02, 0.01, 0.009, 0.003),
   vFullPopulationSampleSizes = c(100, 100, 100), # Sample sizes: first for control and then for treatment arms
-  subpop_sample_sizes = c(50, 50, 50)) # Sample sizes: first for control and then for treatment arms
+  vSubpopulationSampleSizes = c(50, 50, 50)) # Sample sizes: first for control and then for treatment arms
 
 print(look1_out$mcpObj$Correlation)
 print(look1_out)
@@ -479,7 +479,7 @@ look1_out <- AnalyzeLookPEPC(
   design,
   vRawPVals = c(H1 = 0.1, H2 = 0.0025),
   vFullPopulationSampleSizes = c(100, 100), # Sample sizes are specified first for control and then for treatment arm
-  subpop_sample_sizes = c(50, 50)) # Sample sizes are specified first for control and then for treatment arm
+  vSubpopulationSampleSizes = c(50, 50)) # Sample sizes are specified first for control and then for treatment arm
 
 print(look1_out$mcpObj$Correlation)
 print(look1_out)
@@ -525,7 +525,7 @@ look1_out <- AnalyzeLookPEPC(
   design,
   vRawPVals = c(H1 = 0.1, H2 = 0.075),
   vFullPopulationSampleSizes = c(48, 53), # Sample sizes are specified first for control and then for treatment arm
-  subpop_sample_sizes = c(26, 24)) # Sample sizes are specified first for control and then for treatment arm
+  vSubpopulationSampleSizes = c(26, 24)) # Sample sizes are specified first for control and then for treatment arm
 
 print(look1_out$mcpObj$Correlation)
 print(look1_out)
@@ -535,7 +535,7 @@ look2_out <- AnalyzeLookPEPC(
   look1_out,
   vRawPVals = c(H1 = 0.08, H2 = 0.003),
   vFullPopulationSampleSizes = c(100, 100), # Sample sizes are specified first for control and then for treatment arm
-  subpop_sample_sizes = c(53, 49)) # Sample sizes are specified first for control and then for treatment arm
+  vSubpopulationSampleSizes = c(53, 49)) # Sample sizes are specified first for control and then for treatment arm
 
 print(look2_out$mcpObj$Correlation)
 print(look2_out)

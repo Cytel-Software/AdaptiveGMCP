@@ -263,6 +263,123 @@ BuildCerRegressionScenarios <- function()
     )
   )
 
+  # CER Analysis API: stage-2 sample-size names are ignored.
+  lScenario11 <- list(
+    rowId = "CER-AnalysisApi-SampleSizeNames",
+    nArms = 3,
+    nEps = 1,
+    sampleSize = 300,
+    epType = list( "EP1" = "Continuous" ),
+    sigma = list( "EP1" = c( 1, 1, 1 ) ),
+    CommonStdDev = TRUE,
+    prop.ctr = list( "EP1" = NA ),
+    allocRatio = c( 1, 1, 1 ),
+    WI = c( 0.5, 0.5 ),
+    G = matrix( c( 0, 1, 1, 0 ), nrow = 2, byrow = TRUE ),
+    testType = "Parametric",
+    alpha = 0.025,
+    infoFrac = c( 0.5, 1.0 ),
+    typeOfDesign = "asOF",
+    lookInputs = list(
+      list( p_raw = c( H1 = 0.1, H2 = 0.2 ) ),
+      list(
+        p_raw = c( H1 = 0.01, H2 = 0.02 ),
+        new_sample_size = c( 175, 180, 185 )
+      )
+    )
+  )
+
+  # CER Analysis API: binary endpoint with a non-parametric test.
+  lScenario12 <- list(
+    rowId = "CER-AnalysisApi-BinaryNonParametric",
+    nArms = 3,
+    nEps = 1,
+    sampleSize = 300,
+    epType = list( "EP1" = "Binary" ),
+    sigma = list( "EP1" = rep( NA_real_, 3 ) ),
+    CommonStdDev = FALSE,
+    prop.ctr = list( "EP1" = 0.4 ),
+    allocRatio = c( 1, 1, 1 ),
+    WI = c( 0.5, 0.5 ),
+    G = matrix( c( 0, 1, 1, 0 ), nrow = 2, byrow = TRUE ),
+    testType = "Non-Parametric",
+    AdaptStage2 = FALSE,
+    alpha = 0.025,
+    infoFrac = c( 0.5, 1.0 ),
+    typeOfDesign = "asOF",
+    lookInputs = list(
+      list( p_raw = c( H1 = 0.03, H2 = 0.2 ) ),
+      list( p_raw = c( H1 = 0.01, H2 = 0.1 ) )
+    )
+  )
+
+  # CER Analysis API: binary and continuous endpoints with two looks.
+  lScenario13 <- list(
+    rowId = "CER-AnalysisApi-BinaryContinuous",
+    nArms = 3,
+    nEps = 2,
+    sampleSize = 300,
+    epType = list( "EP1" = "Binary", "EP2" = "Continuous" ),
+    sigma = list( "EP1" = NA, "EP2" = rep( 1, 3 ) ),
+    CommonStdDev = FALSE,
+    prop.ctr = list( "EP1" = 0.4, "EP2" = NA ),
+    allocRatio = c( 1, 1, 1 ),
+    WI = rep( 0.25, 4 ),
+    G = matrix( 0, nrow = 4, ncol = 4 ),
+    testType = "Partly-Parametric",
+    alpha = 0.025,
+    infoFrac = c( 0.5, 1.0 ),
+    typeOfDesign = "asOF",
+    lookInputs = list(
+      list( p_raw = c( H1 = 0.03, H2 = 0.2, H3 = 0.04, H4 = 0.3 ) ),
+      list( p_raw = c( H1 = 0.01, H2 = 0.1, H3 = 0.02, H4 = 0.2 ) )
+    )
+  )
+
+  # CER Analysis API: covariance calculation with four arms and two endpoints.
+  lScenario14 <- list(
+    rowId = "CER-AnalysisApi-FourArmCovariance",
+    nArms = 4,
+    nEps = 2,
+    sampleSize = 400,
+    epType = list( "EP1" = "Continuous", "EP2" = "Continuous" ),
+    sigma = list( "EP1" = rep( 1, 4 ), "EP2" = rep( 1, 4 ) ),
+    CommonStdDev = FALSE,
+    prop.ctr = list( "EP1" = NA, "EP2" = NA ),
+    allocRatio = c( 1, 2, 3, 4 ),
+    WI = rep( 1 / 6, 6 ),
+    G = matrix( 0, nrow = 6, ncol = 6 ),
+    testType = "Parametric",
+    alpha = 0.025,
+    infoFrac = c( 0.5, 1.0 ),
+    typeOfDesign = "asOF",
+    lookInputs = list(
+      list( p_raw = setNames( rep( 0.2, 6 ), paste0( "H", 1:6 ) ) )
+    )
+  )
+
+  # CER Analysis API: non-parametric PCER indexing in a mixed-endpoint design.
+  lScenario15 <- list(
+    rowId = "CER-AnalysisApi-MixedPCER",
+    nArms = 3,
+    nEps = 2,
+    sampleSize = 300,
+    epType = list( "EP1" = "Binary", "EP2" = "Continuous" ),
+    sigma = list( "EP1" = rep( NA_real_, 3 ), "EP2" = rep( 1, 3 ) ),
+    CommonStdDev = FALSE,
+    prop.ctr = list( "EP1" = 0.4, "EP2" = NA ),
+    allocRatio = c( 1, 2, 4 ),
+    WI = rep( 0.25, 4 ),
+    G = matrix( 0, nrow = 4, ncol = 4 ),
+    testType = "Partly-Parametric",
+    alpha = 0.025,
+    infoFrac = c( 0.5, 1.0 ),
+    typeOfDesign = "asOF",
+    lookInputs = list(
+      list( p_raw = c( H1 = 0.2, H2 = 0.4, H3 = 0.2, H4 = 0.2 ) )
+    )
+  )
+
   return( list(
     "CER-regression-01" = lScenario1,
     "CER-regression-02" = lScenario2,
@@ -273,8 +390,211 @@ BuildCerRegressionScenarios <- function()
     "CER-GSExample4-01" = lScenario7,
     "CER-GSExample4-02" = lScenario8,
     "CER-GSExample2-01" = lScenario9,
-    "CER-AdaptExample2-01" = lScenario10
+    "CER-AdaptExample2-01" = lScenario10,
+    "CER-AnalysisApi-SampleSizeNames" = lScenario11,
+    "CER-AnalysisApi-BinaryNonParametric" = lScenario12,
+    "CER-AnalysisApi-BinaryContinuous" = lScenario13,
+    "CER-AnalysisApi-FourArmCovariance" = lScenario14,
+    "CER-AnalysisApi-MixedPCER" = lScenario15
   ) )
+}
+
+#' Extract the shared CER regression outputs from a legacy analysis object
+#'
+#' @param mcpObj An analysis object at a completed look.
+#' @return A named list of fixture-compatible CER analysis outputs.
+ExtractCerRegressionLook <- function( mcpObj )
+{
+  mStage1Boundary <- NA
+  mStage2Boundary <- NA
+  vCumulativeStage2PValues <- NA
+  mAdjustedBoundary <- NA
+
+  if( is.list( mcpObj$Stage1Obj ) && is.list( mcpObj$Stage1Obj$plan_Bdry ) )
+  {
+    if( !is.null( mcpObj$Stage1Obj$plan_Bdry$Stage1Bdry ) )
+    {
+      mStage1Boundary <- mcpObj$Stage1Obj$plan_Bdry$Stage1Bdry
+    }
+
+    if( !is.null( mcpObj$Stage1Obj$plan_Bdry$Stage2Bdry ) )
+    {
+      mStage2Boundary <- mcpObj$Stage1Obj$plan_Bdry$Stage2Bdry
+    }
+  }
+
+  if( is.list( mcpObj$AdaptObj ) && !is.null( mcpObj$AdaptObj$Stage2AdjBdry ) )
+  {
+    mAdjustedBoundary <- mcpObj$AdaptObj$Stage2AdjBdry
+  }
+
+  if( !is.null( mcpObj$Stage2CumPValues ) )
+  {
+    vCumulativeStage2PValues <- mcpObj$Stage2CumPValues
+  }
+
+  mAdaptedCovariance <- NA
+  if( is.list( mcpObj$AdaptObj ) && !is.null( mcpObj$AdaptObj$Stage2Sigma ) )
+  {
+    mAdaptedCovariance <- mcpObj$AdaptObj$Stage2Sigma
+  }
+
+  return( list(
+    stage1_boundary = mStage1Boundary,
+    stage2_boundary = mStage2Boundary,
+    cumulative_stage2_pvalues = vCumulativeStage2PValues,
+    adjusted_boundary = mAdjustedBoundary,
+    final_rejection_status = mcpObj$rej_flag_Curr,
+    stage1_intersect_test = mcpObj$Stage1Obj$Stage1Analysis$IntersectHypoTest,
+    stage1_primary_test = mcpObj$Stage1Obj$Stage1Analysis$PrimaryHypoTest,
+    active_hypotheses = mcpObj$IndexSet,
+    selected_hypotheses = mcpObj$SelectedIndex,
+    dropped_flag = mcpObj$DroppedFlag,
+    planned_sample_allocation = mcpObj$AllocSampleSize,
+    adapted_sample_allocation = mcpObj$Stage2AllocSampleSize,
+    adapted_covariance = mAdaptedCovariance,
+    structured_cer_pcer = mcpObj$CERTab
+  ) )
+}
+
+#' Run a CER regression scenario through the legacy analysis API
+#'
+#' @param lScenario A scenario returned by `BuildCerRegressionScenarios()`.
+#' @return A named list of fixture-compatible outputs for each completed look.
+CaptureCerRegressionOutputsForTest <- function( lScenario )
+{
+  nPlannedLooks <- length( lScenario$lookInputs )
+  bAdaptStage2 <- TRUE
+  if( !is.null( lScenario$AdaptStage2 ) )
+  {
+    bAdaptStage2 <- isTRUE( lScenario$AdaptStage2 )
+  }
+
+  eCaptured <- new.env( parent = emptyenv() )
+  eCaptured$lLooks <- list()
+
+  testthat::with_mocked_bindings(
+    adaptGMCP_CER(
+      nArms = lScenario$nArms,
+      nEps = lScenario$nEps,
+      SampleSize = lScenario$sampleSize,
+      EpType = lScenario$epType,
+      sigma = lScenario$sigma,
+      CommonStdDev = lScenario$CommonStdDev,
+      prop.ctr = lScenario$prop.ctr,
+      allocRatio = lScenario$allocRatio,
+      WI = lScenario$WI,
+      G = lScenario$G,
+      test.type = lScenario$testType,
+      alpha = lScenario$alpha,
+      info_frac = lScenario$infoFrac,
+      typeOfDesign = lScenario$typeOfDesign,
+      AdaptStage2 = bAdaptStage2,
+      plotGraphs = FALSE
+    ),
+    getRawPValues = function( mcpObj )
+    {
+      return( lScenario$lookInputs[[ mcpObj$CurrentLook ]]$p_raw )
+    },
+    trialContinuationDecision = function( mcpObj )
+    {
+      eCaptured$lLooks[[ as.character( mcpObj$CurrentLook ) ]] <- ExtractCerRegressionLook( mcpObj )
+
+      if( StopTrial( mcpObj ) )
+      {
+        return( "n" )
+      }
+
+      if( mcpObj$CurrentLook < nPlannedLooks )
+      {
+        return( "y" )
+      }
+
+      return( "n" )
+    },
+    do_Selection = function( mcpObj )
+    {
+      nNextLook <- as.integer( mcpObj$CurrentLook + 1L )
+      if( nNextLook > nPlannedLooks ) return( mcpObj )
+
+      vSelection <- lScenario$lookInputs[[ nNextLook ]]$selection
+      if( is.null( vSelection ) ) return( mcpObj )
+
+      return( applySelection( mcpObj, selected_hyps = vSelection, look = nNextLook ) )
+    },
+    do_modifyStrategy = function( mcpObj, showExistingStrategy = FALSE )
+    {
+      nNextLook <- as.integer( length( eCaptured$lLooks ) + 1L )
+      if( nNextLook > nPlannedLooks ) return( mcpObj )
+
+      vNewWeights <- lScenario$lookInputs[[ nNextLook ]]$new_weights
+      mNewG <- lScenario$lookInputs[[ nNextLook ]]$new_G
+      if( is.null( vNewWeights ) && is.null( mNewG ) ) return( mcpObj )
+
+      return( applyStrategyUpdate(
+        mcpObj,
+        new_weights = vNewWeights,
+        new_G = mNewG
+      ) )
+    },
+    do_ModifyStage2Sample = function( allocRatio, ArmsPresent, AllocSampleSize )
+    {
+      nNextLook <- as.integer( length( eCaptured$lLooks ) + 1L )
+      vStage2SampleSize <- lScenario$lookInputs[[ nNextLook ]]$new_sample_size
+
+      if( is.null( vStage2SampleSize ) )
+      {
+        return( list(
+          newAllocSampleSize = AllocSampleSize,
+          newallocRatio = allocRatio
+        ) )
+      }
+
+      vTargetArms <- names( vStage2SampleSize )
+
+      if( is.null( vTargetArms ) )
+      {
+        vTargetArms <- colnames( AllocSampleSize )[ ArmsPresent ]
+      }
+
+      if( any( !nzchar( vTargetArms ) ) )
+      {
+        stop(
+          "Stage-2 sample sizes must be named by arm.",
+          call. = FALSE
+        )
+      }
+
+      if( anyDuplicated( vTargetArms ) )
+      {
+        stop(
+          "Stage-2 sample-size arm names must be unique.",
+          call. = FALSE
+        )
+      }
+
+      vUnknownArms <- setdiff( vTargetArms, colnames( AllocSampleSize ) )
+      if( length( vUnknownArms ) > 0L )
+      {
+        stop(
+          "Unknown stage-2 sample-size arm(s): ",
+          paste( vUnknownArms, collapse = ", " ),
+          call. = FALSE
+        )
+      }
+
+      mNewAllocSampleSize <- AllocSampleSize
+      mNewAllocSampleSize[ 2, vTargetArms ] <- as.numeric( vStage2SampleSize )
+
+      return( list(
+        newAllocSampleSize = mNewAllocSampleSize,
+        newallocRatio = as.numeric( mNewAllocSampleSize[ 2, ] ) /
+          as.numeric( mNewAllocSampleSize[ 2, 1 ] )
+      ) )
+    }
+  )
+
+  return( eCaptured$lLooks )
 }
 
 LoadCerRegressionFixtures <- function( strRowId )
