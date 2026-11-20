@@ -141,11 +141,15 @@ ExpectNonInteractiveCerRegressionLookEqual <- function(
     lActual$stage2_boundary, lExpected$stage2_boundary,
     tolerance = 1e-8, info = strContext
   )
-  testthat::expect_equal(
-    vCumulativePValues[ vContinuingHypotheses ],
-    lExpected$cumulative_stage2_pvalues[ vContinuingHypotheses ],
-    tolerance = 1e-8, info = strContext
-  )
+  # The legacy no-adaptation path leaves cumulative stage-2 p-values unavailable.
+  if( any( !is.na( lExpected$cumulative_stage2_pvalues ) ) )
+  {
+    testthat::expect_equal(
+      vCumulativePValues[ vContinuingHypotheses ],
+      lExpected$cumulative_stage2_pvalues[ vContinuingHypotheses ],
+      tolerance = 1e-8, info = strContext
+    )
+  }
   testthat::expect_equal(
     lActual$stage1_intersect_test, lExpected$stage1_intersect_test,
     tolerance = 1e-8, info = strContext
@@ -189,7 +193,7 @@ lCerScenarios <- BuildCerRegressionScenarios()
 for( strScenarioId in names( lCerScenarios ) )
 {
   testthat::test_that(
-    paste0( strScenarioId, " non-interactive API matches legacy fixture outputs" ),
+    paste0( strScenarioId, " non-interactive API matches adaptGMCP_CER fixture outputs" ),
     {
       lActual <- CaptureNonInteractiveCerRegressionOutputs(
         lCerScenarios[[ strScenarioId ]]
