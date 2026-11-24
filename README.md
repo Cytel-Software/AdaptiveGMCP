@@ -10,6 +10,31 @@ remotes::install_github("Cytel-Software/AdaptiveGMCP", ref = "master")
 
 This will download and install the latest version of the package from the master branch.
 
+### Install from a local source archive
+
+When installing an AdaptGMCP source archive downloaded from a release, first
+install its required dependencies from CRAN, then install the local archive.
+Replace the example path with the location of your downloaded archive.
+
+```R
+install.packages(
+  c("data.table", "dplyr", "gMCPLite", "htmltools", "knitr",
+    "Matrix", "matrixcalc", "mvtnorm", "pbapply", "plyr",
+    "RColorBrewer", "reshape2", "rpact", "shiny", "stringr",
+    "tidyr", "visNetwork"),
+  repos = "https://cloud.r-project.org"
+)
+
+install.packages(
+  "path/to/AdaptGMCP_2.3.0.tar.gz",
+  repos = NULL,
+  type = "source"
+)
+```
+
+The first command also installs dependencies required by those packages. The
+second installs the local archive; it does not download dependencies.
+
 ## Important Functions
 
 The package provides APIs for interactive analyses, scripted look-by-look

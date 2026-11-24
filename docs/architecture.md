@@ -22,5 +22,5 @@
 ## External Dependencies
 - rpact: group sequential design boundaries and alpha spending (used to derive `stageLevels` and `alphaSpent`).
 - Core runtime: `data.table`, `dplyr`, `mvtnorm`, `Matrix`, `matrixcalc`, `parallel`, `stringr`.
-- Visualization/UI: `visNetwork`, `ggplot2`, `gridExtra`, `shiny`, `rhandsontable`, `htmltools`, `shinycssloaders`.
+- Visualization/UI: `visNetwork`, `reshape2`, `ggplot2`, `gridExtra`, `shiny`, `rhandsontable`, `htmltools`, `shinycssloaders`. Graph plotting requires `visNetwork` and `reshape2`, which are package imports.
 - See [DESCRIPTION](../DESCRIPTION) for full `Imports`/`Suggests`.

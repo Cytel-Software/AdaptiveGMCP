@@ -87,6 +87,51 @@ testthat::test_that( "CER plotting uses metadata in the analysis state", {
   testthat::expect_false( "cDesign" %in% names( formals( PlotGraphCER ) ) )
 } )
 
+testthat::test_that( "plotGraph preserves transitions without attaching packages", {
+  vSearchBefore <- search()
+  lGraph <- plotGraph(
+    HypothesisName = c( "H1", "H2" ),
+    w = c( 0.5, 0.5 ),
+    G = matrix( c( 0, 0.25, 0.75, 0 ), nrow = 2, byrow = TRUE ),
+    activeStatus = c( TRUE, FALSE ),
+    Title = "Initial Graph",
+    Text = "Hypotheses"
+  )
+
+  testthat::expect_identical( search(), vSearchBefore )
+  testthat::expect_s3_class( lGraph[[ 1 ]], "visNetwork" )
+  testthat::expect_equal( lGraph[[ 1 ]]$x$nodes$color, c( "skyblue", "grey" ) )
+  testthat::expect_equal( lGraph[[ 1 ]]$x$edges$from, c( 2L, 1L ) )
+  testthat::expect_equal( lGraph[[ 1 ]]$x$edges$to, c( 1L, 2L ) )
+  testthat::expect_equal( lGraph[[ 1 ]]$x$edges$label, c( "0.75", "0.25" ) )
+
+  lGraphWithoutEdges <- plotGraph(
+    HypothesisName = c( "H1", "H2" ),
+    w = c( 0.5, 0.5 ),
+    G = matrix( 0, nrow = 2, ncol = 2 ),
+    Title = "Initial Graph"
+  )
+  testthat::expect_null( lGraphWithoutEdges[[ 1 ]]$x$edges )
+
+  lGraphWithoutEdgesWithText <- plotGraph(
+    HypothesisName = c( "H1", "H2" ),
+    w = c( 0.5, 0.5 ),
+    G = matrix( 0, nrow = 2, ncol = 2 ),
+    Title = "Initial Graph",
+    Text = "Hypotheses"
+  )
+  testthat::expect_null( lGraphWithoutEdgesWithText[[ 1 ]]$x$edges )
+
+  lInactiveGraph <- plotGraph(
+    HypothesisName = c( "H1", "H2" ),
+    w = NULL,
+    G = NULL,
+    Title = "Inactive Graph"
+  )
+  testthat::expect_equal( lInactiveGraph[[ 1 ]]$x$nodes$color, c( "grey", "grey" ) )
+  testthat::expect_identical( search(), vSearchBefore )
+} )
+
 testthat::test_that( "AnalyzeLookCER exposes direct strategy adaptation arguments", {
   testthat::expect_false( "strategy_update" %in% names( formals( AnalyzeLookCER ) ) )
 })

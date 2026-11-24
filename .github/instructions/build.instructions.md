@@ -70,6 +70,10 @@ devtools::load_all()
   devtools::test(filter = '<pattern>')
   ```
 
+The Linux PR fast-checks job disables renv autoloading and installs dependencies
+with `pak` from the Posit Package Manager repository configured by `setup-r`.
+Local development continues to use renv.
+
 ## Linting & Quality
 
 - Lintr script: [`internalData/LintThisPkg.R`](../../internalData/LintThisPkg.R) shows typical usage and exclusions.

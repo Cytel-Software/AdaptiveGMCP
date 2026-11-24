@@ -14,11 +14,6 @@
 #' @param Text Additional information to be added in the plot
 #' @export
 plotGraph <- function(HypothesisName, w, G, activeStatus, Title, Text) {
-  # Libraries
-  library(visNetwork)
-  library(reshape2)
-  #------------ -
-
   if (is.null(w) & is.null(G)) {
     nodes <- data.frame(
       id = 1:length(HypothesisName),
@@ -30,8 +25,8 @@ plotGraph <- function(HypothesisName, w, G, activeStatus, Title, Text) {
       physics = FALSE,
       row.names = NULL
     )
-    visN <- visNetwork(nodes, main = Title) %>%
-      visNodes(font = list(size = 16))
+    visN <- visNetwork::visNetwork(nodes, main = Title) %>%
+      visNetwork::visNodes(font = list(size = 16))
   } else {
     n <- length(w)
     rownames(G) <- colnames(G) <- NULL
@@ -62,7 +57,7 @@ plotGraph <- function(HypothesisName, w, G, activeStatus, Title, Text) {
     if (all(G == 0)) {
       edges <- NULL
     } else {
-      edges_df <- melt(G,
+      edges_df <- reshape2::melt(G,
         varnames = c("from", "to"),
         value.name = "weight"
       )
@@ -90,33 +85,33 @@ plotGraph <- function(HypothesisName, w, G, activeStatus, Title, Text) {
 
     if (missing(Text)) {
       if (length(edges) == 0) {
-        visN <- visNetwork(nodes, main = Title) %>%
-          visNodes(font = list(size = 16))
+        visN <- visNetwork::visNetwork(nodes, main = Title) %>%
+          visNetwork::visNodes(font = list(size = 16))
       } else {
-        visN <- visNetwork(nodes, edges, main = Title) %>%
-          visNodes(font = list(size = 16)) %>%
-          visEdges(font = list(size = 20))
+        visN <- visNetwork::visNetwork(nodes, edges, main = Title) %>%
+          visNetwork::visNodes(font = list(size = 16)) %>%
+          visNetwork::visEdges(font = list(size = 20))
       }
     } else {
       if (length(edges) == 0) {
-        visN <- visNetwork(nodes,
+        visN <- visNetwork::visNetwork(nodes,
           main = Title,
           submain = list(
             text = Text,
             style = "font-family:Times New Roman;font-size:14px;text-align:center;"
           )
         ) %>%
-          visNodes(font = list(size = 16))
+          visNetwork::visNodes(font = list(size = 16))
       } else {
-        visN <- visNetwork(nodes, edges,
+        visN <- visNetwork::visNetwork(nodes, edges,
           main = Title,
           submain = list(
             text = Text,
             style = "font-family:Times New Roman;font-size:14px;text-align:center;"
           )
         ) %>%
-          visNodes(font = list(size = 16)) %>%
-          visEdges(font = list(size = 20))
+          visNetwork::visNodes(font = list(size = 16)) %>%
+          visNetwork::visEdges(font = list(size = 20))
       }
     }
     # End of else check for null values in nodes and edeges
