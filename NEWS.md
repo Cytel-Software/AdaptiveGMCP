@@ -1,3 +1,10 @@
+# AdaptGMCP 2.3.1 (2026-11-24)
+
+## Corrections
+
+* Updated the package release version to 2.3.1 to include the dependency
+  installation fix omitted from version 2.3.0.
+
 # AdaptGMCP 2.3.0 (development version)
 
 ## New Features
