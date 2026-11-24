@@ -50,6 +50,9 @@ jobs:
     needs: changes
     if: ${{ needs.changes.outputs.run_fast_checks == 'true' }}
     runs-on: ubuntu-latest
+    env:
+      # Use the repositories configured by setup-r instead of renv.lock.
+      RENV_CONFIG_AUTOLOADER_ENABLED: "false"
 
     steps:
       - name: Checkout code
@@ -65,6 +68,10 @@ jobs:
         with:
           r-version: "4.5.1"
           use-public-rspm: true
+
+      - name: Verify R package repository
+        run: |
+          Rscript -e 'repos <- getOption("repos"); expected <- Sys.getenv("RSPM"); if (!nzchar(expected) || length(repos) == 0L || !identical(unname(repos[[1L]]), expected)) stop("Posit Package Manager is not the first R repository"); message("Using repository: ", expected)'
 
       - name: Install R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
