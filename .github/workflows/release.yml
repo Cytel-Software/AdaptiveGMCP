@@ -24,6 +24,9 @@ jobs:
   check-and-release:
     needs: [exhaustive-validation, windows-install-smoke]
     runs-on: ubuntu-latest
+    env:
+      # Use the repositories configured by setup-r instead of renv.lock.
+      RENV_CONFIG_AUTOLOADER_ENABLED: "false"
 
     steps:
       - name: Checkout code
