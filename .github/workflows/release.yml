@@ -18,8 +18,11 @@ jobs:
     with:
       run-fast-tests: false
 
+  windows-install-smoke:
+    uses: ./.github/workflows/windows-install-smoke.yml
+
   check-and-release:
-    needs: exhaustive-validation
+    needs: [exhaustive-validation, windows-install-smoke]
     runs-on: ubuntu-latest
 
     steps:

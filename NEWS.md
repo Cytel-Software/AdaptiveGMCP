@@ -18,6 +18,9 @@
 
 ## Corrections
 
+* Declared `visNetwork` and `reshape2` as required dependencies for graph
+  plotting and stopped attaching them to the user's search path.
+
 * Unified the non-interactive CER setup and analysis lifecycle: `SetupAnalysisCER()`
   returns the initial `CERAnalysisState`, `AnalyzeLookCER()` advances that state
   without a separate design argument, and `PlotGraphCER()` reads plotting
@@ -79,6 +82,8 @@
 
 ## Quality Improvements
 
+* Added a clean Windows source-installation and CER graphing smoke test to PR
+  and release checks.
 * Added fixture-driven numerical equivalence tests between `adaptGMCP_CER()`
   and the non-interactive `SetupDesignCER()`/`AnalyzeLookCER()` workflow
   across all shared CER regression scenarios.

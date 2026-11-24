@@ -17,10 +17,10 @@ BugReports: https://github.com/Cytel-Software/AdaptiveGMCP/issues
 Encoding: UTF-8
 LazyData: true
 Imports: data.table, dplyr, gMCPLite, htmltools, knitr, Matrix, matrixcalc, mvtnorm, parallel, 
-         pbapply, plyr, RColorBrewer, rpact, shiny, stringr, tidyr
-Suggests: future, ggplot2, gridExtra, lintr, promises, reshape2, 
+         pbapply, plyr, RColorBrewer, reshape2, rpact, shiny, stringr, tidyr, visNetwork
+Suggests: future, ggplot2, gridExtra, lintr, promises,
           rhandsontable, rmarkdown, shinycssloaders, testthat (>= 3.0.0), usethis, 
-          visNetwork, gMCP, purrr, tidyverse, graphicalMCP, pkgload, devtools
+          gMCP, purrr, tidyverse, graphicalMCP, pkgload, devtools
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 Config/roxygen2/version: 8.1.0

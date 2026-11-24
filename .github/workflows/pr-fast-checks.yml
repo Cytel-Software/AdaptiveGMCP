@@ -34,6 +34,8 @@ jobs:
               - 'tools/ci/**'
               - 'renv.lock'
               - '.github/workflows/pr-fast-checks.yml'
+              - '.github/workflows/windows-install-smoke.yml'
+              - '.github/workflows/release.yml'
 
       - name: Resolve fast-checks requirement
         id: resolve
@@ -84,19 +86,27 @@ jobs:
         run: |
           Rscript tools/ci/run_fast_tests.R
 
+  windows-install-smoke:
+    needs: changes
+    if: ${{ needs.changes.outputs.run_fast_checks == 'true' }}
+    uses: ./.github/workflows/windows-install-smoke.yml
+
   ci-gate:
     runs-on: ubuntu-latest
     if: ${{ always() }}
     needs:
       - changes
       - fast-checks
+      - windows-install-smoke
     steps:
       - name: Enforce fast-checks result when required
         run: |
           echo "run_fast_checks: ${{ needs.changes.outputs.run_fast_checks }}"
           echo "fast-checks result: ${{ needs['fast-checks'].result }}"
+          echo "windows-install-smoke result: ${{ needs['windows-install-smoke'].result }}"
           if [ "${{ needs.changes.outputs.run_fast_checks }}" != "true" ]; then
             echo "No relevant changes detected; skipping fast-checks requirement."
             exit 0
           fi
           test "${{ needs['fast-checks'].result }}" = "success"
+          test "${{ needs['windows-install-smoke'].result }}" = "success"

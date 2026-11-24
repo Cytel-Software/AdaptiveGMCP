@@ -1,0 +1,46 @@
+name: Windows Installation Smoke
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-install:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.5.1'
+
+      - name: Create isolated R library
+        shell: pwsh
+        run: |
+          $library = Join-Path $env:RUNNER_TEMP 'AdaptGMCPSmokeLibrary'
+          $siteLibrary = Join-Path $env:RUNNER_TEMP 'AdaptGMCPSmokeSiteLibrary'
+          New-Item -ItemType Directory -Path $library -Force | Out-Null
+          "R_LIBS_USER=$library" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "R_LIBS_SITE=$siteLibrary" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "R_LIBS=" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "R_PROFILE_USER=$(Join-Path $env:RUNNER_TEMP 'NoUserRProfile')" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Build source archive
+        shell: pwsh
+        run: |
+          R.exe CMD build --no-resave-data --no-build-vignettes --no-manual .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Install archive and exercise CER plotting
+        shell: pwsh
+        run: |
+          $archives = @(Get-ChildItem -Path . -Filter 'AdaptGMCP_*.tar.gz' -File)
+          if ($archives.Count -ne 1) { throw 'Expected exactly one package archive.' }
+          Rscript --vanilla 'tools\ci\windows_install_smoke.R' $archives[0].FullName
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
